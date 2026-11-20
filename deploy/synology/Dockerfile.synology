@@ -1,0 +1,45 @@
+# 可选：把代码打进镜像，做出「一个镜像带走全部」的版本
+#
+# 什么时候用：
+#   - 不想在宿主机上摊开 app/ 目录（例如把镜像推到私有 registry 再拉到别的机器）
+#   - 想给容器降权到 node 用户
+# 什么时候不用：
+#   - 平时升级：挂载式的 docker-compose.yml 更好用，替换 app/ 重启即可
+#
+# 构建（在部署包根目录，即含 app-server.mjs 的那层）：
+#   docker build -f Dockerfile.synology -t client-base-web:VERSION .
+# 运行：
+#   docker run -d --name client-base -p 5174:5174 \
+#     -v /volume1/docker/client-base/data/pages:/data/pages \
+#     -v /volume1/docker/client-base/data/office:/data/office \
+#     -v /volume1/docker/client-base/data/logs:/app/logs \
+#     -e TZ=Asia/Shanghai client-base-web:VERSION
+
+FROM node:20-slim
+
+ENV NODE_ENV=production \
+    PORT=5174 \
+    HOST=0.0.0.0 \
+    APP_DISABLE_OO=1 \
+    APP_DATA_DIR=/data/pages \
+    APP_OFFICE_DIR=/data/office
+
+# 工作目录放 /data：审计日志写 cwd/logs，/app 只读（见 docker-compose.yml 注释）
+WORKDIR /data
+
+# 先拷清单与代码，再建可写目录（分层缓存友好）
+COPY package.json ./
+COPY app-server.mjs ./
+COPY scripts ./scripts
+COPY dist-web ./dist-web
+
+RUN mkdir -p /data/pages /data/office /app/logs \
+ && chown -R node:node /data /app
+
+USER node
+EXPOSE 5174
+
+HEALTHCHECK --interval=30s --timeout=6s --start-period=15s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||5174)+'/healthz').then(r=>r.json()).then(d=>process.exit(d.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "/app/app-server.mjs"]

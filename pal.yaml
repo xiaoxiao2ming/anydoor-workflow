@@ -1,0 +1,126 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - button "折叠节点库（画布占满）" [ref=e6] [cursor=pointer]
+    - button "展开参数库" [ref=e9] [cursor=pointer]
+    - generic [ref=e12]:
+      - paragraph [ref=e13]: 添加节点
+      - generic [ref=e14]:
+        - paragraph [ref=e15]:
+          - text: 动作型
+          - generic [ref=e16]: "2"
+        - generic [ref=e17]:
+          - generic "开始 —— 决定流程什么时候执行：手动 / 定时 / Webhook" [ref=e18]: 开始
+          - generic "节点组：框住多个节点整体管理。选中节点按 Ctrl+G 建组；拖入画布后拖标题栏移动整组、右下角拖拽调大小" [ref=e21]: 节点组
+      - generic [ref=e24]:
+        - paragraph [ref=e25]:
+          - text: 输入型
+          - generic [ref=e26]: "2"
+        - generic [ref=e27]:
+          - generic "参数表 —— 数据从外部进来：文件导入或参数录入" [ref=e28]: 参数表
+          - generic "数据表节点：手动输入参数与参数数据（双击节点打开编辑弹窗），供 OO Excel 引用调试" [ref=e31]: 数据表节点
+      - generic [ref=e34]:
+        - paragraph [ref=e35]:
+          - text: 数据处理型
+          - generic [ref=e36]: "4"
+        - generic [ref=e37]:
+          - generic "数据排序 —— 对数据做加工：排序、查表补列、文本" [ref=e38]: 数据排序
+          - generic "数据对照表 —— 对数据做加工：排序、查表补列、文本" [ref=e41]: 数据对照表
+          - generic "文本 —— 对数据做加工：排序、查表补列、文本" [ref=e44]: 文本
+          - generic "OO 材料 —— 对数据做加工：排序、查表补列、文本" [ref=e47]: OO 材料
+      - generic [ref=e50]:
+        - paragraph [ref=e51]:
+          - text: 资料库型
+          - generic [ref=e52]: "3"
+        - generic [ref=e53]:
+          - generic "PDF —— 存数据供引用，本身不产生产物" [ref=e54]: PDF
+          - generic "照片 —— 存数据供引用，本身不产生产物" [ref=e57]: 照片
+          - generic "表 —— 存数据供引用，本身不产生产物" [ref=e60]: 表
+      - generic [ref=e63]:
+        - paragraph [ref=e64]:
+          - text: 输出型
+          - generic [ref=e65]: "7"
+        - generic [ref=e66]:
+          - generic "便利贴 —— 流程终点：导出文件，不接受下游" [ref=e67]: 便利贴
+          - generic "PDF合并 —— 流程终点：导出文件，不接受下游" [ref=e70]: PDF合并
+          - generic "数据输出 —— 流程终点：导出文件，不接受下游" [ref=e73]: 数据输出
+          - generic "Word —— 流程终点：导出文件，不接受下游" [ref=e76]: Word
+          - generic "Excel —— 流程终点：导出文件，不接受下游" [ref=e79]: Excel
+          - generic "OO 文档 —— 流程终点：导出文件，不接受下游" [ref=e82]: OO 文档
+          - generic "OO 工作簿 —— 流程终点：导出文件，不接受下游" [ref=e85]: OO 工作簿
+      - generic [ref=e88]:
+        - paragraph [ref=e89]:
+          - text: 圆形节点（规则 / AI / 参数库）
+          - generic [ref=e90]: "3"
+        - generic [ref=e91]:
+          - generic "规则跟随：连上几个同类节点，在本节点上改一次，它们一起变" [ref=e92]: 规则跟随
+          - generic "AI：从普通节点的下1口出线连到本节点，接收它的数据做 AI 处理" [ref=e95]: AI
+          - generic "参数库：出线连到普通节点的上1口，为它提供参数" [ref=e98]: 参数库
+  - main [ref=e101]:
+    - generic [ref=e102]:
+      - application [ref=e103]:
+        - generic [ref=e106]:
+          - button "缩小" [ref=e107] [cursor=pointer]
+          - generic "当前缩放比例 · 双击恢复 100%" [ref=e110] [cursor=pointer]: 100%
+          - button "放大" [ref=e111] [cursor=pointer]
+          - button "适应" [ref=e114] [cursor=pointer]
+        - img "Mini Map" [ref=e119]
+      - generic [ref=e121]:
+        - generic [ref=e122]:
+          - img "ClientBase" [ref=e123]
+          - button "未命名画布" [ref=e124] [cursor=pointer]
+          - generic "版本 0.00.35 渠道 desktop 构建 2026-10-24T06:22:36Z" [ref=e125]: v0.00.35 · desktop
+          - generic [ref=e126]:
+            - button "撤销 (Ctrl+Z)" [disabled] [ref=e127]
+            - button "重做 (Ctrl+Y)" [disabled] [ref=e130]
+          - button "折叠功能区（只留菜单行）" [ref=e133] [cursor=pointer]
+          - button "文件" [ref=e136] [cursor=pointer]
+          - button "开始" [ref=e137] [cursor=pointer]
+          - button "插入" [ref=e138] [cursor=pointer]
+          - button "视图" [ref=e139] [cursor=pointer]
+          - generic [ref=e140]:
+            - generic "画布节点总数" [ref=e141]: 节点 0
+            - generic "当前选中的节点数" [ref=e142]: 已选 0
+            - button "100%" [ref=e143] [cursor=pointer]
+            - button "回收站" [ref=e144] [cursor=pointer]
+            - button "对齐磁吸：拖动节点时自动吸附对齐线（点击开/关）" [ref=e147] [cursor=pointer]
+            - button "画布背景：从默认图库选择" [ref=e153] [cursor=pointer]
+            - button "界面主题：黑夜 / 白天 / 粉色 / 商务灰" [ref=e159] [cursor=pointer]
+            - button "OO 启动预热：开（启动时后台焐热文档引擎，首次打开 OO 文档更快）。点击关闭" [ref=e162] [cursor=pointer]
+            - button "折叠节点：所有常规节点收成正方形（再点恢复）" [ref=e165] [cursor=pointer]
+            - button "请先点选一个 AI / 参数库 节点，再点此按钮播放运行动画" [disabled] [ref=e168]
+            - button "诊断日志：开（OO 节点诊断与全局错误汇流，显示在画布底部面板）。点击收起" [ref=e171] [cursor=pointer]
+            - button "界面特效：开（双击打开节点=app 式展开，关闭=收缩回节点）。点击关闭" [ref=e174] [cursor=pointer]
+          - generic [ref=e177]:
+            - button "保存 .wfc：当前画布全部内容存为工程文件（覆盖同名文件；节点/数据/连线/控件状态/模板资产单文件带走）" [ref=e178] [cursor=pointer]
+            - button "另存为 .wfc：输入新文件名另存一份（不覆盖原文件）" [ref=e183] [cursor=pointer]
+            - button "清空画布：全部节点移入回收站（可从回收站恢复）" [ref=e188] [cursor=pointer]
+            - button "打开 .wfc 工程文件：作为新画布页导入（不覆盖已开的画布）" [ref=e192] [cursor=pointer]
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - button "复制" [ref=e198] [cursor=pointer]
+              - button "粘贴" [ref=e202] [cursor=pointer]
+              - button "删除" [ref=e206] [cursor=pointer]
+            - generic [ref=e210]: 剪贴板
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - button "自动对齐" [ref=e213] [cursor=pointer]
+              - button "自动排列" [ref=e217] [cursor=pointer]
+              - button "框选" [ref=e221] [cursor=pointer]
+              - button "运行" [ref=e225] [cursor=pointer]
+            - generic [ref=e229]: 排列与运行
+          - generic [ref=e230]:
+            - generic [ref=e231]:
+              - button "适应窗口" [ref=e232] [cursor=pointer]
+              - button "缩小" [ref=e236] [cursor=pointer]
+              - button "放大" [ref=e240] [cursor=pointer]
+            - generic [ref=e244]: 视图
+    - generic [ref=e245]:
+      - generic [ref=e246]:
+        - generic [ref=e247]: 诊断日志
+        - generic [ref=e248]: "1"
+        - button "刷新" [ref=e249] [cursor=pointer]
+        - button "清空" [ref=e250] [cursor=pointer]
+        - button "复制" [ref=e251] [cursor=pointer]
+        - button "收起" [ref=e252] [cursor=pointer]
+      - generic [ref=e253]: "[14:38:47] 日志面板就绪（OO 诊断与全局错误在此汇流）"

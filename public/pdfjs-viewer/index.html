@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PDF.js Viewer</title>
+<link rel="stylesheet" href="./viewer.css" />
+<style>
+  html, body { height: 100%; margin: 0; background: #262626; }
+  #toolbar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px; background: #323232; color: #eee;
+    font: 12px/1 -apple-system, 'Segoe UI', sans-serif;
+    border-bottom: 1px solid #222; user-select: none;
+  }
+  #toolbar button {
+    min-width: 26px; height: 26px; padding: 0 6px; border-radius: 4px;
+    border: 1px solid #555; background: transparent; color: #ddd; cursor: pointer;
+    font-size: 13px;
+  }
+  #toolbar button:hover { background: #4a4a4a; }
+  #pager { width: 40px; height: 24px; text-align: center; background: #1f1f1f;
+    color: #eee; border: 1px solid #555; border-radius: 4px; }
+  #viewerContainer {
+    position: absolute; inset: 37px 0 0 0; overflow: auto;
+    background: #262626;
+  }
+  #loading { position: absolute; inset: 37px 0 0 0; display: flex;
+    align-items: center; justify-content: center; color: #999; font: 13px sans-serif; }
+</style>
+  <script>window.onerror = function (m, s, l) { const d = document.getElementById('loading') || document.body; d.textContent = '薄壳错误: ' + m + ' @' + String(s || '').split('/').pop() + ' :' + l; d.style.color = '#ff6b6b' }</script>
+</head>
+<body>
+<div id="toolbar">
+  <button id="prev" title="上一页">‹</button>
+  <input id="pager" value="1" /><span id="numPages">/ …</span>
+  <button id="next" title="下一页">›</button>
+  <span style="width:1px;height:18px;background:#555"></span>
+  <button id="zoomOut" title="缩小">−</button>
+  <button id="zoomFit" title="适应页面">适应</button>
+  <span style="width:1px;height:18px;background:#555"></span>
+  <button id="panBtn" title="手型拖拽（点击切换）">✋</button>
+  <button id="zoomIn" title="放大">＋</button>
+</div>
+<div id="viewerContainer">
+  <div id="viewer" class="pdfViewer"></div>
+</div>
+<div id="loading">加载中…</div>
+<script type="module">
+let pdfjsLib, viewerMod
+try {
+  pdfjsLib = await import('./pdf.min.mjs')
+} catch (e1) {
+  document.getElementById('loading').textContent = '模块加载失败 pdf.min.mjs: ' + (e1 && e1.message || e1)
+  document.getElementById('loading').style.color = '#ff6b6b'
+  throw e1
+}
+try {
+  viewerMod = await import('./pdf_viewer.mjs')
+} catch (e2) {
+  document.getElementById('loading').textContent = '模块加载失败 pdf_viewer.mjs: ' + (e2 && e2.message || e2)
+  document.getElementById('loading').style.color = '#ff6b6b'
+  throw e2
+}
+const { EventBus, PDFLinkService, PDFViewer } = viewerMod
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.min.mjs'
+
+const params = new URLSearchParams(location.search)
+const fileUrl = params.get('file') || ''
+const container = document.getElementById('viewerContainer')
+const eventBus = new EventBus()
+const linkService = new PDFLinkService({ eventBus })
+const viewer = new PDFViewer({ container, eventBus, linkService, l10n: null, sandboxBundleSrc: "./pdf.sandbox.mjs" })
+linkService.setViewer(viewer)
+
+/* 工具条 */
+const pager = document.getElementById('pager')
+const numPages = document.getElementById('numPages')
+const cur = () => viewer.currentPageNumber
+eventBus.on('pagechanging', () => { pager.value = cur() })  /* ★ 翻页回页顶（水平由 fit 保证居中） */
+pager.addEventListener('change', () => { const n = Number(pager.value) || 1; viewer.currentPageNumber = n; container.scrollTop = 0 })
+document.getElementById('prev').onclick = () => { viewer.currentPageNumber = Math.max(1, cur() - 1); container.scrollTop = 0 }
+document.getElementById('next').onclick = () => { viewer.currentPageNumber = Math.min(viewer.pagesCount, cur() + 1); container.scrollTop = 0 }
+document.getElementById('zoomIn').onclick = () => { viewer.currentScaleValue = Math.min(4, (parseFloat(viewer.currentScaleValue) || viewer.currentScale) * 1.2) }
+document.getElementById('zoomOut').onclick = () => { viewer.currentScaleValue = Math.max(0.25, (parseFloat(viewer.currentScaleValue) || viewer.currentScale) / 1.2) }
+document.getElementById('zoomFit').onclick = () => { viewer.currentScaleValue = 'page-fit' }
+/* ★ 2026-10-24 用户指令「增加 ctrl+滚轮缩放」：Ctrl+滚轮 ±10% 步进（无 Ctrl 正常滚动） */
+container.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey) return
+  e.preventDefault()
+  const cur = parseFloat(viewer.currentScale) || 1
+  viewer.currentScale = Math.min(4, Math.max(0.25, cur * (e.deltaY < 0 ? 1.1 : 0.9)))
+}, { passive: false })
+
+/* ★ 2026-10-24 用户反馈「没有手的样式/拖拽」：手型拖拽模式（✋ 切换，抓手平移） */
+let panMode = true, panning = false, px = 0, py = 0   /* ★ 默认手型拖拽（用户指令） */
+const panBtn = document.getElementById('panBtn')
+/* 初始即手型态 */
+panBtn.style.background = '#4a6fa5'
+panBtn.style.borderColor = '#6b8fc9'
+container.style.cursor = 'grab'
+panBtn.onclick = () => {
+  panMode = !panMode
+  panBtn.style.background = panMode ? '#4a6fa5' : ''
+  panBtn.style.borderColor = panMode ? '#6b8fc9' : '#555'
+  container.style.cursor = panMode ? 'grab' : ''
+}
+container.addEventListener('mousedown', (e) => {
+  if (!panMode) return
+  panning = true; px = e.clientX; py = e.clientY
+  container.style.cursor = 'grabbing'
+  e.preventDefault()
+})
+window.addEventListener('mousemove', (e) => {
+  if (!panning) return
+  container.scrollLeft -= (e.clientX - px)
+  container.scrollTop -= (e.clientY - py)
+  px = e.clientX; py = e.clientY
+})
+window.addEventListener('mouseup', () => {
+  if (!panning) return
+  panning = false
+  if (panMode) container.style.cursor = 'grab'
+})
+
+/* 加载文档（同源 blob/路径均可） */
+if (fileUrl) {
+  pdfjsLib.getDocument({ url: fileUrl, cMapUrl: './cmaps/', cMapPacked: true, standardFontDataUrl: './standard_fonts/' }).promise.then((doc) => {
+    document.getElementById('loading').remove()
+    viewer.setDocument(doc)
+    linkService.setDocument(doc)
+    numPages.textContent = '/ ' + doc.numPages
+    pager.value = '1'
+    /* 首开适应页面 */
+    viewer.currentScaleValue = 'page-fit'
+    /* ★ 防首屏渲染覆盖：300ms 后再校准一次适应 */
+    setTimeout(() => { try { viewer.currentScaleValue = 'page-fit' } catch { /* ignore */ } }, 300)
+    window.addEventListener('resize', () => { clearTimeout(window.__fitT); window.__fitT = setTimeout(() => { viewer.currentScaleValue = 'page-fit' }, 400) })
+  }).catch((e) => {
+    document.getElementById('loading').textContent = '加载失败: ' + String(e && e.message || e).slice(0, 120)
+  })
+} else {
+  document.getElementById('loading').textContent = '未提供 file 参数'
+}
+</script>
+</body>
+</html>

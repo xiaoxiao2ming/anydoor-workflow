@@ -1,0 +1,3 @@
+选中格: E2  公式栏: =D2/$D$2
+判定: ✅ 公式栏正确显示公式
+截图 → sample-template/wb-5-formula-bar.png

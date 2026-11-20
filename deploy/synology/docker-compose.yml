@@ -1,0 +1,96 @@
+# client-base 网页端 · 群晖 Container Manager 部署
+#
+# 不需要 build、不需要 npm install：
+#   镜像用官方 node:20-slim + 官方 onlyoffice/documentserver，代码以只读方式挂进 /app。
+#   升级版本只要替换宿主机上的 app/ 目录，然后重启容器。
+#
+# 宿主机目录约定（File Station 里建）：
+#   /volume1/docker/client-base/app            ← 本部署包内容（只读挂载）
+#   /volume1/docker/client-base/data/pages     ← 画布数据（务必纳入 Hyper Backup）
+#   /volume1/docker/client-base/data/office    ← Office 中转文件（含 remote-ws/ 远程工作区）
+#   /volume1/docker/client-base/data/logs      ← 操作审计日志 audit-YYYY-MM-DD.log
+#   /volume1/docker/client-base/ds             ← OnlyOffice DS 的日志/数据/数据库
+#
+# 如果共享文件夹不叫 docker，改 .env 里的 CB_ROOT，或直接改下面的 ${CB_ROOT:-...} 默认值。
+
+version: "3.8"
+
+services:
+  client-base:
+    image: node:20-slim
+    container_name: client-base
+    restart: unless-stopped
+    # ★ 工作目录故意放在 /data 而不是 /app：
+    #   app-server 的审计日志写在 process.cwd()/logs，而 /app 是只读挂载，
+    #   Docker 无法在只读挂载下创建 /app/logs 这个挂载点（实测 runc 报
+    #   "read-only file system"）。把 cwd 指到可写的 /data，日志自然落到 /data/logs，
+    #   静态资源仍由 __dirname(= /app) 解析，不受影响。
+    working_dir: /data
+    command: ["node", "/app/app-server.mjs"]
+    depends_on:
+      - onlyoffice-ds
+
+    environment:
+      TZ: Asia/Shanghai
+      # 容器内监听；对外端口由 ports 决定
+      PORT: "5174"
+      HOST: "0.0.0.0"
+      # 访问口令（2026-10-17）：端口已映射到公网，必须挡一道。
+      # 改口令：改 .env 里的 CB_PASSWORD，然后 docker compose up -d（容器重建即生效）。
+      # 置空字符串 = 关闭验证（仅限纯内网调试，公网端口上不要这么干）。
+      APP_PASSWORD: "${CB_PASSWORD:-xiao2ming}"
+      # 本地 OnlyOffice 分发仍然关（Windows 二进制在 Linux 跑不了）；
+      # 在线编辑走下面的远程 DS 桥（oo-remote.mjs）。
+      APP_DISABLE_OO: "1"
+      # ★ OO 远程桥（2026-10-17）：指向 compose 网络里的 DS，网页版即可在线编辑工作簿。
+      #   不想用就把这两行连同 onlyoffice-ds 服务一起删掉，回到「只读提示」模式。
+      APP_OO_DS_URL: http://onlyoffice-ds
+      # 浏览器侧访问 DS 的地址（登录页/编辑器加载 api.js 用）。
+      # NAS 局域网 IP 变了就改 .env 里的 CB_DS_PUBLIC。
+      APP_OO_DS_PUBLIC: "${CB_DS_PUBLIC:-http://192.168.1.16:8080}"
+      # 画布自己暴露给 DS 的地址（DS 回头拉源文件/回传产物用）。
+      # 群晖本机端口回环没问题；改成非标端口时同步改 .env 的 CB_ORIGIN。
+      APP_OO_ORIGIN: "${CB_ORIGIN:-http://192.168.1.16:5174}"
+      APP_DATA_DIR: /data/pages
+      APP_OFFICE_DIR: /data/office
+
+    volumes:
+      # 代码只读：容器内不可能改坏部署包，升级时替换宿主机文件即可
+      - ${CB_ROOT:-/volume1/docker/client-base}/app:/app:ro
+      # 一个可写卷管住三样：pages（画布）/ office（中转）/ logs（审计）
+      - ${CB_ROOT:-/volume1/docker/client-base}/data:/data
+
+    ports:
+      # 左边是群晖上的端口，被占用就换成 8074 之类
+      - "5174:5174"
+
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5174/healthz').then(r=>r.json()).then(d=>process.exit(d.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 15s
+
+  # ── OnlyOffice 文档服务（Linux 官方镜像）────────────────────────
+  # 网页版在线编辑 docx/xlsx 的内核。首次启动要跑内置 PG/Redis/RabbitMQ，
+  # 健康就绪约 30~60s（之前显示 502 属正常，等它起来）。
+  # JWT 暂关（局域网可接受）；暴露公网前必须开 JWT 并配密钥。
+  onlyoffice-ds:
+    image: onlyoffice/documentserver:latest
+    container_name: client-base-ds
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      JWT_ENABLED: "false"
+    volumes:
+      - ${CB_ROOT:-/volume1/docker/client-base}/ds/logs:/var/log/onlyoffice
+      - ${CB_ROOT:-/volume1/docker/client-base}/ds/data:/var/www/onlyoffice/Data
+      - ${CB_ROOT:-/volume1/docker/client-base}/ds/lib:/var/lib/onlyoffice
+      - ${CB_ROOT:-/volume1/docker/client-base}/ds/db:/var/lib/postgresql
+      - ${CB_ROOT:-/volume1/docker/client-base}/ds/rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "8080:80"

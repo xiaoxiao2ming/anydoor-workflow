@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      内联 SVG 图标：不新增二进制资源，也不会再有 /favicon.ico 的 404。
+      （浏览器默认会去探测 /favicon.ico，index.html 不声明就会在每次冒烟测试里
+       顶着一条假警报——它不是真错误，但会掩盖真错误。）
+      深色底 + 两个节点 + 一条连线 = 画布的抽象形状。
+    -->
+    <link
+      rel="icon"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADkElEQVR42sVXWU8TURTuD2BK95b2WRP9OYbFbnShQGtbRGhBFGhYLbIEEYGgAQqJLGIVfUBDRCIgaMBAoQnGpCyJvhAeDIiPx3NnCgi102mhdZLbSefOvee73/3ud+bwIHztf1uEUPs1CNiksFbAT0pbdyphs0sLB6Glo7DAIz+7C2OwbhMlLXAEELsM9mZ9DID90HJKg5+AkMPhj6/AC3VkpTz4UdvqswJvzaFIapAvFj60mPjwzhjZF3RdRgBJXmV9kQD0r1XgxfvZvlWHMjqAZqcA7DUS8OWnJxx83MwHzagSdF1y+GCk4gNQ6RaB5jkOfqGCBqcg7uCfMbixVQZanGMg79/vsAIIYBvDvctF9LqXKmiyxQfCUyykqa8oj37CAlZRbA1MIghdrxw0z5QwaOYW3G9gqNd3ymAhxhhOIhw52stHcpg3sb+7ms+HwgYJaJG1gYLY+uF8CmpLGUprythNqx9Fq3ulAgcKOMBhXs4AFk0UrQdLowTYdFPQJKXFO27kNm9cPjCtp2Aml4raP4pBtXhqnPUSznNeqBGV3xHR21SdSYEvKw382Wm0JpIO4BOKtAcFpx5Q0ADIFpC7Gk+OqU4CU6YkAZhFd/OWCEH7mAlMGjkprgoReG4JweER0x5ibYguyIQALKGz3Udv1/YzgdV9CtCgQPWo/mEddUqUVtSDZlwJkxrqYgD4Mbi5VcqsFiknDBCf17RIIbNDRme/v9+vcjO6GDGck4EVFFMj2jExJLLHbqR5Jry3U7jqnOEMsFaJI8a5yTZMqGBCew4GPqLIHJViZtU98ojkQv6TvtozKZewkdMug+xOeQQznAGQVeY1M5Tb70lg2hC5kjYnk/O7zvh+t4EBVs6SkFgBvMdgFlQ1mcR9WwTLUdJqXQlj0z7DadYMD2Wgxi2bYDEvHtunlNXLrPwu+j+boXjDqbc3zMAcsmZDyybPqvA4JmRED6zp9ATFNWJagGyTPMWAJPuZ22RQ7UJfCLN2E8dGY43OnHZFdAAezH7XhzLgjYGKKdIAAnQVCY8dMAuNyeMQwLIlRupm+yIiZvNWQ3H2B2I6fjUFQ5iw5o3cxtEASLn0v+qCYNlV4G126/8bgB2fE3gH2wG6Vkt5aYbM/97dYYrTvdlBulZLZfCfG3Mn1TG5fm2twPaTfAiWXqLFQY7IWuFpaw3YJPhcyfQn0ILuK7DTfwMOv28cl+d/ADZ8II8mdbPpAAAAAElFTkSuQmCC"
+    />
+    <!--
+      初始标题只作首帧占位：React 挂载后 App.tsx 的 useEffect 会把 document.title
+      同步成「当前画布名」，宿主（WorkBuddy 预览面板 / 浏览器标签 / Electron 窗口）
+      显示的就是它。这里不再写死项目名，否则换画布后宿主标题与画布名对不上。
+    -->
+    <title>任意门</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // ★ 启动看门狗（2026-10-11）：首启竞态（渲染层先于内部服务就绪发起首屏请求，
+      //   请求挂起 → 界面永远停在启动屏）→ 12 秒仍未挂载出内容就自动重载一次。
+      //   sessionStorage 标记防循环：每个窗口生命周期只自动重试一次，二次仍空说明真故障。
+      ;(function () {
+        setTimeout(function () {
+          try {
+            var root = document.getElementById('root')
+            var empty = !root || root.innerHTML.length < 500
+            if (empty && !sessionStorage.getItem('__bootRetried')) {
+              sessionStorage.setItem('__bootRetried', '1')
+              location.reload()
+            }
+          } catch (e) { /* ignore */ }
+        }, 12000)
+      })()
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

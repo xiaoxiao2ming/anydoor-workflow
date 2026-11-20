@@ -1,0 +1,28 @@
+# OnlyOffice Document Server —— 服务端部署（NAS 或任意 Docker 主机）
+#
+# 用法（群晖 NAS → Container Manager → 项目 → 上传本文件；或 SSH 进 NAS）：
+#   docker compose up -d
+#   docker compose logs -f        # 看到 "Nginx is ready" 即可用
+#
+# 访问：http://<NAS IP>:8080  出现 OnlyOffice 欢迎页即部署成功
+# 本文件对应 docs/OnlyOffice集成部署.md，端口/密钥改动两边要同步。
+
+services:
+  documentserver:
+    image: onlyoffice/documentserver:latest
+    container_name: onlyoffice-ds
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      # DS 8+ 强制 JWT，与 client-base app-server 的 OFFICE_JWT_SECRET 必须一致
+      - JWT_ENABLED=true
+      - JWT_SECRET=client-base-office-dev-secret
+      - JWT_HEADER=Authorization
+    volumes:
+      - ./ds-data:/var/www/onlyoffice/Data
+      - ./ds-log:/var/log/onlyoffice
+      # 中文字体（宋体/黑体/微软雅黑等）：把 Windows 字体目录拷进这个文件夹，
+      # 首次启动或字体变更后执行一次：
+      #   docker exec onlyoffice-ds /usr/bin/documentserver-generate-allfonts.sh
+      - ./ds-fonts:/usr/share/fonts/truetype/custom

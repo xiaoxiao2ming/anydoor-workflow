@@ -1,0 +1,5956 @@
+
+
+/* ★ 亮色主题族色重映射（2026-10-20）：root 切亮色时族色消费 L 档——
+   节点卡/徽章/节点库 swatch 白底上为浅族色底+深族色字，不再是深色块。 */
+
+/* ============================================================
+   主题色变量（2026-10-20）：--c-* 跟随 root data-theme；暗色=原值零回归，亮色=GitHub Light。
+   ============================================================ */
+:root {
+  --c-bg0: #0d1117;
+  --c-bg1: #161b22;
+  --c-hover: #1c232c;
+  --c-line: #21262d;
+  --c-border: #30363d;
+  /* ★ 滚动条主题色（暗色默认） */
+  --sb-thumb: rgba(140, 160, 190, 0.32);
+  --sb-thumb-hover: rgba(140, 160, 190, 0.58);
+  --c-border2: #484f58;
+  --c-text4: #6e7681;
+  --c-text3: #8b949e;
+  --c-text2: #c9d1d9;
+  --c-text: #e6edf3;
+  --c-blue: #1f6feb;
+  --c-blue2: #58a6ff;
+  --c-blue3: #79c0ff;
+  --c-red: #f85149;
+  --c-red2: #ff7b72;
+  --c-gold: #d29922;
+  --c-gold2: #e3b341;
+  --c-green: #3fb950;
+  --c-green2: #7ee787;
+  --c-green3: #2ea043;
+}
+:root[data-theme='light'][data-tint='pink'] {
+  /* ★ 粉色主题（2026-10-20 用户「增加几个UI主题 比如粉色、商务灰」） */
+  --c-bg0: #fbf0f5;
+  --c-bg1: #fff7fa;
+  --c-hover: #fbe0ec;
+  --c-line: #f3cfdd;
+  --c-border: #eec3d6;
+  --c-border2: #e0a8c0;
+  --c-text4: #c48ba6;
+  --c-text3: #96688a;
+  --c-text2: #5c3a4d;
+  --c-text: #432836;
+  --c-blue: #db2777;
+  --c-blue2: #db2777;
+  --c-blue3: #be185d;
+}
+:root[data-theme='light'][data-tint='gray'] {
+  /* ★ 商务灰主题 */
+  --c-bg0: #ececee;
+  --c-bg1: #f7f7f8;
+  --c-hover: #e0e1e3;
+  --c-line: #d5d6d9;
+  --c-border: #c9ccd1;
+  --c-border2: #b4b7bc;
+  --c-text4: #8b8e94;
+  --c-text3: #5f6268;
+  --c-text2: #3f434a;
+  --c-text: #26292e;
+  --c-blue: #4b5563;
+  --c-blue2: #4b5563;
+  --c-blue3: #374151;
+}
+:root[data-theme='light'] {
+  --c-bg0: #f6f8fa;
+  --c-bg1: #ffffff;
+  --c-hover: #eaeef2;
+  --c-line: #d8dee4;
+  /* ★ 滚动条主题色（浅色） */
+  --sb-thumb: rgba(90, 110, 140, 0.32);
+  --sb-thumb-hover: rgba(90, 110, 140, 0.58);
+  --c-border: #d0d7de;
+  --c-border2: #afb8c1;
+  --c-text4: #8c959f;
+  --c-text3: #57606a;
+  --c-text2: #424a53;
+  --c-text: #1f2328;
+  --c-blue: #0969da;
+  --c-blue2: #0969da;
+  --c-blue3: #0550ae;
+  --c-red: #cf222e;
+  --c-red2: #a40e26;
+  --c-gold: #9a6700;
+  --c-gold2: #9a6700;
+  --c-green: #1a7f37;
+  --c-green2: #1a7f37;
+  --c-green3: #1a7f37;
+}
+
+/* ============================================================
+   层级体系 —— 单一真相源
+   ------------------------------------------------------------
+   为什么要收成一组变量：原先 8000 / 8500 / 9999 / 10000 / 1500~2000
+   散落在 index.css 与 nodes-office.css 两处，谁盖住谁全靠记忆。
+   实际踩过的坑：.node-editor-mask 一开始给了 900，被画布自己的
+   浮层（1600~2000）盖住，截图才发现。DOM 断言是看不出来的。
+
+   分层规则（数值越大越靠前）：
+     画布内部        < 放大态编辑器 < 编辑器内弹层 < 全屏遮罩 < 最顶层模态
+   ============================================================ */
+:root {
+  --z-resizer: 5; /* 三栏之间的拖拽分隔条 */
+  --z-marquee: 1500; /* 画布框选虚框 */
+  --z-canvas-ui: 1600; /* 画布上的浮层：顶栏 / 工具条 / 统计 / 缩放 */
+  --z-trash: 1700; /* 回收站抽屉（要盖住画布浮层） */
+  --z-ctx-menu: 2000; /* 右键菜单（画布层最高） */
+  --z-node-editor: 8000; /* 双击放大态（Portal 到 body，必须盖住整个画布） */
+  --z-editor-pop: 8500; /* 放大态内部的弹层（域清单等） */
+  --z-editor-side: 8100; /* 放大态内 Portal 的侧边栏（属性引用栏/联动规则/数据预选追加）
+                       —— 必须高于 --z-node-editor(8000) 才能贴在放大态窗体上，
+                          且低于 --z-editor-pop(8500)：弹层要能盖住侧边栏 */
+  --z-overlay: 9000; /* 全屏遮罩类弹层（Word 面板内嵌的确认层） */
+  --z-modal: 10000; /* 最顶层模态（OnlyOffice 弹层、批注清单/函数库等列表弹窗） */
+}
+
+/* ============================================================
+   节点类型色谱标准（v2 · 2026-10-02）—— 单一真相源
+   ------------------------------------------------------------
+   ★ v2：颜色不再按 kind 硬编码，而是「族 + 映射表」两层。
+     映射表唯一真相源 = src/core/nodeStyle.ts 的 KIND_STYLE
+     新增 kind = nodeStyle.ts 加一行 + 这里加一个族（5 个变量），UI 其余自动一致。
+   谁在用：画布节点头/边/徽章（.rf-node--* / .rf-badge--*）、
+   引用胶囊（.ref-capsule.cap-*，经 nodes-office.css 映射）、
+   调色板 shape、后续任何「按节点类型分色」的 UI。
+   铁律：同一 kind 的颜色在**任何地方**必须一致 —— 加新 UI 时
+   只许引用这里的变量，不许再写死 hex。
+
+   每档语义（暗主题，亮主题只覆盖胶囊用到的档）：
+     -500  主色   色点 · 边框 · 徽章底 · 主强调
+     -head 头底   画布节点头背景（与 500 同族、暗一档）
+     -deep 深底   胶囊左段（节点名）—— 比页面底更深、hue 化
+     -soft 浅底   胶囊右段（参数名）—— 与 deep 拉开明度（左深右浅）
+     -ink  浅底字 胶囊右段文字色
+
+   色相谱系（族即语义，同族用明度区分）：
+     既有 5 族（v1）：text 紫 / xlsx 浅绿 / docx 浅蓝 / param 深绿 / table 蓝
+     v2 新增 6 族：start 红 / sort 琥珀 / map 青 / output翠 / ooword 蓝 / oosheet 绿 / gate 靛
+     ★ 2026-10-04 变更：原 `oo` 族（品红）已拆为 ooword(蓝) / oosheet(绿) 两族。
+       拆分理由（用户定）：ooword/oosheet 是「内嵌 OnlyOffice 的文档」，
+       但用户按"这是 Word 类的 / Excel 类的"就能直接对上色，不需要学一套新品红色。
+       区分「内嵌 OnlyOffice 版」靠形状、图标与节点库分组，不靠颜色。
+       若日后要再强调两代编辑器，用形状/图标区分，不要再改回特殊色。
+   ============================================================ */
+:root {
+  --nk-text-500: #a371f7;  --nk-text-head: #2a2140;  --nk-text-deep: #191330;  --nk-text-soft: #322a52;  --nk-text-ink: #c9a6fb;
+  --nk-xlsx-500: var(--c-green2);  --nk-xlsx-head: #14351f;  --nk-xlsx-deep: #0f2418;  --nk-xlsx-soft: #1e4028;  --nk-xlsx-ink: #8fe8ac;
+  --nk-docx-500: var(--c-blue3);  --nk-docx-head: #14283e;  --nk-docx-deep: #0f1f30;  --nk-docx-soft: #1d3a58;  --nk-docx-ink: #a5d2ff;
+  --nk-param-500: var(--c-green); --nk-param-head: #1b3a25; --nk-param-deep: #0e2315; --nk-param-soft: #1d3f26; --nk-param-ink: #7ee2a0;
+  --nk-table-500: var(--c-blue2); --nk-table-head: #14283e; --nk-table-deep: #101c2b; --nk-table-soft: #1c2f47; --nk-table-ink: #9ecbff;
+  /* ── v2 新增 6 族（此前这些 kind 的颜色散落在各处写死 hex，加一种要改 4~6 处）── */
+  --nk-start-500: var(--c-red2); --nk-start-head: #3d1a18; --nk-start-deep: #241110; --nk-start-soft: #3f2320; --nk-start-ink: #ffa198;
+  --nk-sort-500: #ffa657;  --nk-sort-head: #3a2a12;  --nk-sort-deep: #241a0c;  --nk-sort-soft: #3c2f1a;  --nk-sort-ink: #ffc380;
+  --nk-map-500: #39c5cf;   --nk-map-head: #123338;   --nk-map-deep: #0c2024;   --nk-map-soft: #1a3d42;   --nk-map-ink: #56d4dd;
+  --nk-output-500: var(--c-green); --nk-output-head: #143a1f; --nk-output-deep: #0b2413; --nk-output-soft: #1c4427; --nk-output-ink: #7ee2a0;
+  --nk-ooword-500: var(--c-blue3); --nk-ooword-head: #14283e; --nk-ooword-deep: #0f1f30; --nk-ooword-soft: #1d3a58; --nk-ooword-ink: #a5d2ff;
+  --nk-oosheet-500: var(--c-green2); --nk-oosheet-head: #14351f; --nk-oosheet-deep: #0f2418; --nk-oosheet-soft: #1e4028; --nk-oosheet-ink: #8fe8ac;
+  --nk-gate-500: #8250df;  --nk-gate-head: #241a3d;  --nk-gate-deep: #171029;  --nk-gate-soft: #2b2149;  --nk-gate-ink: #c0a9f5;
+  /* ── chapter 族（2026-10-05新增）：章节工作簿 = Excel 全量功能 + 外挂章节编排层。
+     选色理由：Excel 系是绿、Word 系是蓝、OO 两族沿用同色；
+     章节节点既要「像 Excel」又要「一眼可辨」，故取 teal→gold 之间的青金色相（既不撞 map 青、也不撞 sort 琥珀）。── */
+  --nk-chapter-500: #d4b106; --nk-chapter-head: #35300f; --nk-chapter-deep: #221e08; --nk-chapter-soft: #3d3617; --nk-chapter-ink: #e8d16a;
+  /* ── rule 族（2026-10-05 新增）：规则节点（圆形）给连上的节点发规则。
+     选色理由：**青绿高饱和 + 圆形** = 「控制 / 统一」的视觉信号，
+     与所有业务节点（数据色系）明显分家，一眼认出「这是发规则的，不是干活的」。
+     刻意避开 start 的红与 gate 的紫——那两个也是圆形/菱形，容易混。── */
+  --nk-rule-500: #2dd4bf;  --nk-rule-head: #10312e;  --nk-rule-deep: #0a201e;  --nk-rule-soft: #16423e;  --nk-rule-ink: #7ce8db;
+  /* ── ai 族（2026-10-06 新增）：AI 节点（圆形，模仿规则跟随）。
+     选色理由：亮紫罗兰 —— 「智能/生成」的通用视觉联想；刻意与 gate 的深紫
+     （#8250df）、text 的暗紫拉开明度，暗底上一眼可辨。── */
+  --nk-ai-500: #c084fc;  --nk-ai-head: #2b1d42;  --nk-ai-deep: #1c1230;  --nk-ai-soft: #342353;  --nk-ai-ink: #e0c8ff;
+  /* ── paramlib 族（2026-10-06 新增）：参数库节点（圆形，模仿规则跟随）。
+     选色理由：玫粉 —— 「库存/供给」感，避开 sort 的琥珀与 rule 的青绿；
+     与 ai 紫同属高辨识辅助色系，圆形节点三家（rule 青 / ai 紫 / paramlib 粉）互不撞色。── */
+  --nk-paramlib-500: #f472b6;  --nk-paramlib-head: #3d1a2c;  --nk-paramlib-deep: #2a0f1d;  --nk-paramlib-soft: #4d2438;  --nk-paramlib-ink: #fbb6d9;
+  /* 亮主题：胶囊左段变 hue 浅底、右段近白（左深右浅的相对关系保持） */
+  --nk-text-500L: #8250df;  --nk-text-deepL: #ece4fb;  --nk-text-softL: #f8f5fe;  --nk-text-inkL: #6639ba;
+  --nk-xlsx-500L: #2da44e;  --nk-xlsx-deepL: #e2f6e8;  --nk-xlsx-softL: #f2fbf5;  --nk-xlsx-inkL: #116329;
+  --nk-docx-500L: #0969da;  --nk-docx-deepL: #dbeafc;  --nk-docx-softL: #f0f7fe;  --nk-docx-inkL: #0550ae;
+  --nk-param-500L: #1a7f37; --nk-param-deepL: #ddf3e3; --nk-param-softL: #eefaf2; --nk-param-inkL: #0f6b30;
+  --nk-table-500L: #0969da; --nk-table-deepL: #dbeafc; --nk-table-softL: #f0f7fe; --nk-table-inkL: #0550ae;
+  --nk-start-500L: #cf222e; --nk-start-deepL: #ffebe9; --nk-start-softL: #fff5f4; --nk-start-inkL: #a40e26;
+  --nk-sort-500L: #bc4c00;  --nk-sort-deepL: #fff1e5;  --nk-sort-softL: #fff8f2;  --nk-sort-inkL: #8f3700;
+  --nk-map-500L: #0e7c86;   --nk-map-deepL: #e0f5f7;   --nk-map-softL: #f0fbfc;   --nk-map-inkL: #08585f;
+  --nk-output-500L: #1a7f37; --nk-output-deepL: #ddf3e3; --nk-output-softL: #eefaf2; --nk-output-inkL: #0f6b30;
+  --nk-ooword-500L: #0969da;  --nk-ooword-deepL: #dbeafc;  --nk-ooword-softL: #f0f7fe;  --nk-ooword-inkL: #0550ae;
+  --nk-oosheet-500L: #2da44e; --nk-oosheet-deepL: #e2f6e8; --nk-oosheet-softL: #f2fbf5; --nk-oosheet-inkL: #116329;
+  --nk-gate-500L: #6639ba;  --nk-gate-deepL: #ece4fb;  --nk-gate-softL: #f8f5fe;  --nk-gate-inkL: #4c2889;
+  --nk-chapter-500L: #9a7b00; --nk-chapter-deepL: #fffbe5; --nk-chapter-softL: #fffdf0; --nk-chapter-inkL: #6b5600;
+  --nk-rule-500L: #0d9488;  --nk-rule-deepL: #dff7f4;  --nk-rule-softL: #f0fbfa;  --nk-rule-inkL: #0b6d64;
+  --nk-ai-500L: #8b5cf6;  --nk-ai-deepL: #f3ecfe;  --nk-ai-softL: #f9f4ff;  --nk-ai-inkL: #6d28d9;
+  --nk-paramlib-500L: #db2777;  --nk-paramlib-deepL: #fdebf3;  --nk-paramlib-softL: #fef5fa;  --nk-paramlib-inkL: #be185d;
+  --nk-group-500: #a8b545;  --nk-group-head: #2f3312;  --nk-group-deep: #1d2009;  --nk-group-soft: #3a3f16;  --nk-group-ink: #d7e08a;
+  --nk-note-500: #f6c945;  --nk-note-head: #8a6d1a;  --nk-note-deep: #6b5312;  --nk-note-soft: #fdf3c9;  --nk-note-ink: #5a450c;
+  --nk-note-500: #f6c945;  --nk-note-head: #8a6d1a;  --nk-note-deep: #6b5312;  --nk-note-soft: #fdf3c9;  --nk-note-ink: #5a450c;
+  --nk-group-500L: #6b7a1f;  --nk-group-deepL: #f2f5da;  --nk-group-softL: #f8fae8;  --nk-group-inkL: #4c5a12;
+  --nk-note-500L: #d9ac1f;  --nk-note-headL: #fff7d6;  --nk-note-deepL: #fdf6d8;  --nk-note-softL: #fdf3c9;  --nk-note-inkL: #6b5312;
+  --nk-note-500L: #d9ac1f;  --nk-note-headL: #fff7d6;  --nk-note-deepL: #fdf6d8;  --nk-note-softL: #fdf3c9;  --nk-note-inkL: #6b5312;
+}
+
+/* ★ 亮色主题族色重映射（2026-10-20）：root 切亮色时族色消费 L 档——
+   节点卡/徽章/节点库 swatch 白底上为浅族色底+深族色字，不再是深色块。 */
+:root[data-theme='light'] {
+  --nk-text-500: var(--nk-text-500L); --nk-text-head: var(--nk-text-softL); --nk-text-deep: var(--nk-text-deepL); --nk-text-soft: var(--nk-text-softL); --nk-text-ink: var(--nk-text-inkL);
+  --nk-xlsx-500: var(--nk-xlsx-500L); --nk-xlsx-head: var(--nk-xlsx-softL); --nk-xlsx-deep: var(--nk-xlsx-deepL); --nk-xlsx-soft: var(--nk-xlsx-softL); --nk-xlsx-ink: var(--nk-xlsx-inkL);
+  --nk-docx-500: var(--nk-docx-500L); --nk-docx-head: var(--nk-docx-softL); --nk-docx-deep: var(--nk-docx-deepL); --nk-docx-soft: var(--nk-docx-softL); --nk-docx-ink: var(--nk-docx-inkL);
+  --nk-param-500: var(--nk-param-500L); --nk-param-head: var(--nk-param-softL); --nk-param-deep: var(--nk-param-deepL); --nk-param-soft: var(--nk-param-softL); --nk-param-ink: var(--nk-param-inkL);
+  --nk-table-500: var(--nk-table-500L); --nk-table-head: var(--nk-table-softL); --nk-table-deep: var(--nk-table-deepL); --nk-table-soft: var(--nk-table-softL); --nk-table-ink: var(--nk-table-inkL);
+  --nk-start-500: var(--nk-start-500L); --nk-start-head: var(--nk-start-softL); --nk-start-deep: var(--nk-start-deepL); --nk-start-soft: var(--nk-start-softL); --nk-start-ink: var(--nk-start-inkL);
+  --nk-sort-500: var(--nk-sort-500L); --nk-sort-head: var(--nk-sort-softL); --nk-sort-deep: var(--nk-sort-deepL); --nk-sort-soft: var(--nk-sort-softL); --nk-sort-ink: var(--nk-sort-inkL);
+  --nk-map-500: var(--nk-map-500L); --nk-map-head: var(--nk-map-softL); --nk-map-deep: var(--nk-map-deepL); --nk-map-soft: var(--nk-map-softL); --nk-map-ink: var(--nk-map-inkL);
+  --nk-output-500: var(--nk-output-500L); --nk-output-head: var(--nk-output-softL); --nk-output-deep: var(--nk-output-deepL); --nk-output-soft: var(--nk-output-softL); --nk-output-ink: var(--nk-output-inkL);
+  --nk-ooword-500: var(--nk-ooword-500L); --nk-ooword-head: var(--nk-ooword-softL); --nk-ooword-deep: var(--nk-ooword-deepL); --nk-ooword-soft: var(--nk-ooword-softL); --nk-ooword-ink: var(--nk-ooword-inkL);
+  --nk-oosheet-500: var(--nk-oosheet-500L); --nk-oosheet-head: var(--nk-oosheet-softL); --nk-oosheet-deep: var(--nk-oosheet-deepL); --nk-oosheet-soft: var(--nk-oosheet-softL); --nk-oosheet-ink: var(--nk-oosheet-inkL);
+  --nk-gate-500: var(--nk-gate-500L); --nk-gate-head: var(--nk-gate-softL); --nk-gate-deep: var(--nk-gate-deepL); --nk-gate-soft: var(--nk-gate-softL); --nk-gate-ink: var(--nk-gate-inkL);
+  --nk-chapter-500: var(--nk-chapter-500L); --nk-chapter-head: var(--nk-chapter-softL); --nk-chapter-deep: var(--nk-chapter-deepL); --nk-chapter-soft: var(--nk-chapter-softL); --nk-chapter-ink: var(--nk-chapter-inkL);
+  --nk-rule-500: var(--nk-rule-500L); --nk-rule-head: var(--nk-rule-softL); --nk-rule-deep: var(--nk-rule-deepL); --nk-rule-soft: var(--nk-rule-softL); --nk-rule-ink: var(--nk-rule-inkL);
+  --nk-ai-500: var(--nk-ai-500L); --nk-ai-head: var(--nk-ai-softL); --nk-ai-deep: var(--nk-ai-deepL); --nk-ai-soft: var(--nk-ai-softL); --nk-ai-ink: var(--nk-ai-inkL);
+  --nk-paramlib-500: var(--nk-paramlib-500L); --nk-paramlib-head: var(--nk-paramlib-softL); --nk-paramlib-deep: var(--nk-paramlib-deepL); --nk-paramlib-soft: var(--nk-paramlib-softL); --nk-paramlib-ink: var(--nk-paramlib-inkL);
+  --nk-group-500: var(--nk-group-500L); --nk-group-head: var(--nk-group-softL); --nk-group-deep: var(--nk-group-deepL); --nk-group-soft: var(--nk-group-softL); --nk-group-ink: var(--nk-group-inkL);
+  --nk-note-500: var(--nk-note-500L); --nk-note-head: var(--nk-note-softL); --nk-note-deep: var(--nk-note-deepL); --nk-note-soft: var(--nk-note-softL); --nk-note-ink: var(--nk-note-inkL);
+  --nk-note-500: var(--nk-note-500L); --nk-note-head: var(--nk-note-softL); --nk-note-deep: var(--nk-note-deepL); --nk-note-soft: var(--nk-note-softL); --nk-note-ink: var(--nk-note-inkL);
+}
+
+
+/* ★ 亮色主题族色重映射（2026-10-20）：root 切亮色时族色消费 L 档——
+   节点卡/徽章/节点库 swatch 白底上为浅族色底+深族色字，不再是深色块。 */
+:root[data-theme='light'] {
+  --nk-text-500: var(--nk-text-500L); --nk-text-head: var(--nk-text-softL); --nk-text-deep: var(--nk-text-deepL); --nk-text-soft: var(--nk-text-softL); --nk-text-ink: var(--nk-text-inkL);
+  --nk-xlsx-500: var(--nk-xlsx-500L); --nk-xlsx-head: var(--nk-xlsx-softL); --nk-xlsx-deep: var(--nk-xlsx-deepL); --nk-xlsx-soft: var(--nk-xlsx-softL); --nk-xlsx-ink: var(--nk-xlsx-inkL);
+  --nk-docx-500: var(--nk-docx-500L); --nk-docx-head: var(--nk-docx-softL); --nk-docx-deep: var(--nk-docx-deepL); --nk-docx-soft: var(--nk-docx-softL); --nk-docx-ink: var(--nk-docx-inkL);
+  --nk-param-500: var(--nk-param-500L); --nk-param-head: var(--nk-param-softL); --nk-param-deep: var(--nk-param-deepL); --nk-param-soft: var(--nk-param-softL); --nk-param-ink: var(--nk-param-inkL);
+  --nk-table-500: var(--nk-table-500L); --nk-table-head: var(--nk-table-softL); --nk-table-deep: var(--nk-table-deepL); --nk-table-soft: var(--nk-table-softL); --nk-table-ink: var(--nk-table-inkL);
+  --nk-start-500: var(--nk-start-500L); --nk-start-head: var(--nk-start-softL); --nk-start-deep: var(--nk-start-deepL); --nk-start-soft: var(--nk-start-softL); --nk-start-ink: var(--nk-start-inkL);
+  --nk-sort-500: var(--nk-sort-500L); --nk-sort-head: var(--nk-sort-softL); --nk-sort-deep: var(--nk-sort-deepL); --nk-sort-soft: var(--nk-sort-softL); --nk-sort-ink: var(--nk-sort-inkL);
+  --nk-map-500: var(--nk-map-500L); --nk-map-head: var(--nk-map-softL); --nk-map-deep: var(--nk-map-deepL); --nk-map-soft: var(--nk-map-softL); --nk-map-ink: var(--nk-map-inkL);
+  --nk-output-500: var(--nk-output-500L); --nk-output-head: var(--nk-output-softL); --nk-output-deep: var(--nk-output-deepL); --nk-output-soft: var(--nk-output-softL); --nk-output-ink: var(--nk-output-inkL);
+  --nk-ooword-500: var(--nk-ooword-500L); --nk-ooword-head: var(--nk-ooword-softL); --nk-ooword-deep: var(--nk-ooword-deepL); --nk-ooword-soft: var(--nk-ooword-softL); --nk-ooword-ink: var(--nk-ooword-inkL);
+  --nk-oosheet-500: var(--nk-oosheet-500L); --nk-oosheet-head: var(--nk-oosheet-softL); --nk-oosheet-deep: var(--nk-oosheet-deepL); --nk-oosheet-soft: var(--nk-oosheet-softL); --nk-oosheet-ink: var(--nk-oosheet-inkL);
+  --nk-gate-500: var(--nk-gate-500L); --nk-gate-head: var(--nk-gate-softL); --nk-gate-deep: var(--nk-gate-deepL); --nk-gate-soft: var(--nk-gate-softL); --nk-gate-ink: var(--nk-gate-inkL);
+  --nk-chapter-500: var(--nk-chapter-500L); --nk-chapter-head: var(--nk-chapter-softL); --nk-chapter-deep: var(--nk-chapter-deepL); --nk-chapter-soft: var(--nk-chapter-softL); --nk-chapter-ink: var(--nk-chapter-inkL);
+  --nk-rule-500: var(--nk-rule-500L); --nk-rule-head: var(--nk-rule-softL); --nk-rule-deep: var(--nk-rule-deepL); --nk-rule-soft: var(--nk-rule-softL); --nk-rule-ink: var(--nk-rule-inkL);
+  --nk-ai-500: var(--nk-ai-500L); --nk-ai-head: var(--nk-ai-softL); --nk-ai-deep: var(--nk-ai-deepL); --nk-ai-soft: var(--nk-ai-softL); --nk-ai-ink: var(--nk-ai-inkL);
+  --nk-paramlib-500: var(--nk-paramlib-500L); --nk-paramlib-head: var(--nk-paramlib-softL); --nk-paramlib-deep: var(--nk-paramlib-deepL); --nk-paramlib-soft: var(--nk-paramlib-softL); --nk-paramlib-ink: var(--nk-paramlib-inkL);
+}
+
+
+
+
+
+
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--c-bg0);
+  color: var(--c-text);
+  font-
+
+family: -apple-system, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+.app-header {
+  padding: 10px 16px;
+  background: var(--c-bg1);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.app-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.app-sub {
+  font-size: 12px;
+  color: var(--c-text3);
+  margin-top: 6px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  padding: 5px 14px;
+  font-size: 13px;
+  color: var(--c-text3);
+  background: transparent;
+  border: 1px solid var(--c-line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.tab:hover {
+  color: var(--c-text2);
+  border-color: var(--c-border);
+}
+
+.tab-active {
+  color: var(--c-text);
+  background: var(--c-line);
+  border-color: var(--c-blue2);
+}
+
+/* 左右分栏 */
+.split {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* 新布局：面板 | 画布 | 属性 */
+.layout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  /*菜单（ribbon）通栏，竖向节点库面板落在菜单下方 —— 故布局整体下移一个菜单高度。
+     高度由 CanvasRibbon 运行时写入 --ribbon-h（菜单带可折叠，高度会变），不写死。 */
+  margin-top: var(--ribbon-h, 0px);
+}
+
+.palette {
+  width: 160px;
+  flex-shrink: 0;
+  background: var(--c-bg1);
+  border-right: 1px solid var(--c-line);
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.18s ease;
+}
+/* 折叠态：整栏收起，画布占满宽度（折叠按钮常驻在 app 标题栏，不会随之消失）。
+   overflow:hidden + flex 布局下，子区块仍会按内容撑出 ~24px，必须显式压掉，
+   否则画布左边会漏出一条空白带（实测 palette w=0 但子块 w=24）。 */
+.palette--folded {
+  width: 0;
+  border-right: none;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+/* 侧栏分组内的条目区：去掉多余内边距，让 .palette-item 与上一版一样占满整栏 */
+.sidebar-section--palette {
+  padding-top: 6px;
+}
+
+.sidebar-section {
+  padding: 12px;
+  border-bottom: 1px solid var(--c-line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-label {
+  font-size: 11px;
+  color: var(--c-text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px;
+  font-weight: 500;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: var(--c-bg0);
+  color: var(--c-text2);
+  font-size: 12px;
+  cursor: grab;
+}
+
+.palette-item:hover {
+  border-color: var(--c-blue2);
+  color: var(--c-text);
+}
+
+/* ── text 节点面板：插入引用胶囊（批次 12 · ①）───────────── */
+.pp-cap-insert {
+  flex-basis: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 2px 0 6px;
+}
+.pp-cap-insert-label {
+  font-size: 11px;
+  color: var(--c-text4);
+  flex: none;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.pp-cap-insert-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.pp-cap-insert-grp {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding-right: 6px;
+  border-right: 1px solid var(--c-line);
+}
+.pp-cap-insert-grp:last-child {
+  border-right: none;
+}
+.pp-cap-insert-src {
+  font-size: 10.5px;
+  color: var(--c-text4);
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* text 节点正文：胶囊拖放靶（批次 12 · ①拖拽入口） */
+[data-cap-drop] {
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+/* 悬停待放置态：虚线框 +淡蓝底，明确「松手就插在这里」 */
+.rf-cap-drop-hot {
+  background: rgba(56, 139, 253, 0.1) !important;
+  box-shadow: inset 0 0 0 1px rgba(56, 139, 253, 0.55);
+  border-radius: 4px;
+}
+
+.pp-cap-chip {
+  cursor: pointer;
+  font-size: 10.5px;
+  line-height: 16px;
+  padding: 0 5px;
+}
+.pp-cap-chip:hover {
+  filter: brightness(1.25);
+}
+/* 面板内的胶囊按来源节点类型取色（与画布 .cap-* 同一套 --nk-* 变量） */
+.cap-cap-kind-text  { --cap: var(--nk-text-500);--cap-soft: var(--nk-text-soft);--cap-soft-ink: var(--nk-text-ink);--cap-node-bg: var(--nk-text-deep); }
+.cap-cap-kind-xlsx  { --cap: var(--nk-xlsx-500);--cap-soft: var(--nk-xlsx-soft);--cap-soft-ink: var(--nk-xlsx-ink);--cap-node-bg: var(--nk-xlsx-deep); }
+.cap-cap-kind-docx  { --cap: var(--nk-docx-500);--cap-soft: var(--nk-docx-soft);--cap-soft-ink: var(--nk-docx-ink);--cap-node-bg: var(--nk-docx-deep); }
+.cap-cap-kind-param { --cap: var(--nk-param-500);--cap-soft: var(--nk-param-soft);--cap-soft-ink: var(--nk-param-ink);--cap-node-bg: var(--nk-param-deep); }
+.cap-cap-kind-sort  { --cap: var(--nk-sort-500);--cap-soft: var(--nk-sort-soft);--cap-soft-ink: var(--nk-sort-ink);--cap-node-bg: var(--nk-sort-deep); }
+.cap-cap-kind-map   { --cap: var(--nk-map-500);--cap-soft: var(--nk-map-soft);--cap-soft-ink: var(--nk-map-ink);--cap-node-bg: var(--nk-map-deep); }
+.cap-cap-kind-table { --cap: var(--nk-table-500);--cap-soft: var(--nk-table-soft);--cap-soft-ink: var(--nk-table-ink);--cap-node-bg: var(--nk-table-deep); }
+.cap-cap-kind-output{ --cap: var(--nk-output-500);--cap-soft: var(--nk-output-soft);--cap-soft-ink: var(--nk-output-ink);--cap-node-bg: var(--nk-output-deep); }
+.cap-cap-kind-start { --cap: var(--nk-start-500);--cap-soft: var(--nk-start-soft);--cap-soft-ink: var(--nk-start-ink);--cap-node-bg: var(--nk-start-deep); }
+.cap-cap-kind-ooword{ --cap: var(--nk-ooword-500);--cap-soft: var(--nk-ooword-soft);--cap-soft-ink: var(--nk-ooword-ink);--cap-node-bg: var(--nk-ooword-deep); }
+.cap-cap-kind-oosheet{ --cap: var(--nk-oosheet-500);--cap-soft: var(--nk-oosheet-soft);--cap-soft-ink: var(--nk-oosheet-ink);--cap-node-bg: var(--nk-oosheet-deep); }
+.cap-cap-kind-chapter{ --cap: var(--nk-chapter-500);--cap-soft: var(--nk-chapter-soft);--cap-soft-ink: var(--nk-chapter-ink);--cap-node-bg: var(--nk-chapter-deep); }
+
+.palette-shape {
+  width: 28px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ── app 标题栏（C 端）：标识 + 当前画布名（品牌名已去掉） ── */
+.app-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px 0 10px;
+  background: var(--c-bg0);
+  border-bottom: 1px solid var(--c-line);
+  flex-shrink: 0;
+}
+/* .wfc 保存按钮（2026-10-06）：标题栏动作区。2026-10-07 用户：「做成方形按钮放在右侧」
+   —— 四钮（保存/打开/重启/关闭）32×32 方形聚拢靠右（app-titlebar-actions），
+   完整语义在悬浮 title；去逐钮 margin-left:auto（那是四钮均匀散布全宽的原因）。 */
+/* ★ 2026-10-24 动作区按钮统一规范（变量化——尺寸/图标/间距单点定义） */
+:root {
+  --btn-sz: 31px;   /* 按钮外框 */
+  --btn-icon: 17px; /* 图标统一尺寸 */
+  --btn-gap: 6px;   /* 按钮间距 */
+}
+.app-titlebar-actions {
+  margin-left: auto;
+  /* ★ 2026-10-24 交界补偿：右侧动作区与 cr-right 容器交界实测 2px（两容器 gap 互不管交界），
+     cr-right 加 padding-right 4px 凑齐 6px 规范——不动 margin-left:auto（右锚） */
+  display: flex;
+  align-items: center;
+  gap: var(--btn-gap);
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.app-savebtn {
+  /* ★ 2026-10-19 用户「做成正方形的（带圆角）」：31×31 方形（图标已换 logo） */
+  width: var(--btn-sz);
+  height: var(--btn-sz);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* ★ 2026-10-19 用户「这里也统一 样式」：实心蓝 → 细灰框描边钮（与 OO 标题栏
+     按钮同语言：默认素净灰框、hover 浮起），四钮不再一排蓝块。 */
+  border: 1px solid var(--ed-border, var(--c-border));
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ed-text1, var(--c-text2));
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.app-savebtn:hover:not(:disabled) {
+  background: var(--ed-bg3, var(--c-hover));
+  border-color: var(--ed-text4, var(--c-text4));
+  color: var(--ed-text, var(--c-text));
+}
+.app-savebtn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.app-mark {
+  /* ★ 22:4x 用户：「左上角的 logo 也和快捷方式一样」—— 天蓝圆角砖墨圈 logo 图（logo-tile.png）
+     ★ 2026-10-19 用户「前后的 logo大小不一致」：26 → 31px，与按钮同高 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+/* 画布名（合并进标题栏后左对齐显示）
+   品牌名「数据关联底座」已从标题栏去掉，画布名成了这里唯一的文字，
+   所以从次级信息（13px/500/var(--c-text2)）提到主标题规格（15px/600/var(--c-text)）——
+   权重不跟上会看起来像残留的副标题，而不是当前画布名。 */
+.app-docname {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  flex-basis: auto;
+  min-width: 0;
+  max-width: 320px;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--c-text);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 3px 8px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-docname:hover {
+  background: var(--ed-bg2, var(--c-bg1));
+  border-color: var(--ed-border, var(--c-border));
+  color: var(--ed-text, var(--c-text));
+}
+
+/* 版本号（标题栏，画布名右侧）：纯展示，不参与交互。
+   标题栏底色是固定的 var(--c-bg0)（不跟主题），所以这里可以用半透明白字。 */
+.app-ver {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: rgba(230, 237, 243, 0.45);
+  padding: 2px 6px;
+  border: 1px solid rgba(110, 118, 129, 0.28);
+  border-radius: 5px;
+  user-select: none;
+  cursor: default;
+  white-space: nowrap;
+}
+
+/* 退出登录（仅网页端显示）：口令门禁的出口，桌面端无此概念。
+   故意做得比版本号更淡——日常操作不该被它抢注意力。 */
+.app-logout {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: rgba(230, 237, 243, 0.42);
+  padding: 2px 6px;
+  border: 1px solid rgba(110, 118, 129, 0.28);
+  border-radius: 5px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.app-logout:hover {
+  color: rgba(230, 237, 243, 0.8);
+  border-color: rgba(110, 118, 129, 0.5);
+}
+
+/* ── 左侧竖排图标条：折叠/展开节点库 ──
+   位置与 OO 编辑器左侧批注栏一致（同一条竖排图标条），
+   画布专属能力放画布边缘，不占app 标题栏。 */
+.side-strip {
+  flex-shrink: 0;
+  width: 28px;
+  background: var(--c-bg1);
+  border-right: 1px solid var(--c-line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+}
+.side-strip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--c-text3);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.side-strip-btn:hover {
+  background: var(--c-line);
+  color: var(--c-text);
+}
+.palette-fold-inline {
+  position: absolute;
+  top: 9px;
+  right: 8px;
+  z-index: 5;
+}
+.palette-fold-inline {
+  position: absolute;
+  top: 9px;
+  right: 8px;
+  z-index: 5;
+}
+.side-strip-btn.is-folded {
+  color: var(--c-blue3);
+  border-color: var(--c-blue);
+}
+/* 折叠按钮已移到左侧竖排图标条 .side-strip（见上方），此处旧规则作废 */
+
+/* 节点库七类分组（数据驱动，见 core/nodeStyle.ts 的 PALETTE_GROUPS） */
+/* 节点库分组容器——单列铺满，与上一版 (.palette-item 占满整栏) 观感一致。
+   注意 1：不要改成多列网格，侧栏只有 160px，两列会把条目压成窄块。
+   注意 2：分组本身是 .sidebar-section（自带 12px padding），若再套一层同样 padding 的
+     section，左右内边距会叠加成 24px，条目被压到 112px（实测）。所以这里用
+     .palette-group 单独控制：只留上间距，左右交给外层 section。 */
+.palette-group {
+  padding: 6px 0 0;
+  border-bottom: none;
+}
+.palette-group > .sidebar-label {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.palette-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.palette-count {
+  float: right;
+  font-size: 10px;
+  color: var(--c-text4);
+  background: var(--c-line);
+  border-radius: 999px;
+  padding: 0 6px;
+  margin-left: 6px;
+}
+
+/* 表形状已迁到 .palette-store-shape（见调色板七形状区块，资料库型双横线） */
+
+.canvas-wrap {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  background: var(--c-bg0);
+  /* ★ 2026-10-21 用户「向右/下拖动 会带着画布尺寸增加」：画布可视区固定裁剪——
+     节点/组拖出边界不再把可视区撑大（此前无裁剪，出界内容外溢） */
+  overflow: hidden;
+}
+
+.resizer {
+  width: 5px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: var(--c-line);
+  position: relative;
+  z-index: var(--z-resizer);
+}
+
+.resizer:hover,
+.resizer:active {
+  background: var(--c-blue2);
+}
+
+.props-panel {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--c-bg1);
+  border-left: 1px solid var(--c-line);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ★ 属性栏右上角圆角悬浮框（2026-11-01 用户指令）——
+   覆盖 .props-panel 的右栏布局：浮在画布右上、圆角、阴影，
+   高度随内容自适应（max-height 限高，超出内部滚动） */
+.prop-float {
+  position: fixed;
+  top: calc(var(--ribbon-h, 56px) + 12px);
+  right: 18px;
+  width: min(430px, 38%);
+  max-height: min(78vh, 960px);
+  border: 1px solid var(--c-border, #d9dfe7);
+  border-radius: 14px;
+  box-shadow: 0 14px 44px rgba(30, 40, 60, 0.18);
+  overflow: hidden;
+  z-index: 150;
+}
+.prop-float .props-content {
+  overflow-y: auto;
+}
+
+.props-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.props-tabs .tab {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--c-text3);
+  font-weight: 500;
+  padding: 7px 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.props-tabs .tab-active {
+  background: rgba(77, 125, 253, 0.16);
+  color: var(--c-blue2);
+  font-weight: 600;
+}
+
+.props-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.props-body {
+  padding: 14px 16px 18px;
+  gap: 2px;
+}
+
+.props-empty {
+  color: var(--c-text3);
+  font-size: 12px;
+  text-align: center;
+  padding: 40px 12px;
+}
+
+/* ★ 属性面板 UI 重做（2026-11-01 用户指令「按属性内容和布局合理性增加美观度」）：
+   字段卡片化（微底色+圆角）、label 小标签化（大写间距）、控件聚焦 ring、
+   分组分隔带、列表行 hover、双主题全用 --c-* 变量 */
+.props-field {
+  margin-bottom: 12px;
+  padding: 9px 11px 10px;
+  background: var(--c-hover, rgba(120, 140, 180, 0.08));
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  transition: border-color 0.15s ease;
+}
+
+.props-field:hover {
+  border-color: var(--c-border);
+}
+
+.props-field:focus-within {
+  border-color: var(--c-blue2);
+}
+
+.props-field > label {
+  display: block;
+  font-size: 10.5px;
+  color: var(--c-text3);
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.props-field input,
+.props-field select {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  color: var(--c-text);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.props-field input:focus,
+.props-field select:focus {
+  border-color: var(--c-blue2);
+  box-shadow: 0 0 0 3px rgba(77, 125, 253, 0.18);
+}
+
+.props-field input:disabled {
+  color: var(--c-text3);
+  opacity: 0.7;
+  background: transparent;
+}
+
+/* ── 血缘标记（2026-10-05 用户要求「在节点系统上增加衍生的关联标记，
+     哪个是哪个节点衍生的，做了哪些适配，都 有记录」）。
+     视觉意图：让人在属性面板上一眼分清三件事——
+       ① 这不是原始节点，是衍生节点；
+       ② 它从哪个节点来（父节点徽章）；
+       ③ 升级父内核时要改哪几处（逐条适配表）。
+     左边框用 chapter 族金色相：与普通 props 字段区隔开，且天然提示
+     「这块是 OO 系的东西」，和画布上的节点配色对得上。 ── */
+.props-lineage {
+  border-left: 2px solid var(--nk-chapter-500, #d4b106);
+  background: var(--nk-chapter-deep, #221e08);
+  border-radius: 0 6px 6px 0;
+  padding: 8px 10px 10px;
+}
+
+.props-lineage > label {
+  color: var(--nk-chapter-ink, #e8d16a);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.props-lineage .props-hint {
+  color: var(--c-text3);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+/* 单条适配记录：左「改哪里」标签 + 右「怎么改」说明。
+   ★ 用 grid 而非 flex：说明文字长短不一，flex 下标签行会参差不齐，
+   grid 的固定列宽能让每条的标签左缘对齐，扫读时快很多。 */
+.lineage-item {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 6px;
+  align-items: baseline;
+  padding: 4px 0;
+  border-top: 1px solid var(--nk-chapter-soft, #3d3617);
+}
+
+.lineage-item:first-of-type {
+  border-top: none;
+}
+
+.lineage-area {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--nk-chapter-500, #d4b106);
+  background: var(--nk-chapter-soft, #3d3617);
+  border-radius: 3px;
+  padding: 1px 5px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.lineage-note {
+  font-size: 11px;
+  color: var(--c-text2);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.props-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-border) 18%, var(--c-border) 82%, transparent);
+  margin: 16px 2px;
+}
+
+.props-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.props-tabs .tab {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--c-text3);
+  font-weight: 500;
+  padding: 7px 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.props-tabs .tab:hover {
+  background: var(--c-hover);
+  color: var(--c-text);
+}
+
+.field-row {
+  display: grid;
+  /* 备忘 · 待办38：四列化（名 | 类型 | 格式 | 删）—— 数据格式编辑入口 */
+  grid-template-columns: 1fr 72px 66px 24px;
+  gap: 4px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.field-row .fr-formula,
+.field-row .lookup-edit {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+}
+
+.fr-name,
+.fr-type,
+.fr-fmt,
+.fr-del {
+  padding: 4px 6px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text);
+  font-size: 12px;
+}
+
+.fr-type {
+  width: 100%;
+}
+
+.fr-fmt {
+  width: 100%;
+  padding: 4px 2px;
+}
+
+.fr-del {
+  padding: 4px 0;
+  text-align: center;
+  cursor: pointer;
+  color: var(--c-text3);
+}
+
+.fr-del:hover {
+  background: #a32d2d;
+  border-color: #a32d2d;
+  color: #fff;
+}
+
+.fr-formula {
+  padding: 4px 6px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-blue3);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.lookup-edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 6px;
+  background: var(--c-bg0);
+  border: 1px dashed var(--c-border);
+  border-radius: 4px;
+}
+
+.lookup-edit select {
+  flex: 1 1 80px;
+  min-width: 80px;
+  padding: 3px 4px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 3px;
+  color: var(--c-text);
+  font-size: 11px;
+}
+
+.lk-arrow {
+  color: var(--c-blue2);
+  font-size: 11px;
+}
+
+.form-bar-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.bar-btn {
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--c-text2);
+  background: var(--c-line);
+  border: 1px solid var(--c-border);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.bar-btn:hover {
+  background: var(--c-border);
+  color: var(--c-text);
+}
+
+.bar-btn.danger:hover {
+  background: #a32d2d;
+  border-color: #a32d2d;
+  color: #fff;
+}
+
+/* React Flow 自定义表节点 */
+.rf-node {
+  min-width: 180px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  font-size: 12px;
+  /* 关键修复：overflow 必须为 visible，否则定位在节点边缘（translate(50%,-50%)）的
+     连线 handle 会被裁切，pointer/mouse 事件永远落到节点本体而非 handle，
+     导致「有些节点连线连不上」。圆角裁切改由 .rf-node-inner 承担。 */
+  overflow: visible;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+/* 内容层：承担圆角裁切与 overflow:hidden，让边缘 handle 不被父容器裁掉 */
+.rf-node-inner {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* 悬停反馈：鼠标放在节点上时，边框提亮 + 轻微抬起（与选中态区分开） */
+.rf-node:hover {
+  border-color: var(--c-text4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+  transform: translateY(-2px);
+  cursor: pointer;
+}
+
+.rf-node.rf-node-sel {
+  border-color: var(--c-blue2);
+  box-shadow: 0 0 0 2px var(--c-blue2), 0 0 14px rgba(88, 166, 255, 0.55);
+}
+
+/* ★ 2026-10-22 亮色主题选中态协调（用户「白色的主题 颜色有点不协调 尤其是选中后」）：
+   深色风格的粗蓝辉光 + 深蓝头部条在亮色下过重——亮色改实蓝细描边 + 弱辉光，
+   头部浅蓝底深字，与白卡片同调。hoverglow 已有同款亮色覆盖先例。 */
+:root[data-theme='light'] .rf-node.rf-node-sel {
+  border-color: var(--c-blue);
+  box-shadow: 0 0 0 1.5px var(--c-blue), 0 0 10px rgba(31, 111, 235, 0.22);
+}
+:root[data-theme='light'] .rf-node.rf-node-sel:hover {
+  border-color: var(--c-blue);
+  box-shadow: 0 0 0 1.5px var(--c-blue), 0 0 14px rgba(31, 111, 235, 0.3);
+  transform: none;
+}
+:root[data-theme='light'] .rf-node.rf-node-sel .rf-node-head {
+  background: #dbe9fd;
+  border-bottom-color: var(--c-blue);
+  color: #1a3c6e;
+
+  position: relative;}
+
+/* 备忘 2026-09-27 ⑤ · 画布节点 hover 亮显：fx/FCE 悬停引用胶囊 → 来源节点边框亮显
+   （store 瞬态 fxHoverNode 桥，WorkbookEditor 写 / TableNode 读）——蓝框微光，弱于选中态 */
+.rf-node.rf-node-hoverglow {
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.65), 0 0 16px rgba(74, 158, 255, 0.4);
+}
+:root[data-theme='light'] .rf-node.rf-node-hoverglow {
+  border-color: #1d6fd1;
+  box-shadow: 0 0 0 2px rgba(29, 111, 209, 0.6), 0 0 14px rgba(29, 111, 209, 0.35);
+}
+
+/* 已选中节点悬停时，保留蓝框选中效果并增强辉光，不丢失选中态 */
+.rf-node.rf-node-sel:hover {
+  border-color: var(--c-blue3);
+  box-shadow: 0 0 0 2px var(--c-blue2), 0 0 20px rgba(88, 166, 255, 0.7);
+  transform: none;
+}
+
+.rf-node.rf-node-sel .rf-node-head {
+  background: #1f3a5f;
+  border-bottom-color: var(--c-blue2);
+}
+
+.rf-node-head {
+  padding: 6px 10px;
+  background: var(--c-line);
+  color: var(--c-text);
+  font-weight: 600;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.rf-node-body {
+  padding: 2px 0;
+}
+
+/* ══════════════ 规则节点（圆形）══════════════
+   2026-10-05 用户：「画布内容中增加个圆形的节点。类似于功能节点。为规则适配节点。」
+
+   形态：正圆 + 居中文字，视觉上「是个按钮/开关」，与方形的干活节点一眼分家。
+
+   ★ 三条不能破的约束：
+   1. overflow 仍须 visible —— 圆形边上的连线 handle 若被裁掉，
+      症状是「节点看着在，但连线连不上」，且极难定位（同上方注释里的既有教训）。
+      故圆形只改 border-radius，**不动 overflow**。
+   2. 圆角用 50% 而不是固定 px：节点大小随锁定节点数变化时仍是正圆。
+   3. 徽章不画 —— 圆形里塞不下横排徽章，且「规则」二字已在中心文字里。
+      徽章隐藏走 :nth 组合的 CSS，不改组件逻辑（UI 只读不写样式铁律）。*/
+.rf-node--rule {
+  /* 2026-10-05 用户第1 条：「规则跟随节点 的节点大小太大了 变小点」。
+     88→64。圆形节点的直径直接决定它在画布上的视觉权重：
+     88px 时一个规则节点比旁边的数据表还显眼，喧宾夺主；
+     64px 仍能清楚看见圆心计数与锁定环，又不压过真正承载数据的表节点。
+     圆心的 30px 数字同步降到 22px，否则字撑满整个圆。 */
+  min-width: 64px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--nk-rule-deep, #0a201e);
+  border: 2px solid var(--nk-rule-500, #2dd4bf);
+  /* 圆形不吃 .rf-node-inner 的 8px 圆角裁切，统一 50% */
+}
+.rf-node--rule .rf-node-inner {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* 圆内居中文字：替代方节点的「头 + 体」两段结构 */
+.rf-node--rule .rf-node-head {
+  background: transparent;
+  border-bottom: none;
+  padding: 4px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--nk-rule-ink, #7ce8db);
+  width: 100%;
+  word-break: break-all;
+  line-height: 1.3;
+}
+.rf-node--rule .rf-node-body { display: none; }
+/* 圆形不画横向徽章条 */
+.rf-node--rule .rf-badge { display: none; }
+
+/* ══════════════ AI / 参数库圆形（2026-10-06，用户：「模仿规则跟随节点样式
+   增加一个AI节点 / 参数库节点」）══════════════
+   ★ 复用策略：两类节点在 TableNode 里也挂 .rf-node--rule（圆形结构一套，
+     永不出两套样式漂移），再各挂 .rf-node--ai / .rf-node--paramlib，
+     这里只覆盖**族色**（底/边框/圆内文字/计数）。
+   ★ 选择器 .rf-node--rule.rf-node--ai 特异性 (0,2,0) 压过基础块 (0,1,0)，
+     且写在基础块之后 —— 双保险，不会被后置普通规则顶掉。 */
+.rf-node--rule.rf-node--ai {
+  background: var(--nk-ai-deep, #1c1230);
+  border-color: var(--nk-ai-500, #c084fc);
+}
+.rf-node--rule.rf-node--ai .rf-node-head {
+  color: var(--nk-ai-ink, #e0c8ff);
+}
+.rf-node--rule.rf-node--ai .rf-rule-in-label {
+  color: color-mix(in srgb, var(--nk-ai-ink, #e0c8ff) 78%, transparent);
+}
+.rf-node--rule.rf-node--ai .rf-rule-count {
+  color: var(--nk-ai-ink, #e0c8ff);
+}
+.rf-node--rule.rf-node--paramlib {
+  background: var(--nk-paramlib-deep, #2a0f1d);
+  border-color: var(--nk-paramlib-500, #f472b6);
+}
+.rf-node--rule.rf-node--paramlib .rf-node-head {
+  color: var(--nk-paramlib-ink, #fbb6d9);
+}
+.rf-node--rule.rf-node--paramlib .rf-rule-in-label {
+  color: color-mix(in srgb, var(--nk-paramlib-ink, #fbb6d9) 78%, transparent);
+}
+.rf-node--rule.rf-node--paramlib .rf-rule-count {
+  color: var(--nk-paramlib-ink, #fbb6d9);
+}
+
+/* ── 圆形节点（AI/参数库）运行动画（2026-10-06 用户：「折叠的时候 样式内容先不变
+   但是要增加一套运行的动画 帮我做个按钮用来测试」）──
+   rf-round-run 由 Canvas.tsx 挂在 wrapper（条件 = (nodesFolded || roundRunning)，
+   AI/参数库专属，rule 不挂）。两层动画，都 pointer-events:none 不挡连线起手：
+   ① ::before 旋转光环 —— conic-gradient 圆环（亮段扫过暗段），mask 抠成环，
+      族色走 --run-c（ai 紫 / paramlib 粉，与节点描边同色系）；
+   ② ::after 呼吸脉冲 —— box-shadow spread 从圆缘向外扩散后消散（ping 效果）。
+   圆内结构零改动（「样式内容先不变」）；.rf-node overflow: visible（不断线铁律）
+   让 inset 负值的光环露在圆外。 */
+.rf-node.rf-round-run {
+  --run-c: var(--nk-ai-500, #c084fc); /* 默认紫（AI）；paramlib 在下一行覆盖 */
+}
+.rf-node--paramlib.rf-round-run {
+  --run-c: var(--nk-paramlib-500, #f472b6);
+}
+.rf-node.rf-round-run::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 60deg,
+    var(--run-c) 280deg,
+    transparent 355deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  animation: rf-round-spin 1.1s linear infinite;
+  pointer-events: none;
+}
+@keyframes rf-round-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.rf-node.rf-round-run::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  animation: rf-round-pulse 1.6s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes rf-round-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--run-c);
+    opacity: 0.55;
+  }
+  70% {
+    box-shadow: 0 0 0 12px transparent;
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-node.rf-round-run::before {
+    animation: none; /* 降级：光环静止常显（保留运行中暗示，不转） */
+  }
+  .rf-node.rf-round-run::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ── 退出效果（2026-10-06 用户第2条：「增加特效的结束的退出效果
+     测试的时候3秒结束」）──
+   rf-round-exit 由 Canvas.tsx 在状态机的 exiting 阶段挂上，
+   且**与 rf-round-run 同时存在**（见 core/roundRun.roundRunClassOf）：
+   只挂 exit 会让 ::before/::after 失去旋转/脉冲的底层样式，
+   元素被重建 → 退出动画从一个错误的初始帧开始。
+
+   为什么必须有这个态：class 一摘，::before/::after 立刻被移除，
+   动画无从播完 —— 用户看到的是「啪」一下消失，不是退出。
+   所以 exiting 期间元素留在 DOM 上，播一段 0.5s 的淡出+收缩。
+
+   ★ 时长必须与 core/roundRun.ROUND_RUN_EXIT_MS（500ms）一致：
+     JS 侧 500ms 后摘 class，CSS 侧若写长了，动画播到一半元素就没了
+     （表现为「闪一下就没了」）；写短了则会留一帧静止的光环。
+     两处漂移过一次就很难查，所以时长在 core/roundRun 有单测钉住。 */
+.rf-node.rf-round-run.rf-round-exit::before {
+  /* 光环：停止旋转 → 向内收缩并淡出。收缩而非放大，因为「收工」的语义
+     是能量被收回节点；放大会更像「能量扩散出去」。 */
+  animation: rf-round-exit-in 0.5s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+@keyframes rf-round-exit-in {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+}
+.rf-node.rf-round-run.rf-round-exit::after {
+  /* 脉冲：直接淡出（它本身是扩散态，再叠收缩会显得拖沓） */
+  animation: rf-round-exit-fade 0.5s ease-out forwards;
+}
+@keyframes rf-round-exit-fade {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* reduced-motion：退出时不能残留一个静止光环（原本 running 时是「静止常显」的
+   降级策略，若 exit 不覆盖它，退出会变成「什么都不发生」）。*/
+@media (prefers-reduced-motion: reduce) {
+  .rf-node.rf-round-run.rf-round-exit::before {
+    animation: rf-round-exit-fade 0.5s ease-out forwards;
+  }
+}
+
+/* ══════════════ 常规节点折叠态（圆角矩形 · 上logo下参数数）══════════════
+   2026-10-06 用户四条（第二轮细化）：
+   1. 「圆角半径和方形的一致」—— 折叠块圆角 = 展开节点同款 8px，不做特殊圆角；
+   2. 「高度和拥有两行的一致。即一行标题 一行内容（两行高度一致）」——
+      折叠块高度 = 展开「一行标题 + 一行内容」节点的总高，
+      且折叠块内部上（logo）下（数量）两行各占一半、行高彼此一致。
+      ★ 实现不写死 px：上行复用 .rf-node-head 的行盒（padding 6px 10px），
+        下行复用 .rf-field 的行盒（padding 3px 10px），字号同源 ——
+        展开节点改行高时折叠块自动跟平，不会出现两套高度漂移；
+   3. 「点击折叠节点，左上的坐标不变。右边向左边靠齐」——
+      RF 节点 position 就是左上角，宽度收缩天然满足；折叠块**禁用 transform
+      缩放类方案**（那会让左上角也动），只用 width 变化；
+   4. 「折叠后的节点 上方是logo 下方是节点内参数数量」——
+      DOM 由 Canvas.tsx 折叠分支渲染（rf-fold-logo-row / rf-fold-count），
+      节点全名挪到 wrapper title（悬停可见）。
+   ★ overflow 仍不动（.rf-node visible），边缘 handle 不被裁 —— 不断线铁律。
+   ★ 2026-10-06 二轮：logo 改写类型全名后，用户先「强行锁定宽度」→ 锁 80，
+   随即实测「宽度大了」→ 收回 64px。配套收缩：徽章左右 padding 5→3、
+   行盒 margin 4→3 —— 最宽全名「数据对照表」10px×5字+6px padding = 56px，
+   恰好塞进 64−6 = 58px 可用宽，所有节点折叠后仍等宽。 */
+.rf-node--folded {
+  min-width: 64px;
+  width: 64px;
+  max-width: 64px;
+  /* 高度锁 56px：与「一行标题+一行参数」的展开节点精确等高（探针实测展开真高
+     55.9≈56，head 6+14+1 + body 4+field 3+13+3 + 节点 border 2）。二轮 logo 换
+     全名徽章后行盒变矮、内容撑不满了 —— 显式定高锁住「折叠高=展开两行高」，
+     两行 flex:1 自动分半。展开侧行盒参数若再改，这里要跟平。 */
+  height: 56px;
+  border-radius: 8px;
+}
+.rf-node--folded .rf-node-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+/* 上行 logo：rf-fold-logo-row 只是居中行盒（flex:1 占半行高），
+   里面的 .rf-badge 与展开态徽章**同一个类**（10px/600/圆角4px/族色填充）——
+   用户「logo字体也一致」靠复用同一类实现。仅左右 padding 5→3 收窄
+   （64px 锁宽下最宽全名「数据对照表」需要 ≤58px），上下 padding 不动。 */
+.rf-node--folded .rf-fold-logo-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px 3px 2px;
+}
+.rf-node--folded .rf-fold-logo-row .rf-badge {
+  padding: 2px 3px;
+  max-width: 100%;
+}
+/* 下行两组数字（2026-10-06 用户：「X参 X引 改成 X/X 引用数量的颜色要鲜艳一点」）：
+   「参数数/引用数」纯数字斜杠分隔；参数数保持浅灰白，引用数用规则青绿
+   （var(--nk-rule-500)，画布既有强调色、暗底上足够鲜艳）。 */
+.rf-node--folded .rf-fold-count {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  color: var(--c-text);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 2px 3px 5px;
+  border-radius: 5px;
+  background: rgba(177, 186, 196, 0.12);
+  line-height: 1;
+  padding: 4px 0;
+}
+.rf-node--folded .rf-fold-count em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--c-text4);
+  margin: 0 1px;
+}
+.rf-node--folded .rf-fold-count .rf-fold-ref {
+  color: var(--nk-rule-500, #2dd4bf);
+}
+
+/* ── 成员名标签列（2026-10-05 用户：「连接上了，就显示节点」）─────────
+   连上成员后，把成员名挂在圆圈**上方**（用户第 1 条：由下改上），
+   且**默认隐藏、点中该规则节点才显形**（同条指令）。
+
+   为什么默认隐藏（而不是常态显示）：
+     一个规则节点连 10 个成员时会糊着一列标签，画布长期噪音不断；
+     这些信息只在「用户正在看这个节点」时才有价值。
+     常态只留圆内的「规则跟随 + 计数」两行，够认出来。
+
+   ★ 必须挂成 .rf-node 的**兄弟节点**（在 .rf-node-inner 之外），
+     不能放进 .rf-node-inner —— 后者 overflow:hidden 会把溢出部分裁掉。
+     .rf-node 自身是 overflow:visible，标签挂在它上面才不会被裁。
+
+   ★ 显隐用 opacity/visibility 而非 display：
+     display:none 会把元素移出渲染树，虽然这里只是纯展示不影响连线，
+     但保持「始终在 DOM 里」更利于探针读数，也不给将来加交互埋坑。 */
+.rf-rule-tags {
+  position: absolute;
+  /* 上移：bottom:100% 把标签整体挂到圆圈**上沿之外**，
+     配合 margin-bottom 留出 6px 缝。原先是 top:100% + margin-top 挂下方。 */
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  /* 标签是纯展示，**不能挡拖拽**：pointer-events:none 让鼠标事件穿透到
+     节点本体，用户可以直接从标签上把规则节点拖走。 */
+  pointer-events: none;
+  max-width: 190px;
+  /* ★ 默认隐藏。visibility:hidden + opacity:0 而不是 display:none ——
+     见上方说明，且 visibility 保留过渡动画（display 无法过渡）。 */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s;
+}
+/* 点中该规则节点 → 标签列浮出。
+   ★ 只认 .rf-node-sel（点击选中），**不挂 :hover** ——
+     用户原话是「当我点击规则跟随节点才浮动出来」，
+     若连 hover 也给，鼠标一移上去标签就冒出来、
+     移开又消失，变成"闪一下就没"的最烦人形态；
+     而且 hover 与「正在看它」不等价，鼠标可能只是路过。
+     选中是明确意图，才配浮出。 */
+.rf-node-sel .rf-rule-tags {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.rf-rule-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 1px 7px;
+  border-radius: 9px;
+  font-size: 10px;
+  line-height: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  color: #a9b4c0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+/* 三态色与 RuleMembersPanel 的身份徽标同源：
+   主=青绿实心点、跟随=灰、 不跟随=虚线圈。画布与面板讲同一套身份语言。*/
+.rf-rule-tag-dot {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-border2);
+}
+.rf-rule-tag--primary {
+  color: var(--nk-rule-ink, #7ce8db);
+  border-color: color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 45%, transparent);
+  background: color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 10%, var(--c-bg1));
+}
+.rf-rule-tag--primary .rf-rule-tag-dot { background: var(--nk-rule-500, #2dd4bf); }
+.rf-rule-tag--follow .rf-rule-tag-dot { background: var(--c-text4); }
+.rf-rule-tag--ignore {
+  color: var(--c-text4);
+  border-style: dashed;
+  opacity: 0.75;
+}
+.rf-rule-tag--more {
+  color: var(--c-text4);
+  background: var(--c-bg0);
+  border-style: dashed;
+  font-variant-numeric: tabular-nums;
+}
+/* 被锁定的辅节点：加一圈虚线外环，表示「规则不由我决定」。
+   用 box-shadow 而非额外 DOM，零结构改动。 */
+.rf-node--rule-locked {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nk-rule-500) 35%, transparent),
+    0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* 圆心的成员计数（「规则节点上显示几个节点」）。
+   做成大号数字 —— 圆形里最有用的信息就是「我管着几个」，
+   「规则跟随」四个字放 title 悬停即可，挤在圆里会互相压。 */
+/* 圆内两行结构（2026-10-05 用户第 3 条：「数字居中缩小往下移动 上面及以上 规则跟随 四个字」）
+   上行小字「规则跟随」+ 下行计数。
+   改前只有一个 22px 大数字孤零零占满圆心，看着像"数字节点"而不是"规则节点"。
+   两行拆开后：字小、居中、数字下沉，圆心重心偏低一点更稳。 */
+.rf-node--rule .rf-rule-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 100%;
+  line-height: 1.15;
+}
+.rf-node--rule .rf-rule-in-label {
+  /* 2026-10-05 用户：「规则跟随字体稍微大点」→ 9 → 11。
+     圆直径 64px，扣掉 2px 边框剩 60px；「规则跟随」4 字 × 11px + 字距≈ 45.5px，
+     仍在可用宽度内（white-space:nowrap 保证不折行），不会撑破圆。 */
+  font-size: 11px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--nk-rule-ink, #7ce8db) 78%, transparent);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.rf-node--rule .rf-rule-count {
+  /* 同步 13 → 15，保持上行字与下行数字的字面层级（label 仍小一号）。 */
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--nk-rule-ink, #7ce8db);
+  text-align: center;
+  /* 数字整体下移一点：纯靠 flex 居中会显得数字偏上（上方多了 label），
+     给 1px 上边距把视觉重心压到圆心偏下，符合「往下移动」的口径。 */
+  margin-top: 1px;
+}
+
+/* ★★ 默认不显示，只在连线时显示（2026-10-05，用户：「头顶上的两个节点的连接点
+     默认是不显示的。只有连线的时候显示」）
+
+   为什么用 opacity + pointer-events 而不是 display:none：
+   display:none 会把元素从渲染树拿掉，连线时 RF 要靠 getBoundingClientRect 算落点，
+   元素不存在 → 拖到顶部区域没有候选口 → 连线直接连不上。
+   opacity:0 保留布局与命中盒，只是看不见，RF 的命中逻辑完全不受影响。
+
+   ★ 为什么不用 RF 自带的 .connectionindicator 做显隐：
+   它在**非连线时也会被加上**（源码 @xyflow/react 1966 行：
+   `isConnectable && (!connectionInProcess || isPossibleEndHandle) && (...)`，
+   非连线时短路成 isConnectableStart），用它当「正在连线」的判据会全程显形。
+   connectingto / connectingfrom 才严格只在连接进行中出现。
+
+   ★★ 为什么下面每条都要写两遍选择器（.rf-handle--rule 与
+   .react-flow__handle.rf-handle--rule）：
+   RF 官方样式里有 `.react-flow__handle.connectionindicator{pointer-events:all}`，
+   **两个类选择器 = 特异性 (0,2,0)，压过单类的 .rf-handle--rule (0,1,0)**。
+   只写单类时 opacity 生效（RF 没管它）但 pointer-events 不生效。
+
+   ★★★ 关键取舍：隐藏时**必须保留 pointer-events**（第一版写成 none 是错的）：
+   RF 在 @xyflow/react:2345 给 handle 内联 `pointerEvents:'none'`，官方注释说
+   「要让自定义 handle 接住鼠标必须显式写 all」—— 反过来，我若额外压成 none，
+   `elementFromPoint` 会穿透到 .rf-node-inner，鼠标根本按不到规则起点口，
+   **规则线再也连不上**（实测复现：命中的是 rf-node-inner 而非 handle）。
+   所以这里只做「看不见」：opacity:0 + visibility 不改，命中盒完整保留，
+   连线能力与显形时完全一致。用户口述是「默认不显示」，没说要禁用交互。 */
+/* ── 规则跟随专用连接口：常态隐藏，拖拽连线时才显形 ────────────────
+   2026-10-05 用户口径（本轮再次澄清，与上一轮的「常显」相反）：
+     「上1 和上2 在一般情况 会隐藏 只有连接的时候 也就是拖拽连线的时候」
+   逐字落实：**只有上1/上2 恢复默认隐藏**，规则节点下方的下1 不动
+   （下1 是规则线唯一的起点，用户得先看得见它才知道从哪儿能拖）。
+
+   ★ 为什么隐藏用 opacity 而不是 display:none：
+     display:none 会把元素从渲染树拿掉，RF 靠 getBoundingClientRect 算落点，
+     元素不存在 → 连线时找不到候选口 → 直接连不上（这条已在注释里记过）。
+     opacity:0 保留布局与命中盒，看不见但照样能连。
+
+   ★★ 为什么隐藏时**必须保留 pointer-events**：
+     RF 给自定义 handle 内联 pointerEvents:'none'，官方注释说
+     要让自定义 handle 接住鼠标必须显式写 all。反过来若压成 none，
+     鼠标按到的是 .rf-node-inner，规则线再也连不上。 */
+.react-flow__handle.rf-handle--rule,
+.rf-handle--rule {
+  opacity: 0;
+}
+
+/* 拖拽连线中：上1/上2 显形。
+   ★ 2026-10-06 口径二修：.rf-connecting 现在**只在规则线拖拽时挂**
+     （起点是规则口，Canvas.onConnectStart 按 isRulePortId(handleId) 分流）——
+     数据流拖线（左口→右口）改挂 .rf-connecting-data，见本文件末尾的强藏规则。
+   ★ class 挂在**外层 wrapper `.rf-canvas`** 上（Canvas.tsx 的 onConnectStart/End
+     维护的 connectKind state），不在 .react-flow 元素上，
+     所以必须用后代选择器 `.rf-canvas.rf-connecting .xxx`。
+     初版写成 `.react-flow.rf-connecting`（要求同一元素同时有两个类）——
+     实测 lit=68/130，一半锚点死活不亮。 */
+.rf-canvas.rf-connecting .rf-handle--rule {
+  opacity: 1;
+}
+
+/* ── ★ 选中规则节点 → 其成员节点的规则口显形（2026-10-05 用户指令①）──────
+   用户原话：「点击规则跟随 与该节点跟随 节点连接的节点 的锚点
+   在点击选中该节点的时候没显示」。
+   链路：Canvas.onSelectionChange → store.selRuleNode（瞬态桥）
+     → 成员节点 TableNode 算出「锁定我的规则节点正被选中」
+     → 自己的 wrapper 挂 .rf-rule-ports-show → 本规则显形。
+   显形范围是 .rf-handle--rule 全类：成员节点的上1/上2/下1/下2 一起亮 ——
+   用户点选规则节点想看的就是「这条规则线挂在谁身上的哪些口」，
+   亮全套（含新增的底部口）与拖线时的显形粒度保持一致。
+   ★ 特异性 (0,2,0) 高于常态隐藏的 .rf-handle--rule (0,1,0)，
+     写在哪个位置都赢 —— 但放在同一显隐区，后人一眼看全三态：
+     常态藏 / 拖线亮 / 成员被点名亮。 */
+.rf-node.rf-rule-ports-show .rf-handle--rule {
+  opacity: 1;
+}
+
+/* ── ★ 连线中给上1/上2 加一圈「呼吸」高亮环（2026-10-05）──────────────
+   为什么要这个：用户要求上1/上2 **常态隐藏、连线时才显形**。
+   但线一显出来，画布上同时亮起几十个 10px 的小方块，
+   用户拖到某个节点上方时很难确认「我现在停的这一个是不是能连」。
+   这个环只画在**鼠标当前悬停的那个口**上（:hover），
+   于是拖线时的落点判断有了明确的视觉锚点。
+   ★ 为什么不用 box-shadow 之外的花活：box-shadow 不影响布局、
+     不影响命中盒，纯装饰，画质问题不会连带打乱锚点定位
+     （前一轮 `position: relative` 就是纯装饰改动打乱了整个节点布局）。 */
+.rf-canvas.rf-connecting .rf-handle--rule:hover {
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.35);
+}
+
+/* 下1（规则节点出线口）：**保持常显**。
+   它是规则线唯一的起点，用户得先看得见它才知道「从这儿能拖」。
+   （用户本轮只要求上1/上2 隐藏，没提下1。） */
+.react-flow__handle.rf-handle--rule-out,
+.rf-handle--rule-out {
+  opacity: 1;
+}
+
+/* ── 以下是上一轮「两类规则口统一常显」的遗留，已整段删除（2026-10-05 用户本轮改口径）──
+   用户原话：「上1 和上2 在一般情况 会隐藏 只有连接的时候 也就是拖拽连线的时候」。
+   上面的新块已把显隐定成：上1/上2 默认隐藏 + 连线中显形；下1 常显。
+   ★ 若留着这两段，**后写的规则会靠后置覆盖把新块顶掉**（同特异性下后写的赢），
+     于是又变回常显 —— 而肉眼看代码完全正常，只有真浏览器量 opacity 才发现。
+     这类「CSS 靠后置覆盖赢」的坑，参见 gate-selfcheck-real-capture 的陷阱 9.20。
+
+   ★★ 判据为什么是我们自己的 class，不是 RF 的状态（实测查过，保留这条结论）：
+     RF 不会把「连接进行中」暴露成任何 DOM 属性或类名。实测拖线全程对比
+     .react-flow / body / .react-flow__pane 的 class 与 dataset：
+       连线前 = 连线中 = 连线后，完全一致，没有任何字段随连接过程变化。
+     （源码里 connectionInProgress 只进了 React 的 props，不落到 DOM。）
+     所以只能由 Canvas 自己维护 onConnectStart/End 状态并打 class —— 别再去猜 RF 的类名。
+   ★★ class 挂在**外层 wrapper .rf-canvas** 上，不在 .react-flow 元素上，
+     所以必须用后代选择器 .rf-canvas.rf-connecting .xxx。
+     初版写成 .react-flow.rf-connecting（要求同一元素同时有两个类）——
+       真浏览器实测 lit=68/130，一半锚点死活不亮，纯单元测试与肉眼看不出来。 */
+
+/* ── 规则跟随专用连接口（2026-10-05 用户口径）──
+   「每个节点的节点在上方增加一个方便规则跟随节点连接」
+   「规则节点的节点在下方。不在两侧。」
+
+   ★ 为什么用方形而不是圆形：左右的数据流口是圆的，规则口用方形 + 主题色，
+     一眼能分「这条线是数据流还是规则锁定」。
+     早期版本把规则口也做成圆的，结果用户问「这两个点有啥区别」—— 分不清就等于没加。*/
+.rf-handle--rule,
+.rf-handle--rule-out {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--nk-rule-500, #2dd4bf);
+  border: 1.5px solid var(--c-bg0);
+  cursor: crosshair;
+}
+/* 规则跟随节点**下方**那个口：略大一点，暗示「从这儿往外连成员」 */
+.rf-handle--rule-out {
+  width: 12px;
+  height: 12px;
+  background: var(--nk-rule-ink, #7ce8db);
+}
+/* 悬停放大，给个「这个点能用」的反馈 */
+.rf-handle--rule:hover,
+.rf-handle--rule-out:hover {
+  transform: translate(-50%, -50%) scale(1.35);
+}
+
+/* ── AI / 参数库节点的专属口族色（2026-10-06）──
+   两类节点在 TableNode 里挂 rf-handle--rule-out 复用「常显 + 12px 尺寸 +
+   hover 放大」体系（圆形节点唯一的口必须常显，否则无从起手拖线），
+   这里只把底色换成各自族色 —— 同特异性靠后置赢，必须写在基础块之后。
+   显隐行为完全随 rf-handle--rule-out：数据流拖线时一并隐藏（1226 行区）。 */
+.rf-handle--ai {
+  background: var(--nk-ai-500, #c084fc);
+}
+.rf-handle--paramlib {
+  background: var(--nk-paramlib-500, #f472b6);
+}
+
+/* 数据流连接口（2026-10-05 用户第 3 条：从左右两侧移到顶部 16% / 84%）
+   与规则口同在顶部一条边上，所以**形状与颜色必须一眼可分**：
+     规则口 = 方形 + 青绿（规则锁定）
+     数据流口 = 圆形 + 中性灰（数据流）
+   早期版本规则口也是圆的，用户问「这两个点有啥区别」—— 分不清等于没加。 */
+.rf-handle--flow {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-text4);
+  border: 1.5px solid var(--c-bg0);
+}
+.rf-handle--flow:hover {
+  background: var(--c-text3);
+}
+/* 数据流口常显：它一直在那儿，用户要能看见「从这儿接上游」。*/
+.rf-handle--flow {
+  opacity: 1;
+}
+/* ⚠ React Flow 的 top/bottom 口默认已 translate(-50%,-50%)，
+     上面的 hover transform 必须带上同一translate，否则悬停时 handle 会跳位。*/
+.rf-node .react-flow__handle-top.rf-handle--rule,
+.rf-node .react-flow__handle-bottom.rf-handle--rule-out {
+  transform: translate(-50%, -50%);
+}
+.rf-node .react-flow__handle-top.rf-handle--rule:hover,
+.rf-node .react-flow__handle-bottom.rf-handle--rule-out:hover {
+  transform: translate(-50%, -50%) scale(1.35);
+}
+
+/* ── ★ 数据流拖线中：上/下的规则口全部强制隐藏（2026-10-06 用户指令）──────
+   用户原话：「从节点左边 接接节点右边的锚点连线的时候 上下的锚点不用显示。」
+   拖数据流线（左口→右口）时画面只需要左右的圆口，
+   上1/上2/下1/下2（.rf-handle--rule）与规则节点下1 出线口（.rf-handle--rule-out）
+   一并藏掉，拖完恢复。规则线拖拽仍走 .rf-connecting 显形（见前）。
+
+   ★ 位置必须在这些 hover/transform 规则**之后**：
+     与 .rf-node.rf-rule-ports-show .rf-handle--rule（1113 行，特异性同为 (0,3,0)）
+     同特异性靠后置覆盖赢；不压 :hover 的话——隐藏走 opacity、pointer-events
+     仍保留（连线能力的铁律，见 1064-1070），鼠标扫过看不见的口会又被 hover
+     规则点亮，出「忽隐忽现」怪态。所以 :hover 态也一并压成 0。 */
+.rf-canvas.rf-connecting-data .rf-handle--rule,
+.rf-canvas.rf-connecting-data .rf-handle--rule-out,
+.rf-canvas.rf-connecting-data .rf-handle--rule:hover,
+.rf-canvas.rf-connecting-data .rf-handle--rule-out:hover {
+  opacity: 0;
+}
+
+.rf-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 10px;
+  color: var(--c-text2);
+  border-bottom: 1px solid var(--c-line)33;
+}
+
+.rf-field:last-child {
+  border-bottom: none;
+}
+
+.rf-type {
+  color: var(--c-text3);
+  font-size: 11px;
+}
+
+/* 连接点（拖动可画连线） */
+.rf-handle {
+  width: 9px;
+  height: 9px;
+  background: var(--c-blue2);
+  border: 1.5px solid var(--c-bg0);
+  border-radius: 50%;
+}
+
+/* 连线删除按钮 */
+.edge-rm {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  line-height: 1;
+  font-size: 14px;
+  color: var(--c-text3);
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.edge-rm:hover {
+  color: #fff;
+  background: #a32d2d;
+  border-color: #a32d2d;
+}
+
+/* 关键修复：elementsSelectable=false（快速点击修复）会让 React Flow 把整条连线
+   设为 pointer-events:none，导致 onEdgeMouseEnter 收不到、悬停删除按钮永远不出现。
+   这里强制恢复连线的悬停命中区域，但保持连线不可被“选中”（仍由 elementsSelectable 控制）。 */
+.react-flow__edge {
+  pointer-events: all !important;
+}
+.react-flow__edge .react-flow__edge-interaction {
+  pointer-events: stroke !important;
+}
+
+/* AG Grid 单元格 */
+.row-no {
+  color: var(--c-text3);
+}
+
+.col-total {
+  font-weight: 600;
+  color: var(--c-blue3);
+}
+
+.col-computed {
+  color: var(--c-green2);
+  font-style: italic;
+}
+
+/* 节点按族配色（头/边/徽章）—— 单一真相源 = :root 的--nk-<族>-* 色谱。
+   类名由 src/core/nodeStyle.ts 的 familyClassOf()/badgeClassOf() 生成：
+     .rf-node.nk--<族>  →  节点描边 + 节点头底 + 底边线
+     .rf-badge--<族>    →  徽章底色
+   加一种新 kind 只需在 nodeStyle.ts 加一行 + :root 加一个族，这里零改动。 */
+.nk--text { border-color: var(--nk-text-500); }
+.nk--text .rf-node-head { background: var(--nk-text-head); border-bottom-color: var(--nk-text-500); }
+.nk--xlsx { border-color: var(--nk-xlsx-500); }
+.nk--xlsx .rf-node-head { background: var(--nk-xlsx-head); border-bottom-color: var(--nk-xlsx-500); }
+.nk--docx { border-color: var(--nk-docx-500); }
+.nk--docx .rf-node-head { background: var(--nk-docx-head); border-bottom-color: var(--nk-docx-500); }
+.nk--param { border-color: var(--nk-param-500); }
+.nk--param .rf-node-head { background: var(--nk-param-head); border-bottom-color: var(--nk-param-500); }
+.nk--table { border-color: var(--nk-table-500); }
+.nk--table .rf-node-head { background: var(--nk-table-head); border-bottom-color: var(--nk-table-500); }
+.nk--start { border-color: var(--nk-start-500); }
+.nk--start .rf-node-head { background: var(--nk-start-head); border-bottom-color: var(--nk-start-500); }
+.nk--sort { border-color: var(--nk-sort-500); }
+.nk--sort .rf-node-head { background: var(--nk-sort-head); border-bottom-color: var(--nk-sort-500); }
+.nk--map { border-color: var(--nk-map-500); }
+.nk--map .rf-node-head { background: var(--nk-map-head); border-bottom-color: var(--nk-map-500); }
+.nk--output { border-color: var(--nk-output-500); }
+.nk--output .rf-node-head { background: var(--nk-output-head); border-bottom-color: var(--nk-output-500); }
+.nk--ooword { border-color: var(--nk-ooword-500); }
+.nk--ooword .rf-node-head { background: var(--nk-ooword-head); border-bottom-color: var(--nk-ooword-500); }
+.nk--oosheet { border-color: var(--nk-oosheet-500); }
+.nk--oosheet .rf-node-head { background: var(--nk-oosheet-head); border-bottom-color: var(--nk-oosheet-500); }
+.nk--gate { border-color: var(--nk-gate-500); }
+.nk--gate .rf-node-head { background: var(--nk-gate-head); border-bottom-color: var(--nk-gate-500); }
+.nk--chapter { border-color: var(--nk-chapter-500); }
+.nk--chapter .rf-node-head { background: var(--nk-chapter-head); border-bottom-color: var(--nk-chapter-500); }
+.nk--rule { border-color: var(--nk-rule-500); }
+.nk--rule .rf-node-head { background: var(--nk-rule-head); border-bottom-color: var(--nk-rule-500); }
+
+.rf-node-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rf-node-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rf-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--c-bg0);
+}
+/* 徽章底色：按族自动取（类名来自 nodeStyle.ts badgeClassOf） */
+.rf-badge--table {
+  background: var(--nk-table-500);
+}
+.rf-badge--text {
+  background: var(--nk-text-500);
+}
+.rf-badge--xlsx {
+  background: var(--nk-xlsx-500);
+}
+.rf-badge--docx {
+  background: var(--nk-docx-500);
+}
+.rf-badge--param {
+  background: var(--nk-param-500);
+}
+.rf-badge--start {
+  background: var(--nk-start-500);
+}
+.rf-badge--sort {
+  background: var(--nk-sort-500);
+}
+.rf-badge--map {
+  background: var(--nk-map-500);
+}
+.rf-badge--output {
+  background: var(--nk-output-500);
+}
+/* OO 系列徽章（2026-10-07 22:3x 用户：「两个 logo 的图片蓝底 你没改」）：
+   底色改**宣纸白砖**（与 wfc 文件图标/快捷方式/任务栏同款风格——
+   「wfc 文件的样式用在软件快捷方式和任务栏等地方」的「等地方」含画布徽章），
+   文字转墨色。蓝/绿分族改由左侧细色条保留辨识。 */
+.rf-badge--ooword,
+.rf-badge--oosheet {
+  background: #f5f3ee;
+  color: #1c1c1c;
+  border: 1px solid #d8d2c4;
+}
+.rf-badge--ooword {
+  box-shadow: inset 3px 0 0 var(--nk-ooword-500);
+}
+.rf-badge--oosheet {
+  box-shadow: inset 3px 0 0 var(--nk-oosheet-500);
+}
+.rf-badge--gate {
+  background: var(--nk-gate-500);
+}
+.rf-badge--chapter {
+  background: var(--nk-chapter-500);
+}
+.rf-badge--group {
+  background: var(--nk-group-500);
+}
+.rf-badge--rule {
+  background: var(--nk-rule-500);
+}
+
+/* 调色板节点图形 —— 形状表达「角色」，底/边引用色谱标准的族色。
+   7 种形状 = 7 个 role（nodeStyle.ts 的 SHAPE_CLASS 决定哪个 kind 用哪种）：
+     flow-in  输入型：左内凹进数据的「入口」
+     flow     数据处理型：直角矩形（可继续流转）
+     flow-out 输出型：右内凹出数据的「出口」
+     trigger  动作型：圆形（触发器，像按钮）
+     gate     循环型：菱形（条件判断）
+     store    资料库型：底部双横线（存储介质）
+     page     模板型：折角文档
+   加一种新 role = 这里加一条形状规则；换某kind 的形状 = 只改 nodeStyle.ts。 */
+.palette-flow-in-shape,
+.palette-flow-shape,
+.palette-flow-out-shape,
+.palette-trigger-shape,
+.palette-gate-shape,
+.palette-store-shape,
+.palette-page-shape,
+.palette-group-shape {
+  background: var(--c-line);
+  border: 1.5px solid var(--c-border);
+  border-radius: 3px;
+}
+/* 入/出：内凹侧向箭头方向感（用 clip-path 造缺口，不改边框色） */
+.palette-flow-in-shape {
+  border-color: var(--nk-param-500);
+  background: var(--nk-param-head);
+}
+.palette-flow-out-shape {
+  border-color: var(--nk-output-500);
+  background: var(--nk-output-head);
+}
+/* 同角色的多个 kind 靠族色区分（sort/map/text 都属flow 形状，但必须各归各色）。
+   .palette-shape 同时挂了形状类与族类，这里按族补底色与描边。
+   注意：形状类在前、族类规则在后，故族色会覆盖形状类里的中性灰。 */
+.palette-shape.nk--sort {
+  background: var(--nk-sort-head);
+  border-color: var(--nk-sort-500);
+}
+.palette-shape.nk--map {
+  background: var(--nk-map-head);
+  border-color: var(--nk-map-500);
+}
+.palette-shape.nk--text {
+  background: var(--nk-text-head);
+  border-color: var(--nk-text-500);
+}
+.palette-shape.nk--table {
+  background: var(--nk-table-head);
+  border-color: var(--nk-table-500);
+}
+.palette-shape.nk--start {
+  background: var(--nk-start-head);
+  border-color: var(--nk-start-500);
+}
+.palette-shape.nk--param {
+  background: var(--nk-param-head);
+  border-color: var(--nk-param-500);
+}
+.palette-shape.nk--output {
+  background: var(--nk-output-head);
+  border-color: var(--nk-output-500);
+}
+/* 模板型 4 个 kind（Word/Excel/OO文档/OO工作簿）形状相同，靠族色区分：
+   Word=蓝 / Excel=绿 / OO文档=蓝 / OO工作簿=绿。
+   ★ 2026-10-04 用户定：ooword/oosheet 不再自成一族（曾用品红），改为跟随原生 Word/Excel 同色，
+     用户按"这是 Word 类的"就能直接对上色，不用记一套新色。
+     真正区分"内嵌 OnlyOffice"靠的是形状/图标与节点库分组，不是颜色。
+     与画布节点徽章口径一致（nodes-office.css cap-* 同源）。 */
+.palette-shape.nk--docx {
+  background: var(--nk-docx-head);
+  border-color: var(--nk-docx-500);
+}
+.palette-shape.nk--xlsx {
+  background: var(--nk-xlsx-head);
+  border-color: var(--nk-xlsx-500);
+}
+.palette-shape.nk--ooword {
+  background: var(--nk-ooword-head);
+  border-color: var(--nk-ooword-500);
+}
+.palette-shape.nk--oosheet {
+  background: var(--nk-oosheet-head);
+  border-color: var(--nk-oosheet-500);
+}
+.palette-shape.nk--gate {
+  background: var(--nk-gate-head);
+  border-color: var(--nk-gate-500);
+}
+.palette-shape.nk--chapter {
+  background: var(--nk-chapter-head);
+  border-color: var(--nk-chapter-500);
+}
+.palette-shape.nk--group {
+  background: var(--nk-group-soft);
+  border-color: var(--nk-group-500);
+  border-style: dashed;
+  border-radius: 4px;
+}
+.palette-shape.nk--chapter {
+  background: var(--nk-chapter-head);
+  border-color: var(--nk-chapter-500);
+}
+/* 动作型 = 触发器按钮：圆形 */
+.palette-trigger-shape {
+  background: var(--nk-start-head);
+  border-color: var(--nk-start-500);
+  border-radius: 50%;
+}
+/* 规则节点（圆形，2026-10-05）：形状沿用 trigger 的圆形，只换族色。
+   形状在本体系里表达 role，rule 的 role=action，与start 同族形状 —— 本就自动生效。 */
+.palette-shape.nk--rule {
+  background: var(--nk-rule-head);
+  border-color: var(--nk-rule-500);
+}
+/* 循环型 = 条件闸门：菱形 */
+.palette-gate-shape {
+  background: var(--nk-gate-head);
+  border-color: var(--nk-gate-500);
+  border-radius: 2px;
+  transform: rotate(45deg) scale(0.82);
+}
+/* 资料库型 = 存储：底部双横线 */
+.palette-store-shape {
+  border-color: var(--nk-table-500);
+  background: var(--nk-table-head);
+  position: relative;
+}
+.palette-store-shape::after {
+  content: '';
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  bottom: 3px;
+  height: 4px;
+  border-top: 1.5px solid var(--nk-table-500);
+  opacity: 0.75;
+}
+/* 模板型 = 文档：右上折角。折角描边用 --nk-docx-500（OO 节点在画布上是品红族，
+   调色板里统一用 docx 蓝示意「文档类」，避免同形状出现四份近似色） */
+.palette-page-shape {
+  border-color: var(--nk-docx-500);
+  background: var(--nk-docx-head);
+  position: relative;
+}
+.palette-page-shape::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--c-line);
+  border-left: 1.5px solid var(--c-border);
+  border-bottom: 1.5px solid var(--c-border);
+  border-radius: 0 2px 0 3px;
+}
+
+/* 数据流连线：醒目虚线 + 标签 */
+.react-flow__edge.edge-flow .react-flow__edge-path {
+  stroke: var(--c-green);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   规则跟随连线（2026-10-05，用户第 2 条：「主节点的样式和其他跟随节点的
+   样式不一致」→ 统一成一套视觉语言，只用「实/虚」区分主从）
+   ════════════════════════════════════════════════════════════════════════
+   ★ 之前没有这段样式 —— 规则线与数据流线共用 edge-flow 那个绿色虚线，
+     所以「主节点线」和「跟随节点线」长得一模一样，用户分不出谁是主。
+     根因在 Canvas 的边构造（已改），不在这里。
+
+   配色沿用规则节点自己的青绿（--nk-rule-500），与圆节点的锁定环同族：
+     · 主节点 → 实线 + 偏亮青绿（规则以它为准，是这一组的"权威"）
+     · 跟随节点 → 虚线 + 暗一档的青绿（从属于主，不抢视线）
+   两者的**线宽与端点一致**，只有虚实与明度不同 ——
+   这样"同组"一眼可辨，"谁是主"也不难分辨，不会像两套无关的线。*/
+.react-flow__edge.edge-rule .react-flow__edge-path {
+  stroke: #2dd4bf;
+  stroke-width: 2;
+  /* 不设 dasharray：主节点是实线 */
+}
+.react-flow__edge.edge-rule--primary .react-flow__edge-path {
+  stroke: #5eead4;
+  /* 2026-10-05 用户第 2 条：「主节点的线太粗了，改一下」
+     2.5 → 1.8。主从两条线在画布上一眼要能分得开主次，
+     但主线只是"稍重"，不是"最粗的那条"—— 原来 2.5 比从线 1.5 重得多，
+     视觉上像另一类关系（用户截图里多条主线并行尤其明显）。
+     1.8 / 1.5 的差值靠**实线 vs 虚线**来区分，不靠粗细堆差距。 */
+  stroke-width: 1.8;
+}
+.react-flow__edge.edge-rule--follow .react-flow__edge-path {
+  stroke: #2a8f83;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 5;
+}
+
+/* ★ 选中规则节点时，让它牵出的规则线「流动」（2026-10-05 用户第 2 条：
+ * 「点击规则节点时，连线发生流动（dash animation）」）。
+
+   ★★★ 这段动画**只改 stroke-dashoffset，且完全由 .rf-flowing 驱动**。
+   为什么不把「是否流动」写进 edges 的 className（第一版做法）：
+     那样点选必然触发 setEdges 全表重建 → RF 把每条边的 <path> 重挂 →
+     所有线的 CSS 动画**同步从头开始** → 肉眼看「其他工作流全停」。
+     用户实测报了这个回归（点一下规则节点，其他线停住，取消选中才恢复）。
+     ⇒ 现在：边对象恒定带 .edge-rule--flow；「此刻动不动」只看祖先有没有
+       .rf-flowing。点选只改节点一个 class，边对象零变动。
+
+   选择器用 :has() —— 边是 <svg> 里的 path，节点是 <div>，两者不是兄弟，
+   共同祖先只有 .react-flow__pane。老浏览器不支持 :has() 时表现为
+   「规则线不流动」，属优雅降级（不影响其它线的动画）。
+
+   实现要点：
+   1. 动画挂在 stroke-dashoffset 上，移动 dash 间隙 → 视觉上线条在跑；
+      改 stroke-dasharray 会改变虚线节距，看起来像闪烁而不是流动。
+   2. **必须显式给 dasharray**：primary 常态是实线（不设 dasharray），
+      实线没有 dash 间隙，offset 动画等于什么都没动。
+   3. offset 位移长度 = dasharray 之和（3+5=8），循环无缝，看不到接缝跳变。
+   4. 默认 paused，只在 .rf-flowing 祖先存在时 running —— 这样「流动」
+      由状态驱动，不会误伤 RF 内建 animated 边的 dashdraw。*/
+@keyframes rf-rule-flow {
+  to {
+    stroke-dashoffset: -8;
+  }
+}
+/* ★ 2026-10-06 线种精确化：:has(.rf-flowing) → :has(.rf-node--rule.rf-flowing)。
+   原选择器匹配「任何挂 rf-flowing 的节点」—— AI/参数库加入后它们选中时
+   也挂 rf-flowing（模仿规则节点），若不细化，选中 AI 会把**规则线**也带着跑。
+   现在：rule 选中 → 只有规则线动；ai 选中 → 只有 AI 线动；paramlib 同理。 */
+.react-flow__pane:has(.rf-node--rule.rf-flowing) .react-flow__edge.edge-rule--flow .react-flow__edge-path {
+  stroke-dasharray: 3 5;
+  animation: rf-rule-flow 0.5s linear infinite;
+  animation-play-state: running;
+}
+.react-flow__edge.edge-rule--flow .react-flow__edge-path {
+  /* 未选中规则节点时：给 dasharray 但**暂停**，
+     保证 primary 选中后有 dash 间隙可跑，且此刻画面完全静止。 */
+  stroke-dasharray: 3 5;
+  animation: rf-rule-flow 0.5s linear infinite;
+  animation-play-state: paused;
+}
+/* 尊重系统「减少动态效果」设置：关掉动画但保留虚线，线仍然可辨识。 */
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.edge-rule--flow .react-flow__edge-path {
+    animation: none;
+  }
+}
+
+/* ══════════════ AI / 参数库连线（2026-10-06，模仿规则线的一套视觉语言）══════════════
+   与 edge-rule 同构：本体定色、--flow 定动画；流动仍由祖先 .rf-flowing 驱动
+   （点选只改节点一个 class，边对象零变动 —— 不重蹈「全表重建致动画同步重启」）。
+   AI 线 = 普通节点下1 → AI 上沿（紫）；参数库线 = 参数库下沿 → 普通节点上2（粉）。
+   实线 2px，与规则线主线同重 —— 三种圆形节点线在画布上「同构不同色」。 */
+.react-flow__edge.edge-ai .react-flow__edge-path {
+  stroke: var(--nk-ai-500, #c084fc);
+  stroke-width: 2;
+}
+.react-flow__edge.edge-paramlib .react-flow__edge-path {
+  stroke: var(--nk-paramlib-500, #f472b6);
+  stroke-width: 2;
+}
+.react-flow__pane:has(.rf-node--ai.rf-flowing) .react-flow__edge.edge-ai--flow .react-flow__edge-path {
+  animation-play-state: running;
+}
+.react-flow__pane:has(.rf-node--paramlib.rf-flowing) .react-flow__edge.edge-paramlib--flow .react-flow__edge-path {
+  animation-play-state: running;
+}
+.react-flow__edge.edge-ai--flow .react-flow__edge-path,
+.react-flow__edge.edge-paramlib--flow .react-flow__edge-path {
+  stroke-dasharray: 3 5;
+  animation: rf-rule-flow 0.5s linear infinite;
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.edge-ai--flow .react-flow__edge-path,
+  .react-flow__edge.edge-paramlib--flow .react-flow__edge-path {
+    animation: none;
+  }
+}
+
+.edge-tag {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  color: var(--c-green);
+  background: var(--c-bg0);
+  border: 1px solid var(--c-green3);
+  border-radius: 4px;
+  padding: 1px 5px;
+  pointer-events: none;
+}
+
+/* 悬停连线上的 × 删除按钮时，在 × 上方显示标签（如"数据流"） */
+.edge-rm:hover + .edge-tag {
+  display: block;
+}
+
+/* 属性面板：来源列表 / 提示 / 导出按钮 */
+.src-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--c-text2);
+}
+.src-list li {
+  margin: 2px 0;
+}
+
+/* 数据来源选择器（免连线引入） */
+.src-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 6px;
+  background: var(--c-bg0);
+}
+.src-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--c-text2);
+  padding: 3px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.src-opt:hover {
+  background: var(--c-bg1);
+}
+.src-opt-on {
+  color: var(--c-text);
+}
+.src-opt input {
+  width: auto;
+  margin: 0;
+  accent-color: #8957e5;
+}
+.src-badge {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--c-green2);
+  border: 1px solid var(--c-green3);
+  border-radius: 10px;
+  padding: 0 6px;
+}
+
+/* 对照规则表编辑器（数据对照表节点专用） */
+.map-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 6px;
+  background: var(--c-bg0);
+  margin-bottom: 6px;
+}
+.map-row {
+  display: grid;
+  gap: 4px;
+  align-items: center;
+}
+.map-row input {
+  padding: 3px 5px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text);
+  font-size: 12px;
+  min-width: 0;
+}
+.map-row input:focus {
+  border-color: #39c5cf;
+  outline: none;
+}
+.map-row-head {
+  font-size: 11px;
+  color: var(--c-text3);
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--c-line);
+}
+.map-row-del {
+  padding: 2px 0;
+  text-align: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--c-text3);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+.map-row-del:hover {
+  color: var(--c-red);
+  border-color: var(--c-red);
+}
+
+/* 属性面板内 hint：左侧提示条+缩进（与字段卡呼应） */
+.props-field .hint {
+  font-size: 11px;
+  color: var(--c-text3);
+  margin: 6px 0 0;
+  line-height: 1.5;
+  padding-left: 8px;
+  border-left: 2px solid var(--c-border);
+}
+.hint {
+  font-size: 11px;
+  color: var(--c-text3);
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+
+.export-btn {
+  color: var(--c-text);
+  background: #8957e5;
+  border-color: #8957e5;
+  padding: 6px 10px;
+  font-weight: 600;
+}
+.export-btn:hover {
+  background: #a371f7;
+  border-color: #a371f7;
+  color: #fff;
+}
+
+/* 画布容器：承载右键菜单 / 框选的指针事件 */
+.rf-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 右键拖拽框选矩形 */
+.sel-marquee {
+  position: fixed;
+  border: 1px solid var(--c-blue2);
+  background: rgba(88, 166, 255, 0.12);
+  z-index: var(--z-marquee);
+  pointer-events: none;
+}
+
+/* 画布顶部居中：节点统计 + 已选中数量 */
+.canvas-statbar {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-canvas-ui);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  background: rgba(22, 27, 34, 0.94);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  color: var(--c-text2);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.stat-total {
+  background: #1f2630;
+  border: 1px solid var(--c-border);
+}
+
+.stat-sel {
+  background: rgba(88, 166, 255, 0.18);
+  border: 1px solid rgba(88, 166, 255, 0.6);
+  color: #cfe4ff;
+}
+
+.stat-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--c-border);
+}
+
+/* 右键上下文菜单（复制自 workflow-app） */
+.ctx-menu {
+  position: fixed;
+  z-index: var(--z-ctx-menu);
+  min-width: 150px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.ctx-item {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--c-text2);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+/* 置灰菜单项（2026-10-22 OO 右键「预加载（如有）」：未绑定内容时不可点） */
+.ctx-item.ctx-item-dis {
+  color: var(--c-text4);
+  cursor: default;
+  opacity: 0.55;
+}
+
+.ctx-item:hover {
+  background: var(--c-line);
+  color: var(--c-text);
+}
+
+.ctx-sep {
+  height: 1px;
+  background: var(--c-line);
+  margin: 4px 0;
+}
+
+.ctx-detach-item {
+  color: var(--c-text3);
+  font-size: 11px;
+}
+
+.ctx-detach-item:hover {
+  color: var(--c-text);
+}
+
+/* 画布浮动工具条：全局预览(居中) / 撤销 / 重做 */
+.canvas-tools {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: var(--z-canvas-ui);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: calc(100% - 360px);
+}
+
+.tool-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--c-text2);
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.tool-btn:hover:not(:disabled) {
+  background: var(--c-border);
+  color: var(--c-text);
+  border-color: var(--c-blue2);
+}
+
+.tool-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 内容偏离中心时高亮，提示可点击"全局预览"居中 */
+.tool-hot {
+  color: var(--c-text);
+  border-color: var(--c-blue2);
+  background: #0d2a4a;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.25);
+}
+
+/* 工具条允许换行，避免按钮过多被挤掉（已在 .canvas-tools 中配置） */
+.tool-sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--c-border);
+  margin: 2px 2px;
+}
+/* 框选模式 / 运行按钮 选中态 */
+.tool-on {
+  color: var(--c-text);
+  border-color: var(--c-blue2);
+  background: #0d2a4a;
+}
+.run-btn {
+  color: var(--c-text);
+  border-color: var(--c-green3);
+}
+.run-btn:hover:not(:disabled) {
+  background: var(--c-green3);
+  border-color: var(--c-green3);
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   画布顶部 UI —— OnlyOffice(Word/Excel) 三段式 ribbon
+   结构：.cr-titlebar 标题行 / .cr-tabrow 菜单标签 / .cr-ribbon 工具带
+   注：根节点类名沿用 .canvas-topbar —— Canvas 指针守卫靠它排除本区域
+
+   定位：fixed 通栏，钉在 app 标题栏下方。菜单必须横跨整个窗口宽度，
+   否则左侧竖向节点库面板会与菜单齐平、而不是落在菜单下方。
+   自身高度通过 --ribbon-h 告诉外层 .layout（见 CanvasRibbon 的 ResizeObserver）。
+   ══════════════════════════════════════════════════════════════════ */
+.canvas-topbar {
+  position: fixed;
+  /* ★ 2026-10-19 用户「这两行合并」：app-titlebar 行取消，本行顶到 0 成为唯一标题行
+     ★ 颜色走 --ed-* 主题变量（主题切换按钮即时生效） */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-canvas-ui);
+  display: flex;
+  flex-direction: column;
+  background: var(--ed-bg2, var(--c-bg1));
+  border-bottom: 1px solid var(--ed-border, var(--c-border));
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  user-select: none;
+  font-size: 12px;
+  color: var(--ed-text1, var(--c-text2));
+}
+/* ① 标题行 */
+/* 独立的工具行已并入 .cr-tabrow（撤销/重做 + 菜单标签 + 状态胶囊同一行），
+   此规则作废。菜单行高度由 .cr-tabrow 统一定义。 */
+.cr-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.cr-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #2f81f7, var(--c-blue));
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+/* 画布名已合并进 app 标题栏（.app-docname），此处旧规则作废 */
+.cr-right {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--btn-gap);
+  gap: 6px;
+  /* ★ 2026-10-24 交界补偿：右侧动作区交界实测 2px（两容器 gap 互不管交界），+4 凑齐 6px 规范 */
+  padding-right: 4px;
+}
+.cr-chip {
+  font-size: 11px;
+  color: var(--c-text3);
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.cr-chip--on {
+  color: var(--c-blue3);
+  border-color: var(--c-blue);
+}
+.cr-chip--btn {
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.cr-chip--btn:hover {
+  color: var(--c-text);
+  border-color: var(--c-blue2);
+}
+/* ★ 2026-10-24 与 app-savebtn 规格完全对齐（padding 0/颜色/变量尺寸）——
+   tabrow 混排两 class 的间距/亮度不一致根因消除 */
+.cr-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-sz);
+  height: var(--btn-sz);
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--ed-border, var(--c-border));
+  background: transparent;
+  color: var(--ed-text1, var(--c-text2));
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.cr-icon-btn svg {
+  width: var(--btn-icon);
+  height: var(--btn-icon);
+  stroke-width: 2;
+}
+.cr-icon-btn:hover {
+  color: var(--ed-text, var(--c-text));
+  border-color: var(--ed-text4, var(--c-text4));
+}
+.cr-icon-btn-on {
+  color: var(--c-red2);
+  border-color: var(--c-red);
+}
+.cr-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.cr-icon-btn:disabled:hover {
+  color: var(--c-text3);
+  border-color: var(--c-border);
+}
+.cr-history {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  padding-right: 8px;
+  border-right: 1px solid var(--c-line);
+}
+/* 折叠按钮：紧贴 .cr-history，视觉上与撤销/重做同属一组（「对界面本身的操作」），
+   但不并进 .cr-history —— 那个容器带 border-right 分隔线，插进去会把撤销组和页签
+   之间的分隔线挤到折叠按钮右边，破坏原有分组。 */
+.cr-fold-btn {
+  flex: 0 0 auto;
+  margin-right: 6px;
+}
+/* ── 功能区折叠（2026-10-06 用户重定语义）：只收 .cr-ribbon 工具带，
+   菜单标签行（.cr-tabrow）永不折叠。高度变化无需专门 CSS ——
+   --ribbon-h 由 ResizeObserver 实时量根节点高度写入，工具带不渲染时
+   根节点自动缩回菜单行一截，画布同步上让。
+   折叠态点页签 = 工具带临时弹出；点了功能按钮/下拉由 CanvasRibbon
+   容器委托收回（选完功能自动折叠，Office 经典交互）。
+   （原「整条收成 22px 窄把手」方案随之作废：.cr-root-folded / .cr-fold-handle 已删。） */
+/* ② 菜单标签行 */
+/* 菜单行：左（撤销/重做）· 中（菜单标签）· 右（状态胶囊）三段，垂直居中 */
+.cr-tabrow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  /* ★ 2026-10-19 合并标题栏：行高 34 → 40（原 app-titlebar 高度） */
+  height: 40px;
+  padding: 0 10px;
+  background: var(--c-bg0);
+  border-bottom: 1px solid var(--c-border);
+}
+.cr-tab {
+  height: 26px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--c-text2);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.cr-tab:hover {
+  background: var(--c-line);
+  color: var(--c-text);
+}
+.cr-tab-on {
+  background: var(--c-bg0);
+  border-color: var(--c-border);
+  color: #fff;
+  font-weight: 600;
+}
+/* ③ 工具带 */
+.cr-ribbon {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 5px 8px 4px;
+  background: var(--c-bg0);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.cr-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px;
+  border-right: 1px solid var(--c-line);
+  flex: 0 0 auto;
+}
+.cr-group:last-child {
+  border-right: none;
+}
+.cr-group-btns {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.cr-group-label {
+  font-size: 10.5px;
+  color: var(--c-text4);
+  white-space: nowrap;
+}
+.cr-tool {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 46px;
+  height: 42px;
+  padding: 3px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--c-text2);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cr-tool:hover {
+  background: var(--c-line);
+  border-color: var(--c-border);
+  color: #fff;
+}
+.cr-tool-on {
+  background: #132b47;
+  border-color: var(--c-blue);
+  color: var(--c-blue3);
+}
+
+/* ★ 2026-10-20 亮色覆盖：上面三处 color:#fff / 深蓝底是为暗色写的，
+   亮色下（浅底）白字/深蓝底全部看不清 —— 换深字 + 浅蓝底。 */
+:root[data-theme='light'] .cr-tab-on {
+  color: var(--c-text);
+}
+:root[data-theme='light'] .cr-tool:hover {
+  color: var(--c-text);
+}
+:root[data-theme='light'] .cr-tool-on {
+  background: #dbeafe;
+  border-color: var(--c-blue);
+  color: var(--c-blue);
+}
+
+/* ★ 2026-10-20 亮色覆盖：上面三处 color:#fff / 深蓝底是为暗色写的，
+   亮色下（浅底）白字/深蓝底全部看不清 —— 换深字 + 浅蓝底。 */
+:root[data-theme='light'] .cr-tab-on {
+  color: var(--c-text);
+}
+:root[data-theme='light'] .cr-tool:hover {
+  color: var(--c-text);
+}
+:root[data-theme='light'] .cr-tool-on {
+  background: #dbeafe;
+  border-color: var(--c-blue);
+  color: var(--c-blue);
+}
+.cr-combo {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 2px;
+}
+.cr-page-select {
+  max-width: 168px;
+  height: 26px;
+  font-size: 12px;
+  color: var(--c-text);
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 0 6px;
+  cursor: pointer;
+}
+.cr-page-select:hover {
+  border-color: var(--c-blue2);
+}
+.cr-zoom-val {
+  min-width: 52px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  color: var(--c-text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.cr-zoom-val:hover {
+  border-color: var(--c-blue2);
+}
+/* ribbon 收起时（点已选中的标签）只留标题行 + 标签行，给画布让出高度 */
+.cr-ribbone-hide {
+  display: none;
+}
+
+/* 回收站按钮 + 数量徽标 */
+.trash-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.trash-btn.trash-open {
+  background: #1f3a5f;
+  border-color: var(--c-blue2);
+  color: #cfe4ff;
+}
+.trash-badge {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #d12b2b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* 回收站抽屉面板 */
+.trash-panel {
+  position: absolute;
+  top: 54px;
+  right: 12px;
+  left: auto;
+  z-index: var(--z-trash);
+  width: 280px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(22, 27, 34, 0.96);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+.trash-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--c-border);
+  background: rgba(31, 58, 95, 0.35);
+}
+.trash-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.trash-head-actions {
+  display: flex;
+  gap: 8px;
+}
+.trash-link {
+  font-size: 12px;
+  color: var(--c-text3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.trash-link:hover {
+  color: var(--c-text2);
+}
+.trash-link.danger:hover {
+  color: var(--c-red2);
+}
+/* 逐步恢复「上一次删除」按钮：强调色，区别于「清空/收起」纯文字链接 */
+.trash-link.restore-last {
+  color: var(--c-blue3);
+  border: 1px solid rgba(121, 192, 255, 0.5);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-weight: 600;
+  background: rgba(56, 139, 253, 0.12);
+}
+.trash-link.restore-last:hover {
+  color: #cae6ff;
+  border-color: var(--c-blue3);
+  background: rgba(56, 139, 253, 0.22);
+}
+.trash-body {
+  overflow-y: auto;
+  padding: 6px;
+}
+.trash-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--c-text4);
+  font-size: 12px;
+}
+.trash-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 7px;
+}
+.trash-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.trash-badge-k {
+  flex: none;
+  font-size: 10px;
+  padding: 1px 6px;
+}
+.trash-name {
+  flex: 1;
+  font-size: 12px;
+  color: var(--c-text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trash-item-actions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+.trash-restore {
+  font-size: 12px;
+  color: #fff;
+  background: var(--c-green3);
+  border: 1px solid var(--c-green3);
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+.trash-restore:hover {
+  background: var(--c-green3);
+}
+.trash-purge {
+  font-size: 12px;
+  color: var(--c-red2);
+  background: transparent;
+  border: 1px solid var(--c-red);
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+.trash-purge:hover {
+  background: rgba(248, 81, 73, 0.15);
+}
+
+/* 开始节点配色（红） */
+.rf-badge--start {
+  background: var(--c-red);
+}
+.rf-node--start {
+  border-color: var(--c-red);
+}
+/* 触发器形状已迁到 .palette-trigger-shape（见调色板七形状区块） */
+
+/* 框选模式：画布游标变十字，提示可拖拽框选 */
+.rf-canvas.marquee-on {
+  cursor: crosshair;
+}
+
+/* 运行可视化：当前正在执行的节点高亮 */
+.rf-node--running {
+  box-shadow: 0 0 0 3px #f2cc60, 0 0 18px rgba(242, 204, 96, 0.6);
+  border-color: #f2cc60;
+  transition: box-shadow 0.3s ease;
+}
+
+/* ★ 统一锁性能联动（2026-10-26 用户备忘「锁定=性能优化联动」）：
+   锁定节点内容不变 → 合成层常驻提升（will-change）——平移/缩放/拖其它节点时
+   锁定节点不参与重绘，锁定越多画布越流畅（正向反馈）。
+   只用 will-change（禁 contain:paint——rn-badge top:-13 溢出会被裁掉）。 */
+.rf-node--locked { will-change: transform; }
+
+/* 锁定头部小锁标（rf-node-head 内、标题右侧） */
+.rf-node-lockmark {
+  flex: 0 0 auto;
+  margin-left: 4px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--c-text4);
+}
+
+/* ===== 缩放控制面板（右下角，缩略图上方） ===== */
+.zoom-panel.react-flow__panel {
+  /* bottom 由内联样式控制（=170px，压在缩略图之上）；这里只定右边距与层叠 */
+  right: 16px;
+  margin: 0;
+  z-index: var(--z-canvas-ui);
+}
+
+.zoom-panel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  /* ★ 2026-10-20 主题跟随（亮色下不再黑块压浅背景） */
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+.zoom-btn,
+.zoom-fit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-text);
+  background: var(--c-hover);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+  user-select: none;
+}
+
+.zoom-fit {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 10px;
+}
+
+.zoom-btn:hover,
+.zoom-fit:hover {
+  background: var(--c-blue);
+  border-color: var(--c-blue2);
+  color: #fff;
+}
+
+.zoom-btn:active,
+.zoom-fit:active {
+  transform: scale(0.94);
+}
+
+.zoom-val {
+  min-width: 46px;
+  text-align: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--c-text2);
+  padding: 0 2px;
+}
+
+/* 缩略图：与缩放面板保持间距，避免视觉重叠 */
+.react-flow__minimap {
+  margin: 16px;
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  background: var(--c-bg0);
+}
+
+/* ── Word 报告面板（output 节点） ───────────────────────────────── */
+
+.wrp {
+  margin-top: 16px;
+  border-top: 1px solid var(--c-line);
+  padding-top: 12px;
+}
+/* 放大编辑器里功能区直接贴住标题栏（margin/padding/分隔线是属性面板布局用的） */
+.ne-body--flush .wrp {
+  margin-top: 0;
+  border-top: none;
+  padding-top: 0;
+}
+.ne-body--flush .wb {
+  gap: 0;
+}
+
+.wrp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.wrp-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.wrp-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 5px;
+  padding: 2px;
+}
+
+.wrp-tabs button {
+  padding: 2px 10px;
+  font-size: 11px;
+  color: var(--c-text3);
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.wrp-tabs button.on {
+  background: var(--c-border);
+  color: var(--c-text);
+}
+
+.wrp-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.wrp-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 5px;
+  color: var(--c-text);
+  font-size: 12px;
+}
+
+.wrp-tpl {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--c-blue2);
+}
+
+.wrp-meta {
+  font-size: 11px;
+  color: var(--c-text3);
+  margin-bottom: 8px;
+}
+
+/* ============================================================
+   取值溯源（Word 侧）
+   ------------------------------------------------------------
+   与 Excel 侧的 .xrp-trace 是对称的两块（措辞也刻意一致）：
+   送审被问「这个数哪来的」，展开就能逐个域答出来。
+   默认折叠 —— 平时不占地方，要查时才展开。
+   ============================================================ */
+.wrp-trace {
+  margin-bottom: 10px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+}
+.wrp-trace > summary {
+  padding: 7px 10px;
+  color: var(--c-text3);
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+}
+.wrp-trace > summary:hover {
+  color: var(--c-text2);
+}
+.wrp-trace-body {
+  border-top: 1px solid var(--c-line);
+  padding: 6px 10px 9px;
+  max-height: 220px;
+  overflow: auto;
+}
+.wrp-trace-row {
+  display: grid;
+  grid-template-columns: minmax(70px, 1fr) 62px minmax(90px, 1.4fr) minmax(50px, 0.9fr);
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 11px;
+  color: var(--c-text2);
+  align-items: baseline;
+}
+.wrp-trace-row.bad {
+  color: var(--c-red);
+}
+.wrp-trace-key,
+.wrp-trace-urn,
+.wrp-trace-val {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wrp-trace-key {
+  font-weight: 600;
+}
+.wrp-trace-from {
+  color: var(--c-green2);
+  font-size: 10px;
+}
+.wrp-trace-row.bad .wrp-trace-from {
+  color: var(--c-red);
+}
+.wrp-trace-urn {
+  color: var(--c-text4);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.wrp-trace-val {
+  text-align: right;
+  color: var(--c-text);
+}
+
+.wrp-err {
+  background: rgba(163, 45, 45, 0.15);
+  border: 1px solid #a32d2d;
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: #ffa198;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+}
+
+.wrp-warn {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: rgba(186, 117, 23, 0.12);
+  border: 1px solid #6b4c10;
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--c-gold2);
+  margin-bottom: 8px;
+}
+.wrp-warn > span {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── 节点编辑器最大化（Excel/Word 面板共用）──
+   连遮罩的 28px 内边距一起归零 —— 最大化必须完全占据整个窗体 */
+.node-editor-mask.ne-max-pad {
+  padding: 0;
+}
+.node-editor.ne-max {
+  width: 100vw !important;
+  height: 100vh !important;
+  /* ★ 2026-10-23 修「最大化不居中」：引用栏/预选栏开着的让位 margin（222px）
+     在最大化时仍在 → 满屏窗体被推偏。最大化本就侧栏内嵌，清除让位。 */
+  margin: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+/* 选区内格淡青底。★ 不再 !important（#33 格式对话框批次）：用户显式填充（cellStyle inline）
+   应盖过瞬态选区 tint（WPS 同语义——上过色的格选中时仍显示自己的颜色） */
+.wb-cell-inrange {
+  background: rgba(54, 197, 214, 0.16);
+}
+/* 阅读模式：高亮选中格所在的行与列（金色淡底，与青色选区框区分；不加描边——避免满屏格子边框） */
+.wb-cell-cross {
+  background: rgba(212, 162, 78, 0.16) !important;
+}
+.wb-menu-drop {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+}
+.wb-fn-drop,
+.wb-fnlib,
+.wb-cmtlist {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+.wb-fnlib-item:hover,
+.wb-cmt-row:hover {
+  background: var(--c-hover);
+}
+
+.wrp-busy {
+  font-size: 11px;
+  color: var(--c-text3);
+  margin-bottom: 8px;
+}
+
+.wrp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.wrp-empty {
+  font-size: 11px;
+  color: var(--c-text3);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.wrp-item {
+  border: 1px solid var(--c-line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: var(--c-bg0);
+}
+
+.wrp-item-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.wrp-kind {
+  flex: none;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.bk-field { background: var(--c-blue)33; color: var(--c-blue2); }
+.bk-rich  { background: #8957e533; color: #bc8cff; }
+.bk-each  { background: var(--c-green3)33; color: var(--c-green); }
+.bk-if    { background: #9e6a0333; color: var(--c-gold2); }
+.bk-image { background: #bf398933; color: #f778ba; }
+
+.wrp-name {
+  flex: none;
+  font-size: 12px;
+  color: var(--c-text);
+  font-weight: 500;
+}
+
+.wrp-resolved {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-size: 10px;
+  color: var(--c-text3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wrp-ctl {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.wrp-ctl select,
+.wrp-val {
+  min-width: 0;
+  flex: 1;
+  padding: 3px 6px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text);
+  font-size: 11px;
+  outline: none;
+}
+
+.wrp-ctl select:focus,
+.wrp-val:focus {
+  border-color: var(--c-blue2);
+}
+
+.wrp-rich {
+  width: 100%;
+  min-height: 56px;
+  resize: vertical;
+  padding: 5px 6px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text);
+  font-size: 11px;
+  font-family: ui-monospace, Consolas, monospace;
+  outline: none;
+}
+
+.wrp-rich:focus {
+  border-color: var(--c-blue2);
+}
+
+.wrp-sample {
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--c-text4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wrp-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.wrp-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── image: 控件 ──────────────────────────────────────────── */
+.wrp-img {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.wrp-img-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wrp-img-pick {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.wrp-img-thumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px dashed var(--c-border);
+  border-radius: 4px;
+  background: var(--c-bg0);
+}
+
+.wrp-img-thumb img {
+  max-width: 120px;
+  max-height: 80px;
+  display: block;
+  border-radius: 2px;
+}
+
+.wrp-img-thumb span {
+  font-size: 10px;
+  color: var(--c-text4);
+}
+
+.wrp-check {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--c-text3);
+  cursor: pointer;
+}
+
+.wrp-check input {
+  accent-color: var(--c-blue);
+}
+
+.wrp-preview {
+  border: 1px solid var(--c-line);
+  border-radius: 6px;
+  background: var(--c-bg0);
+  max-height: 360px;
+  overflow: auto;
+  padding: 8px;
+}
+
+.docx-preview-empty,
+.docx-preview-err {
+  font-size: 11px;
+  color: var(--c-text3);
+  padding: 20px 8px;
+  text-align: center;
+}
+
+.docx-preview-err {
+  color: #ffa198;
+}
+
+/* docx-preview 渲染出来的页面：深色底上放白纸 */
+.wrp-preview .docx-wrapper {
+  background: var(--c-bg1);
+  padding: 12px;
+}
+
+.wrp-preview .docx-wrapper > section.docx {
+  background: #fff;
+  color: #000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  margin-bottom: 12px;
+}
+
+/* ── 富文本编辑器 ───────────────────────────────────────────────── */
+
+.richedit {
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--c-bg1);
+}
+
+.richedit:focus-within {
+  border-color: var(--c-blue2);
+}
+
+.richedit-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 4px;
+  background: var(--c-line);
+  border-bottom: 1px solid var(--c-border);
+  flex-wrap: wrap;
+}
+
+.re-btn {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  font-size: 11px;
+  color: var(--c-text2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.re-btn:hover {
+  background: var(--c-border);
+  color: var(--c-text);
+}
+
+.re-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--c-border);
+  margin: 0 3px;
+}
+
+.re-h {
+  height: 20px;
+  padding: 0 3px;
+  font-size: 11px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 3px;
+  color: var(--c-text2);
+}
+
+.re-color {
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  border: 1px solid var(--c-border);
+  border-radius: 2px;
+  cursor: pointer;
+  background: var(--c-bg0);
+  color: var(--c-text3);
+  font-size: 9px;
+  line-height: 1;
+}
+
+.re-color:hover {
+  border-color: var(--c-blue2);
+}
+
+.richedit-body {
+  min-height: 64px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 5px 7px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--c-text);
+  outline: none;
+}
+
+.richedit-body:empty::before {
+  content: attr(data-placeholder);
+  color: var(--c-text4);
+}
+
+.richedit-body p {
+  margin: 0 0 4px;
+}
+
+.richedit-body ol,
+.richedit-body ul {
+  margin: 2px 0;
+  padding-left: 18px;
+}
+
+.richedit-body h2,
+.richedit-body h3 {
+  margin: 4px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.richedit-body blockquote {
+  margin: 3px 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--c-border);
+  color: var(--c-text3);
+}
+
+/* ── 预览放大浮层 ───────────────────────────────────────────────── */
+
+.wrp-preview-wrap {
+  position: relative;
+}
+
+.wrp-zoom-btn {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.wrp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: rgba(1, 4, 9, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* ── OnlyOffice 在线编辑弹层 ───────────────────────────── */
+.oo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(1, 4, 9, 0.82);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 20px;
+}
+
+.oo-modal-box {
+  display: flex;
+  flex-direction: column;
+  width: min(1280px, 100%);
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.oo-settings {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--c-bg1);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.oo-settings label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--c-text3);
+  white-space: nowrap;
+}
+
+.oo-settings input {
+  flex: 1;
+  min-width: 0;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  color: var(--c-text);
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.oo-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.oo-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--c-bg1);
+  border-bottom: 1px solid var(--c-border);
+  font-size: 12px;
+  color: var(--c-text);
+}
+
+.oo-title { font-weight: 500; }
+
+.oo-dirty { color: var(--c-gold); font-size: 11px; }
+
+.oo-sp { flex: 1; }
+
+.oo-btn {
+  background: var(--c-line);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  color: var(--c-text);
+  font-size: 12px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.oo-err {
+  margin: 10px 12px;
+  padding: 8px 12px;
+  background: #3d1d1d;
+  border: 1px solid #a32d2d;
+  border-radius: 6px;
+  color: #f09595;
+  font-size: 12px;
+}
+
+.oo-loading {
+  padding: 24px;
+  text-align: center;
+  color: var(--c-text3);
+  font-size: 13px;
+}
+
+/* DS iframe 由脚本注入这里；编辑器需要整块高度 */
+.oo-holder {
+  flex: 1;
+  min-height: 0;
+}
+
+.oo-holder > div,
+.oo-holder iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
+}
+
+.wrp-overlay-inner {
+  display: flex;
+  flex-direction: column;
+  width: min(900px, 100%);
+  max-height: 100%;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.wrp-overlay-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--c-bg1);
+  border-bottom: 1px solid var(--c-border);
+  font-size: 12px;
+  color: var(--c-text);
+}
+
+.wrp-overlay-hint {
+  flex: 1;
+  font-size: 11px;
+  color: var(--c-text3);
+}
+
+.wrp-preview.big {
+  max-height: none;
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  padding: 20px;
+  overflow: auto;
+}
+
+/* ── each 列映射 / rich 插字段 ─────────────────────────────────── */
+
+.wrp-cols {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.wrp-col {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wrp-col-name {
+  flex: none;
+  width: 84px;
+  font-size: 10px;
+  color: var(--c-text3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wrp-col select {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 5px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text);
+  font-size: 11px;
+}
+
+.wrp-rich-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wrp-insert {
+  align-self: flex-end;
+  padding: 2px 6px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text2);
+  font-size: 10px;
+}
+
+/* ══════════════ 联动触发规则面板（src/xlsx/TriggerPanel.tsx）══════════════
+   配色沿用既有深色主题（var(--c-border) 边框 / var(--c-text2) 文字），不引入新色系。 */
+.trg-panel {
+  padding: 10px;
+  font-size: 11px;
+  color: var(--c-text2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+.trg-head { display: flex; align-items: baseline; gap: 8px; }
+.trg-head b { font-size: 12px; color: var(--c-text); }
+.trg-sub { color: var(--c-text3); font-size: 10px; }
+.trg-sec { display: flex; flex-direction: column; gap: 5px; }
+.trg-sec-t {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--c-text3); text-transform: none; letter-spacing: .3px;
+}
+.trg-warn-t { color: var(--c-gold); margin-top: 4px; }
+.trg-empty {
+  padding: 8px; border: 1px dashed var(--c-border); border-radius: 4px;
+  color: var(--c-text4); font-size: 10px; line-height: 1.6;
+}
+.trg-changes, .trg-log, .trg-rules { list-style: none; margin: 0; padding: 0; }
+.trg-changes li {
+  padding: 3px 6px; border-left: 2px solid #388bfd; background: var(--c-bg1);
+  border-radius: 0 3px 3px 0; margin-bottom: 3px; font-size: 10px;
+}
+.trg-changes code { color: var(--c-blue3); }
+.trg-log li {
+  padding: 3px 6px; background: var(--c-bg1); border-radius: 3px;
+  margin-bottom: 2px; font-size: 10px; line-height: 1.5;
+}
+.trg-warn li { border-left: 2px solid var(--c-gold); }
+.trg-dim li { color: var(--c-text4); }
+.trg-rules { display: flex; flex-direction: column; gap: 6px; }
+.trg-rule {
+  padding: 7px; background: var(--c-bg1); border: 1px solid var(--c-border);
+  border-radius: 5px; display: flex; flex-direction: column; gap: 5px;
+}
+.trg-off { opacity: .5; }
+.trg-rule-top { display: flex; align-items: center; gap: 5px; }
+.trg-name {
+  flex: 1; min-width: 0; background: var(--c-bg0); border: 1px solid var(--c-border);
+  border-radius: 3px; color: var(--c-text2); font-size: 10px; padding: 3px 5px;
+}
+.trg-badge {
+  background: var(--c-blue); color: #fff; border-radius: 8px;
+  padding: 1px 6px; font-size: 9px; white-space: nowrap;
+}
+.trg-x {
+  background: none; border: none; color: var(--c-text4); cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 0 3px;
+}
+.trg-x:hover { color: var(--c-red); }
+.trg-rule-cond, .trg-rule-act {
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+}
+.trg-k { color: var(--c-text3); font-size: 10px; }
+.trg-rule-cond select, .trg-rule-act select, .trg-coord, .trg-num {
+  background: var(--c-bg0); border: 1px solid var(--c-border); border-radius: 3px;
+  color: var(--c-text2); font-size: 10px; padding: 3px 4px; max-width: 130px;
+}
+.trg-coord { width: 62px; }
+.trg-num { width: 52px; }
+.trg-note { color: var(--c-text4); font-size: 9px; line-height: 1.5; }
+.trg-acts { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.trg-btn {
+  background: var(--c-line); border: 1px solid var(--c-border); border-radius: 4px;
+  color: var(--c-text2); font-size: 10px; padding: 5px 10px; cursor: pointer;
+}
+.trg-btn:hover:not(:disabled) { background: var(--c-border); }
+.trg-btn:disabled { opacity: .4; cursor: not-allowed; }
+.trg-btn-primary { background: var(--c-green3); border-color: var(--c-green3); color: #fff; }
+.trg-btn-primary:hover:not(:disabled) { background: var(--c-green3); }
+.trg-mini {
+  background: none; border: 1px solid var(--c-border); border-radius: 3px;
+  color: var(--c-text3); font-size: 9px; padding: 2px 6px; cursor: pointer;
+}
+.trg-mini:hover { color: var(--c-text2); border-color: var(--c-border2); }
+
+/* ══════════════════════════════════════════════════════════════
+   规则跟随 —— 属性栏编辑区 + 成员管理浮层
+   2026-10-05。这批类名上一版就已在 RuleEditor.tsx 里用上，
+   但样式表里**一个都没有** —— 症状是规则编辑区以裸HTML 呈现，
+   在深色底座上几乎看不清、按钮也没有可点的样子。
+   判据：TSX 里出现的 classname 必须在 CSS 里能查到，否则视为漏项。
+   ══════════════════════════════════════════════════════════════ */
+.rule-panel {
+  border: 1px solid color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 30%, transparent);
+  border-radius: 8px;
+  padding: 10px;
+  background: color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 6%, transparent);
+}
+.rule-panel > label {
+  display: block;
+  font-size: 12px;
+  color: var(--nk-rule-ink, #7ce8db);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.rule-panel .hint {
+  font-size: 11px;
+  color: var(--c-text3);
+  line-height: 1.6;
+  margin: 0;
+}
+/* 辅节点只读提示块 */
+.rule-panel--locked {
+  border-color: rgba(210, 153, 34, 0.4);
+  background: rgba(210, 153, 34, 0.07);
+}
+.rule-panel--locked > label {
+  color: var(--c-gold2);
+}
+.rule-locked-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+.rule-locked-name {
+  flex: 1;
+  font-size: 12px;
+  color: var(--c-text2);
+}
+
+/* 按 kind 分桶的规则块 */
+.rule-bucket {
+  border: 1px solid var(--c-line);
+  border-radius: 7px;
+  padding: 8px;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.rule-bucket-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.rule-bucket-names {
+  flex: 1;
+  font-size: 11px;
+  color: var(--c-text3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rule-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.rule-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--c-text3);
+  margin-top: 6px;
+}
+.rule-item > span { color: var(--c-text3); }
+.rule-item input,
+.rule-item select {
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 5px;
+  color: var(--c-text2);
+  font-size: 12px;
+  padding: 4px 6px;
+}
+.rule-item input:focus,
+.rule-item select:focus {
+  outline: none;
+  border-color: var(--nk-rule-500, #2dd4bf);
+}
+
+/* 规则校验提示：缺项/越界标黄，而不是静默接受 */
+.rule-problems {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rule-problem {
+  font-size: 11px;
+  color: var(--c-gold2);
+  background: rgba(210, 153, 34, 0.1);
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+
+/* 小按钮 */
+.rule-btn {
+  flex: none;
+  font-size: 11px;
+  color: var(--c-text2);
+  background: var(--c-line);
+  border: 1px solid var(--c-border);
+  border-radius: 5px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.rule-btn:hover:not(:disabled) {
+  border-color: var(--nk-rule-500, #2dd4bf);
+  color: #fff;
+}
+.rule-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.rule-btn--danger:hover:not(:disabled) {
+  border-color: #a32d2d;
+  color: #fff;
+  background: #a32d2d;
+}
+.rule-btn--primary {
+  border-color: var(--nk-rule-500, #2dd4bf);
+  color: var(--nk-rule-ink, #7ce8db);
+}
+
+/* ── 成员管理浮层（双击圆形规则节点弹出）──
+   定位在屏幕正中偏上：用户双击的是画布上的圆形，浮层盖住它会挡住「看着节点改」，
+   往下挪一点让圆形仍可见。
+
+   ★★ z-index 必须走 --z-modal，不能写死数字（2026-10-05 用户「样式 UI」反馈修）：
+     原来这里写的是 `z-index: 60`，而顶栏/工具条是 --z-canvas-ui: 1600、
+     右键菜单 2000 —— 面板被 ribbon 从上面压住，标题栏「清单规则…共 N 个节点」
+     那一整行直接看不见（截图实测）。
+     层级铁律：本项目所有浮层一律引用 --z-* 变量，禁止裸数字；
+     新增浮层时对照文件头的 --z-* 表选一个语义匹配的档位。*/
+.rule-members-mask {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(1, 4, 9, 0.62);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+  animation: rule-members-fade 0.12s ease-out;
+}
+@keyframes rule-members-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* 面板本体：改前是「一块扁平的深色矩形」，浮层感几乎为零——
+   底色与遮罩太接近、边框只有 1px 细线、没有内外层次。
+   现在按 WPF/桌面软件的窗体惯例做三层：外描边 + 顶部标题条 + 内容区深底。*/
+.rule-members {
+  width: 580px;
+  max-width: calc(100vw - 40px);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  /* 双层阴影：近处一圈暗边把窗体从遮罩上「抬」起来，
+     远处一片弥散投影交代高度 —— 单层 box-shadow 做不出这个层次 */
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 22%, transparent),
+    0 16px 48px rgba(0, 0, 0, 0.7),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  animation: rule-members-pop 0.14s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+@keyframes rule-members-pop {
+  from { opacity: 0; transform: translateY(-8px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* 标题条：青绿渐变，与圆形规则节点的锁定环同族，一眼看出「这是规则组的窗体」 */
+.rule-members-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 30%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 16%, var(--c-bg0)),
+    color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 7%, var(--c-bg0))
+  );
+}
+.rule-members-title {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+/* 标题前的小圆点：与画布上规则节点的圆形同形，视觉锚点 */
+.rule-members-title::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--nk-rule-500, #2dd4bf);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 25%, transparent);
+}
+.rule-members-sub {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--c-text3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rule-members-x {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  line-height: 1;
+  font-size: 16px;
+  color: var(--c-text3);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.rule-members-x:hover {
+  color: #fff;
+  background: var(--c-line);
+  border-color: var(--c-red);
+}
+
+/* 内容区：可滚动，且给一点内边距让行不贴边 */
+.rule-members-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+  background: var(--c-bg0);
+}
+
+.rule-members-list { padding: 0; display: flex; flex-direction: column; gap: 4px; }
+/* 行改「独立卡片」：改前每行只有左侧 3px 色条，靠 hover 才看得出边界，
+   在深色底上像一串没有分隔的文字。三态底色统一（同一组是一组），
+   差别只在左边框色 + 身份徽标 —— 用户第 4 条「颜色不一致」的口径。*/
+.rule-members-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-line);
+  border-left: 3px solid transparent;
+  border-radius: 7px;
+  transition: border-color 0.12s, background 0.12s;
+}
+.rule-members-row:hover {
+  background: #1c2129;
+  border-color: var(--c-border);
+}
+/* 三态用左边框色区分，与圆形节点上的锁定环同一套语义
+   ★ 2026-10-05 用户第 4 条：「颜色不一致」→ 主节点与从节点**底色统一**，
+     只靠左边框 + 名称前的身份徽标区分。
+     改之前 primary 带 rgba(45,212,191,0.07) 的青绿底、follow 纯透明，
+     两行底色明显不同，看着像"这两行不是一类东西"。同一组的三态应当
+     视觉上是**一组**，差别只在身份标记，不在底色。
+     → 现在三行底色统一为卡片底var(--c-bg1)，primary 只把左边框换成青绿、
+       整行加一圈极淡青绿描边（不出底色），主节点因此"跳出来"但不换底。*/
+.rule-members-row--primary {
+  border-left-color: var(--nk-rule-500, #2dd4bf);
+  border-color: color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 34%, var(--c-line));
+  border-left-width: 3px;
+}
+.rule-members-row--follow { border-left-color: var(--c-border2); }
+.rule-members-row--ignore { border-left-color: var(--c-text4); opacity: 0.62; }
+
+/* 身份徽标：跟着名字排在前面，让「谁说了算」不用读小字就知道。
+   与画布上的规则线配色同族（实心=主、描边=跟随），两处语义一致。 */
+.rule-members-badge {
+  flex: none;
+  display: inline-block;
+  padding: 0 6px;
+  margin-right: 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  vertical-align: 1px;
+}
+.rule-members-badge--primary {
+  color: #05231f;
+  background: #5eead4;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.rule-members-badge--follow {
+  color: #a9b4c0;
+  background: var(--c-line);
+  border: 1px solid var(--c-border2);
+}
+.rule-members-badge--ignore {
+  color: #7d8590;
+  background: transparent;
+  border: 1px dashed var(--c-text4);
+}
+
+/* 行号：改成小圆角块，不再是一串飘着的数字 */
+.rule-members-idx {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: var(--c-line);
+  border: 1px solid var(--c-border);
+  font-size: 10px;
+  color: var(--c-text3);
+}
+.rule-members-row--primary .rule-members-idx {
+  background: color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 18%, var(--c-line));
+  border-color: color-mix(in srgb, var(--nk-rule-500, #2dd4bf) 40%, transparent);
+  color: var(--nk-rule-ink, #7ce8db);
+}
+.rule-members-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rule-members-name {
+  font-size: 12px;
+  color: var(--c-text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rule-members-kind { font-size: 10px; color: var(--c-text4); }
+/* 身份被别的规则组占用时的如实说明（ruleRef 单槽，一个节点只能被一组改身份） */
+.rule-members-taken {
+  font-size: 10px;
+  color: var(--c-gold2);
+}
+/* 操作区：按钮右对齐成一列竖排？—— 否，保持横排，但给主操作一点强调色。
+   横向排布在 580px 宽下三枚按钮不会挤，且与项目其它窗体（trg-btn）一致。 */
+.rule-members-ops {
+  flex: none;
+  display: flex;
+  gap: 5px;
+}
+/* 按钮：与 .trg-btn 同族（var(--c-line) 底 / var(--c-border) 边），保证全项目窗体按钮观感统一 */
+.rule-members-ops .rule-btn {
+  background: var(--c-line);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text2);
+  font-size: 10px;
+  padding: 4px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.rule-members-ops .rule-btn:hover:not(:disabled) { background: var(--c-border); border-color: var(--c-border2); }
+.rule-members-ops .rule-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* 「跟随」是恢复性操作（成员当前不跟随，点它变跟随）→ 给成功色，与 trg-btn-primary 同族 */
+.rule-members-ops .rule-btn--primary {
+  background: var(--c-green3);
+  border-color: var(--c-green3);
+  color: #fff;
+}
+.rule-members-ops .rule-btn--primary:hover:not(:disabled) { background: var(--c-green3); }
+/* 破坏性操作：悬停才显红，平时低调—— 避免整行红按钮像在报警 */
+.rule-members-ops .rule-btn--danger { color: var(--c-text3); }
+.rule-members-ops .rule-btn--danger:hover:not(:disabled) {
+  background: rgba(248, 81, 73, 0.14);
+  border-color: var(--c-red);
+  color: var(--c-red2);
+}
+.rule-members-foot {
+  flex: none;
+  padding: 8px 12px;
+  margin: 0;
+  border-top: 1px solid var(--c-line);
+  background: #0b0e13;
+}
+/* 全组身份被别的规则组占用 → 本组无主。如实说明，不让用户对空格猜。 */
+.rule-members-warn {
+  flex: none;
+  padding: 8px 12px;
+  margin: 0;
+  border-top: 1px solid var(--c-line);
+  background: rgba(210, 153, 34, 0.08);
+  color: var(--c-gold2);
+  line-height: 1.6;
+}
+/* 空态：虚线框，和 trg-empty 同一套写法 */
+.rule-members-empty {
+  margin: 0;
+  padding: 14px 12px;
+  border: 1px dashed var(--c-border);
+  border-radius: 7px;
+  background: var(--c-bg1);
+  font-size: 11px;
+  color: var(--c-text3);
+  line-height: 1.7;
+}
+.rule-members .hint {
+  font-size: 11px;
+  color: var(--c-text3);
+  line-height: 1.6;
+}
+.rule-members .hint b { color: var(--nk-rule-ink, #7ce8db); }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   锚点编号（2026-10-05，用户要求：「你对常规节点 锚点编个号 方便我表述清楚」）
+
+   为什么需要：同一天内因为「说的是哪个口」返工过两次 ——
+     一次把数据流口搬到了顶部（用户指的是规则口），
+     一次把「规则跟随的节点」理解成规则节点本体（用户指的是跟随节点上的锚点）。
+   根因都是**双方说的「锚点」没对齐到同一个具体元素**。
+   故给每个锚点一个**稳定编号 + 悬停可见标签**，此后沟通只需说编号。
+
+   编号按**方位**命名（与用户口语「上下的 / 左右的」同一套语言）：
+     上1 = 上沿 1/3 处，规则跟随口·主节点位
+     上2 = 上沿 2/3 处，规则跟随口·从节点位（规则线统一落点）
+     左1 = 左沿，      数据流入口（上游 → 本节点）
+     右1 = 右沿，      数据流出口（本节点 → 下游）
+     下1 = 下沿 1/3 处，规则跟随出线（规则节点与常规节点都有）
+     下2 = 下沿 2/3 处，规则跟随出线·从节点位（2026-10-05 新增）
+
+   实现取舍：标签用 ::after 纯 CSS 生成，不加 React state。
+   理由：编号是**静态常量**，为它引入状态重渲染不划算；
+   且纯 CSS 在 hover 时才生成节点，**不占常态DOM、不影响拖拽命中**。
+   ★ 但画布带 transform: scale()，标签的 font-size 用固定 px，
+     缩放后字会跟着变小 —— 这是可接受的（读数仍清楚），别为此加反缩放补丁。 */
+/* ★★★ 这里**绝对不能**写 `position: relative`（第一版写了，纯视觉无碍但**全错**）：
+     React Flow 的 handle 是 `position: absolute` 靠贴边定位的，
+     改成 relative 就让它** participate 文档流** ——
+     ① 锚点撑大节点（用户实测：「节点尺寸也变了」）
+     ② 锚点不再贴边，位置全乱（用户实测：「锚点全打乱了」）
+     `::after` 伪元素对absolute 父元素同样能正常定位，
+     所以**根本不需要改父元素的 position**。删掉即可。
+     教训：给框架自带的定位元素加 position 之前，
+     先问「它靠这个属性贴边吗」—— 这是 RF handle 的命门。 */
+
+/* 上方的两个（规则口）：标签放口下方，避让节点边框 */
+.react-flow__handle.rf-port-no-t1::after,
+.react-flow__handle.rf-port-no-t2::after {
+  content: '上1';
+  top: 14px;
+}
+.react-flow__handle.rf-port-no-t2::after { content: '上2'; }
+
+/* 下方的（出线口）：标签放口上方。
+   ★ 2026-10-05 起 b1/b2 不再是规则节点专属 —— 常规节点底部也有了下1/下2
+     （用户：「增加节点 下1 下2 的锚点」，与上1/上2 对称）。
+     编号按方位命名，两处同名不冲突：口语里「下1」指哪类节点
+     由对话上下文定，真要精确时配合 title（悬停有完整说明）。 */
+.react-flow__handle.rf-port-no-b1::after {
+  content: '下1';
+  top: auto;
+  bottom: 14px;
+}
+.react-flow__handle.rf-port-no-b2::after {
+  content: '下2';
+  top: auto;
+  bottom: 14px;
+}
+
+/* 左右的数据流口：标签放在外侧（远离节点），左口向左、右口向右 */
+.react-flow__handle.rf-port-no-l1::after {
+  content: '左1';
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+}
+.react-flow__handle.rf-port-no-r1::after {
+  content: '右1';
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+}
+
+/* 标签通用外观：默认透明，hover 才显形 —— 常态画布不脏 */
+.react-flow__handle[class*='rf-port-no-']::after {
+  position: absolute;
+  left: 50%;
+  margin-left: -1px;
+  padding: 1px 4px;
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #05231f;
+  background: #5eead4;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 5;
+}
+.react-flow__handle[class*='rf-port-no-']:hover::after {
+  opacity: 1;
+}
+/* 左右两个的数据流口是灰的，标签跟着用灰底，避免与规则口标签混淆 */
+.react-flow__handle.rf-port-no-l1::after,
+.react-flow__handle.rf-port-no-r1::after {
+  color: var(--c-bg0);
+  background: var(--c-text3);
+}
+
+/* ★ 画布背景选择下拉（2026-10-19） */
+.bg-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 300;
+  width: 300px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 10px;
+  background: var(--ed-bg2, var(--c-bg1));
+  border: 1px solid var(--ed-border, var(--c-border));
+  border-radius: 10px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+}
+.bg-pop-h {
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--ed-text, #e8edf2);
+  margin-bottom: 8px;
+}
+.bg-cat {
+  margin-bottom: 10px;
+}
+.bg-cat-h {
+  font-size: 11px;
+  color: var(--ed-text3, var(--c-text3));
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+.bg-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.bg-thumb {
+  padding: 0;
+  border: 1px solid var(--ed-border, var(--c-border));
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  height: 40px;
+}
+.bg-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.bg-thumb.on {
+  border: 1.5px solid var(--c-gold);
+}
+.bg-none {
+  margin-top: 8px;
+  width: 100%;
+  padding: 6px 0;
+  background: transparent;
+  border: 1px solid var(--ed-border, var(--c-border));
+  border-radius: 6px;
+  color: var(--ed-text3, var(--c-text3));
+  font-size: 12px;
+  cursor: pointer;
+}
+.bg-none:hover {
+  color: var(--ed-text, #e8edf2);
+  background: var(--ed-bg3, var(--c-hover));
+}
+
+/* ★ 2026-10-20 用户「整个软件节点、画布显示效果略有模糊」：
+   节点层字体抗锯齿收紧 + 提示合成器按不透明层光栅化（配合位置取整生效） */
+.react-flow__node {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ★ 2026-11-07 用户反馈「在工作流画布上选不中文字，没法右键复制」：
+   React Flow 自带样式给 .react-flow__node 设了 user-select:none（防止拖动节点时带出蓝选区），
+   连带节点里的标题/正文全都选不中。这里只放开「纯文本」——
+   标题 + 正文里的文本类元素；按钮/输入框/把手/徽章等交互控件仍保持不可选，
+   避免拖动节点时选中一片文字、或点按钮时被选区干扰。
+   拖动过程中 React Flow 会给节点加 .dragging（下方已设 none），不会拖出一路蓝。 */
+.rf-canvas .react-flow__node .rf-node-title,
+.rf-canvas .react-flow__node .rf-node-body,
+.rf-canvas .react-flow__node .rf-node-body :is(p, span, b, i, strong, em, small, label, td, th, li, h1, h2, h3, h4, h5, h6, pre, code, blockquote):not(.nodrag):not([class*='handle']) {
+  -webkit-user-select: text;
+  user-select: text;
+}
+/* 拖动中一律不可选（否则拖动＝拖选文字） */
+.rf-canvas .react-flow__node.dragging,
+.rf-canvas .react-flow__node.dragging * {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ★ 2026-11-07 用户「沟通的文字选中后能复制」：
+   对话气泡正文显式放开选择（-webkit- 前缀一并给——只写标准属性在老版本内核里会漏），
+   并给出文字光标，用户才知道这里能拖选。按钮/输入框等交互控件不受影响。 */
+.rf-canvas [data-bubble-text],
+.rf-canvas [data-bubble-text] * {
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
+/* 对话面板右键菜单项悬停反馈（无选区时的应用内菜单） */
+.dock-menu-item:hover { background: rgba(77, 125, 253, 0.14); }
+
+/* ★ 2026-11-07 拖动对话面板换左右停靠：拖动期间全局禁止选择类操作——
+   否则一路拖出一片蓝色文字选区，画布还可能开始框选；光标统一 grabbing 给拖拽反馈。
+   只在拖动态（body.cb-dock-dragging）生效，松手立刻恢复，不影响平时选字。 */
+body.cb-dock-dragging,
+body.cb-dock-dragging * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  cursor: grabbing !important;
+}
+
+/* ★ 2026-11-07「拖一点就拖不动了」：面板的过渡是写在 inline style 里的，
+   拖动中若组件因别的原因重渲染，React 会把过渡写回去 —— transform 就变成「带 0.24s 追帧」，
+   拖起来黏手、像卡住。这里用 !important 在整个拖动态禁掉过渡，只保留跟手。 */
+body.cb-dock-dragging .cb-dock-panel {
+  transition: none !important;
+  will-change: transform;
+}
+
+/* ★ 节点组（2026-10-21 用户指令）：视觉容器——框住多个节点。
+   组本体 = 透明底 + 族色虚线框；标题栏可拖动整组（成员跟随，逻辑在 Canvas onNodeDrag）；
+   右下角把手拖拽调整边框大小。 */
+.rf-groupbox {
+  /* ★ 2026-10-21 用户「没有可以承载节点的地方」：改为可见容器——
+     实线族色边框 + 半透明填充，节点落在框内有明确的"承载区"观感；
+     框体仍对指针穿透（点击直达成员） */
+  background: transparent;
+  border: 1.5px solid var(--nk-group-500);
+  border-radius: 12px;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.rf-groupbox.rf-node-sel {
+  border-color: var(--c-blue2);
+  border-style: solid;
+}
+/* ★ 组选中「次一级」（2026-10-21 用户指令「选中状态变为次一级」）：
+   组选中后点选了组内成员 → 组退为虚线淡化态（不抢焦点），
+   成员卡片全权重叠其上，可无缝拖拽编辑；成员取消选中即恢复。 */
+.rf-groupbox.rf-groupbox--secondary {
+  border-color: var(--nk-group-500);
+  border-style: dashed;
+  opacity: 0.45;
+}
+.rf-groupbox--secondary .group-node-head {
+  opacity: 0.55;
+}
+.group-node {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* ★ 2026-10-21 用户「节点组内的节点为什么不能拖动」：组框体对指针透明——
+     点击/拖拽穿透到框内的成员节点；交互面只留标题栏（拖组）与缩放条（调大小）。
+     否则组节点（选中后 zIndex 抬升）盖在成员上，成员全被挡住拖不动。 */
+  pointer-events: none;
+}
+.group-node-head,
+.group-node-rz {
+  pointer-events: auto;
+}
+.group-node-head {
+  height: 34px;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  background: var(--nk-group-head);
+  border-radius: 10px 10px 0 0;
+  color: var(--nk-group-ink);
+  cursor: grab;
+  user-select: none;
+  /* ★ 2026-10-21：单行收纳——六钮 + 标题 + 计数全留在头内，
+     计数徽章不再溢出到组框外（截图里的外挂「1」） */
+  overflow: hidden;
+  flex-wrap: nowrap;
+}
+.group-node-head:active {
+  cursor: grabbing;
+}
+.group-node-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.group-node-count {
+  /* ★ 2026-10-22 用户「计数按钮匹配左侧按钮样式」：与 .group-node-btn 同款
+     22×22 方形幽灵钮（透明底/无边框/组墨色/同圆角），数字居中。 */
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--nk-group-ink);
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0.85;
+}
+/* ★ 计数徽章按钮化（2026-10-22）：点击选中组内全部成员 */
+.group-node-count-btn {
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: border-color .12s ease, background .12s ease;
+}
+.group-node-count-btn:hover {
+  border-color: var(--nk-group-500);
+}
+/* ★ 计数下拉菜单（2026-10-22）：成员清单 + 全部选择 */
+.group-count-menu {
+  position: fixed; /* ★ 2026-10-22 用户「显示不全 放右侧」：脱离组头 overflow 裁剪，按视口定位（JS 算坐标） */
+  z-index: 10000;
+  min-width: 148px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--c-bg1, #161b22);
+  border: 1px solid var(--nk-group-500);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  z-index: 60;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.group-count-item {
+  all: unset;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  color: var(--c-text, #c9d1d9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+.group-count-item:hover {
+  background: var(--nk-group-500);
+  color: #fff;
+}
+.group-count-item--all {
+  font-weight: 600;
+  border-bottom: 1px solid var(--c-border, #30363d);
+  border-radius: 5px 5px 0 0;
+  margin-bottom: 2px;
+  color: var(--nk-group-ink, #d7e08a);
+}
+.group-node-btn {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--nk-group-ink);
+  cursor: pointer;
+  opacity: 0.85;
+}
+.group-node-btn:hover,
+.group-node-count-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  opacity: 1;
+}
+.group-node-btn svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+.group-node-rz {
+  position: absolute;
+  z-index: 3;
+}
+.group-node-rz:hover {
+  background: rgba(168, 181, 69, 0.25);
+}
+
+/* ★ 节点组置入提示（2026-10-21）：拖节点悬停在组上时的高亮浮层 */
+.group-node-hintmask {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 2px dashed var(--c-blue2);
+  border-radius: 12px;
+  background: rgba(88, 166, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.group-node-hintmask > span {
+  background: var(--c-blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 7px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* ★ 对齐追踪线（2026-10-21）：PPT/PS 式对齐磁吸的辅助线 */
+.align-guides {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 5;
+}
+.align-guides line {
+  stroke: #ff3d8b;
+  stroke-width: 1;
+}
+
+/* ★ 节点组 RF 原生 NodeResizer（2026-10-21）：手柄样式 + 穿透补偿 */
+.react-flow__node:has(.rf-groupbox) .react-flow__resize-control {
+  /* ★ 2026-10-22「彻底检查」：撤 position:fixed（破坏 RF absolute 定位体系）。
+     手柄可见性/可交互性改由组 z 分层保证：
+     组选中 → zIndex=1（手柄在成员之上）；未选中 → -1（成员清晰）。
+     组 wrapper 的 pointer-events:none 不影响子元素手柄（其 pointer-events:auto）。 */
+  pointer-events: all;
+}
+.react-flow__node:has(.rf-groupbox) .group-resize-line {
+  border-color: var(--nk-group-500);
+}
+.react-flow__node:has(.rf-groupbox) .group-resize-handle {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--nk-group-500);
+  background: var(--c-bg1);
+  border-radius: 3px;
+}
+
+/* ★ 便利贴/标注节点（2026-10-22）：亮黄便签、双击改文字 */
+/* ★ 2026-10-22 锤子便签式重做：净纸面、细黄顶线、高度随内容自动 */
+/* 无标题栏：便利贴不渲染头（纯纸+四角胶带） */
+.rf-node.nk--note .rf-node-head {
+  display: none;
+}
+.rf-node.nk--note {
+  background: linear-gradient(180deg, #fffef4 0%, #fdf8e2 100%);
+  border: none;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 2px rgba(80, 65, 10, 0.18),
+    0 6px 16px rgba(80, 65, 10, 0.14);
+}
+/* ★ 右下角卷曲（2026-10-22 用户「只要一个角有点卷曲的效果」）：
+   右下角小三角折角 + 轻投影，模拟便签翘角 */
+.rf-node.nk--note::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 18px 18px;
+  border-color: transparent transparent var(--c-bg0) transparent;
+  filter: drop-shadow(-2px -2px 2px rgba(80, 65, 10, 0.18));
+}
+.rf-node.nk--note .rf-stickynote {
+  border-bottom-right-radius: 0;
+}
+.rf-stickynote {
+  padding: 10px 12px 12px;
+  cursor: text;
+}
+.rf-stickynote-text {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #4a4a42;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rf-stickynote-input {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #4a4a42;
+  resize: none;
+  overflow: hidden;
+  font-family: inherit;
+}
+.rf-stickynote-input {
+  height: auto;
+}
+/* 右缘宽度把手 */
+.sticky-width-handle {
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 44px;
+  border-radius: 4px;
+  background: var(--nk-note-500);
+  opacity: 0.35;
+  cursor: ew-resize;
+  z-index: 20;
+}
+.sticky-width-handle:hover {
+  opacity: 0.9;
+}
+
+/* ★ 便利贴/标注节点（2026-10-22）：亮黄便签、双击改文字 */
+.rf-node.nk--note .rf-node-head {
+  background: var(--nk-note-head);
+  border-radius: 3px 3px 0 0;
+}
+.rf-stickynote {
+  min-height: 56px;
+  padding: 8px 10px;
+  cursor: text;
+}
+.rf-stickynote-text {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--nk-note-ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rf-node.nk--note .rf-badge {
+  background: var(--nk-note-500);
+  color: var(--nk-note-ink);
+}
+.rf-node.nk--note .rf-textnode-val {
+  color: var(--nk-note-ink);
+}
+
+/* ★ 便利贴就地编辑态（2026-10-22） */
+.rf-stickynote-input {
+  width: 100%;
+  min-height: 70px;
+  padding: 8px 10px;
+  background: var(--nk-note-soft);
+  border: 1.5px solid var(--nk-note-500);
+  border-radius: 4px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--nk-note-ink);
+  resize: none;
+  outline: none;
+  font-family: inherit;
+}
+/* ★ 便利贴常驻缩放把手（不用选节点，直接拖右下角） */
+.react-flow__node:has(.rf-stickynote) .sticky-resize-handle {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--nk-note-ink);
+  background: var(--nk-note-500);
+  border-radius: 3px;
+  opacity: 0.85;
+}
+.react-flow__node:has(.rf-stickynote) .sticky-resize-line {
+  border-color: transparent;
+}
+
+/* ══════════════ 画布底部日志面板 LogDock（2026-10-22 用户指令
+   「画布下方增加log显示面板。右上角增加个和oo节点内一致的显示诊断信息」）══════════════
+   形态仿 OO 诊断抽屉（Consolas 11px、时间戳、收起/清空/复制），
+   配色走 --c-* 主题变量（不硬编码深底，随全 UI 主题体系）。
+   定位：absolute 于 .canvas-wrap（relative），横跨画布宽度不含右栏。 */
+.logdock {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: 60; /* 压过 RF 变换层内容，低于弹窗体系 --z-modal */
+  background: color-mix(in srgb, var(--c-bg1) 92%, transparent);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+.logdock-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-line);
+}
+.logdock-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-text2);
+}
+.logdock-count {
+  font-size: 10px;
+  color: var(--c-text4);
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 0 6px;
+}
+.logdock-btn {
+  font-size: 11px;
+  padding: 2px 8px;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--c-text3);
+  cursor: pointer;
+}
+.logdock-btn:hover {
+  color: var(--c-text);
+  border-color: var(--c-border2);
+  background: var(--c-hover);
+}
+.logdock-body {
+  margin: 0;
+  padding: 4px 10px;
+  height: 150px;
+  overflow: auto;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--c-text2);
+  user-select: text;
+  cursor: text;
+  white-space: pre-wrap;
+}
+.logdock-line { word-break: break-all; }
+.logdock-line.k-ok   { color: var(--c-green2); }
+.logdock-line.k-warn { color: var(--c-gold2); }
+.logdock-line.k-err  { color: var(--c-red2); }
+.logdock-line.k-info { color: var(--c-text3); }
+.logdock-line:first-child { color: var(--c-text); font-weight: 600; }
+:root[data-theme='light'] .logdock-line:first-child { color: var(--c-text); }
+/* ★ 2026-10-22 用户「诊断日志打开时，右下角的缩略框不要被遮挡」：
+   LogDock 开合状态（.canvas-wrap[data-logdock]）联动抬高右下角
+   缩放面板与缩略图（内联 bottom 需 !important 覆盖）。
+   相对关系保持原布局：缩略图在上、缩放面板压缩略图顶上（间隔 ~6px）。 */
+.canvas-wrap[data-logdock='open'] .react-flow__minimap {
+  bottom: 200px !important;
+}
+.canvas-wrap[data-logdock='open'] .zoom-panel.react-flow__panel {
+  bottom: 338px !important;
+}
+
+/* ══════════════ 重启恢复弹窗 RecoveryDialog（2026-10-22 主题化重设计）══════════════
+   替代系统 confirm（白壳系统标题栏与主题脱节）。--c-* 主题变量，
+   遮罩+居中卡片与 oo-modal 同语言；主钮=恢复（蓝实底），次钮=空白画布（ghost）。 */
+.rc-mask {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(1, 4, 9, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+.rc-dialog {
+  width: min(420px, 92vw);
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+.rc-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+  background: var(--c-line);
+  border-bottom: 1px solid var(--c-border);
+}
+.rc-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--c-blue);
+  color: #fff;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.rc-body { padding: 14px 16px 16px; }
+.rc-line {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--c-text2);
+}
+.rc-line b { color: var(--c-blue2); }
+.rc-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 9px 14px;
+  font-size: 12.5px;
+  border-radius: 6px;
+  border: 1px solid var(--c-border);
+  background: transparent;
+  color: var(--c-text2);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.rc-btn:hover { border-color: var(--c-border2); background: var(--c-hover); color: var(--c-text); }
+.rc-btn-primary {
+  background: var(--c-blue);
+  border-color: var(--c-blue);
+  color: #fff;
+  font-weight: 600;
+}
+.rc-btn-primary:hover { background: var(--c-blue2); border-color: var(--c-blue2); color: #fff; }
+.rc-sub { color: inherit; opacity: 0.68; font-weight: 400; }
+
+/* ★ 2026-10-23 用户指令「文档名字太宽 不要把节点做的很宽」：
+   节点宽度上限 340px——标题 .rf-node-title 本就有 ellipsis（flex+min-width 已就绪），
+   此前节点无 max-width 导致长文档名把节点撑到很宽、截断永不触发。
+   便签（nk--note，有自定宽度把手）与组框（nk--group，任意大）豁免。 */
+.rf-node:not(.nk--note):not(.nk--group) {
+  max-width: 340px;
+}
+/* 字段行随节点收窄时防溢出（字段名/值超长裁切，不破圆角） */
+.rf-field {
+  overflow: hidden;
+}
+
+/* ★ 2026-10-23 OO 节点拖入文件高亮（用户指令「拖 word/excel 到相应节点」）：
+   拖 .docx/.xlsx 悬停时蓝虚线框 + 微提亮——与照片节点（pn-root--over）同语言 */
+.rf-node--oover {
+  outline: 2px dashed var(--c-blue2);
+  outline-offset: -2px;
+  box-shadow: 0 0 0 3px var(--c-hover);
+}
+
+/* ★ 2026-10-23 photo/pdf 标题栏数量（用户指令「数量做成和节点组中节点数量
+   一样的表达样式」）：同 .group-node-count 22×22 幽灵钮——透明底无边框，
+   数字居中，margin-left auto 推到标题栏右缘 */
+.rf-node-count {
+  flex: 0 0 auto;
+  margin-left: auto;
+  height: 20px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-hover);
+  border: none;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.rf-node-count:hover { background: var(--c-hover); color: var(--c-text); }
+
+/* ★ 2026-10-23 参数库侧板（用户指令「展开参数库的侧边 和展开节点库并列」）：
+   与 palette 同语言的独立面板；条目=名称+描述+添加钮；数据来自 core/paramSeeds */
+.paramlib-panel {
+  flex-shrink: 0;
+  width: 250px;
+  background: var(--c-bg1);
+  border-right: 1px solid var(--c-line);
+  overflow-y: auto;
+}
+.paramlib-fold-inline {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+}
+.paramlib-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  margin: 0 8px 6px;
+  background: var(--c-hover);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+}
+.paramlib-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.paramlib-item-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.paramlib-item-desc {
+  font-size: 10.5px;
+  color: var(--c-text4);
+}
+.paramlib-add {
+  flex-shrink: 0;
+  padding: 4px 9px;
+  font-size: 11px;
+  border-radius: 5px;
+  border: 1px solid var(--c-blue);
+  background: var(--c-blue);
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.paramlib-add:hover { background: var(--c-blue2); border-color: var(--c-blue2); }
+.paramlib-add:disabled { opacity: 0.6; cursor: default; }
+.paramlib-note {
+  font-size: 10.5px;
+  color: var(--c-text4);
+  padding: 4px 12px;
+  line-height: 1.5;
+}
+.side-strip-btn--on {
+  color: var(--c-blue2);
+  border-color: var(--c-blue2);
+}
+
+/* ★ 2026-10-23 圆形参数库·选择参数库浮层（用户指令「双击打开参数库选择」）：
+   居中小卡 portal；圆内已选库名小字（rf-rule-lib） */
+.rf-rule-lib {
+  font-size: 10px;
+  color: var(--c-blue2);
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.libpick-mask {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(1, 4, 9, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.libpick-card {
+  width: 300px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.libpick-cap {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--c-border);
+}
+.libpick-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--c-border);
+  background: var(--c-hover);
+  cursor: pointer;
+}
+.libpick-item:hover { border-color: var(--c-blue2); }
+.libpick-item--on { border-color: var(--c-blue); background: var(--c-hover); }
+.libpick-item-name { font-size: 12px; font-weight: 600; color: var(--c-text); }
+.libpick-item-desc { font-size: 10.5px; color: var(--c-text4); }
+.libpick-clear {
+  padding: 6px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid var(--c-border);
+  background: transparent;
+  color: var(--c-text3);
+  cursor: pointer;
+}
+.libpick-clear:hover { border-color: var(--c-red); color: var(--c-red); }
+
+/* ★ 2026-10-23 参数库内容窗体（用户指令「双击参数库 打开窗体 选择参数库内容」）：
+   居中大窗体（同 node-editor 语言）+ 头部库切换下拉 + AG Grid 虚拟滚动 */
+.libpick-big { width: min(1180px, 92vw); height: 82vh; }
+.libpick-select {
+  padding: 3px 8px;
+  font-size: 11.5px;
+  border-radius: 5px;
+  border: 1px solid var(--c-border);
+  background: var(--c-bg0);
+  color: var(--c-text);
+  max-width: 200px;
+}
+.libpick-sel-hint {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--c-text4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.libpick-grid { flex: 1; min-height: 0; width: 100%; border: none; }
+
+/* ★ 2026-10-23 用户截图指令「好乱 控制宽度 名字太长用 … 省略」：
+   OO 节点 hint 行（双击进入编辑 + boundHint 长名）竖排根因——
+   第二个 span（boundHint 长 UUID 无断点）把第一个 span 挤到逐字换行。
+   两 span 都截断：名称不缩、值截断省略。 */
+.rf-field {
+  min-width: 0;
+}
+.rf-field > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rf-field > span:first-child {
+  flex-shrink: 0;
+}
+
+/* ★ 2026-10-23 数据引用面板·参数库选择条（用户指令「最上方切换参数库数据选择
+   优先选连接的参数库；和节点数据引用并列」） */
+.ref-paramlib {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-hover);
+}
+.ref-paramlib-label {
+  font-size: 11px;
+  color: var(--c-text3);
+  flex-shrink: 0;
+}
+.ref-paramlib-sel {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--c-border);
+  background: var(--c-bg0);
+  color: var(--c-text);
+}
+
+/* ★ 2026-10-23 参数库内容浏览器（用户指令「选择参数库内的内容 关联进excel」）：
+   搜索框 + 计数 + 行列表（点单元格插值到 Excel 光标处） */
+.ref-libbrowser {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--c-border);
+  max-height: 46vh;
+}
+.ref-libbrowser-q {
+  margin: 6px 10px;
+  padding: 4px 8px;
+  font-size: 11.5px;
+  border-radius: 5px;
+  border: 1px solid var(--c-border);
+  background: var(--c-bg0);
+  color: var(--c-text);
+}
+.ref-libbrowser-q:focus { outline: none; border-color: var(--c-blue2); }
+.ref-libbrowser-meta {
+  font-size: 10.5px;
+  color: var(--c-text4);
+  padding: 0 10px 4px;
+}
+.ref-libbrowser-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 6px 6px;
+}
+.ref-libbrowser-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--c-text2);
+}
+.ref-libbrowser-row:hover { background: var(--c-hover); }
+.ref-libbrowser-idx {
+  width: 34px;
+  flex-shrink: 0;
+  text-align: right;
+  color: var(--c-text4);
+  font-size: 10px;
+}
+.ref-libbrowser-cell {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 1px 3px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.ref-libbrowser-cell:hover { background: var(--c-blue2); color: #fff; }
+.ref-libbrowser-empty { padding: 10px; font-size: 11px; color: var(--c-text4); }
+
+/* ★ 2026-10-23 参数库内容行——节点树同款语言（cap-dot/cap-badge）+ 双击链接 */
+.ref-libbrowser-row { cursor: pointer; }
+.ref-libbrowser-cell { cursor: pointer; padding: 1px 4px; }
+.ref-libbrowser-cell:hover { background: var(--c-blue2); color: #fff; }
+.cap-badge--lib {
+  flex-shrink: 0;
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--c-hover);
+  color: var(--c-text4);
+  border: 1px solid var(--c-border);
+}
+
+/* ★ 2026-10-23 用户澄清「红色底的logo 不是整个标题栏是红色的」：
+   PDF 标题栏恢复默认；红色只落在 kind 徽章（.rf-badge--pdf）。
+   边框保留深红作族辨识。 */
+.nk--pdf { border-color: #7f1d1d; }
+
+/* ★ 2026-10-23 用户指令「PDF 红色 logo；ooexcel 绿；ooword 蓝」：
+   kind 徽章彩色底白字（Office 品牌色系） */
+.rf-badge--pdf {
+  background: #b02a2a;
+  color: #fff;
+}
+.rf-badge--ooword,
+.rf-badge--oosheet {
+  background: #2b579a;
+  color: #fff;
+  border: none;
+  box-shadow: none;
+}
+.rf-badge--oosheet {
+  background: #217346;
+}
+
+/* ★ 2026-10-23 可搜索下拉（SearchSelect）——参数库/内容选择共用 */
+.ssearch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  border-radius: 5px;
+  border: 1px solid var(--c-border);
+  background: var(--c-bg0);
+  color: var(--c-text);
+  cursor: pointer;
+  text-align: left;
+}
+.ssearch-btn:hover { border-color: var(--c-blue2); }
+.ssearch-btn-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ssearch-caret { flex-shrink: 0; color: var(--c-text4); font-size: 10px; }
+.ssearch-mask {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 2);
+}
+.ssearch-panel {
+  position: fixed;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.ssearch-q {
+  padding: 5px 8px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid var(--c-border);
+  background: var(--c-bg0);
+  color: var(--c-text);
+}
+.ssearch-q:focus { outline: none; border-color: var(--c-blue2); }
+.ssearch-list {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.ssearch-item {
+  padding: 6px 9px;
+  font-size: 11.5px;
+  color: var(--c-text2);
+  border-radius: 5px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ssearch-item:hover { background: var(--c-hover); color: var(--c-text); }
+.ssearch-item--on { color: var(--c-blue2); font-weight: 600; }
+.ssearch-empty { padding: 10px; font-size: 11px; color: var(--c-text4); }
+
+/* ★ 2026-10-24 性能：viewport 提升为合成层——平移/缩放走 GPU 合成，不触发重排 */
+.react-flow__viewport { will-change: transform; }
+
+/* ★ 连线流动动画三态（2026-10-24 用户指令「拖动的时候暂停或者不暂停」）：
+   pause=拖动/平移时暂停（默认，性能与视觉折中）/always=始终播放/off=关闭。
+   动画走 CSS（stroke-dashoffset），paused 态零重绘开销。 */
+@keyframes edge-flow-dash { to { stroke-dashoffset: -10 } }
+.edge-anim-always .edge-flow .react-flow__edge-path,
+.edge-anim-pause:not(.canvas-interacting) .edge-flow .react-flow__edge-path {
+  stroke-dasharray: 6 4;
+  animation: edge-flow-dash 0.6s linear infinite;
+}
+.edge-anim-off .edge-flow .react-flow__edge-path { animation: none }
+.edge-anim-pause.canvas-interacting .edge-flow .react-flow__edge-path { animation-play-state: paused }
+
+/* ★ 连线显示效果扩展（2026-11-01 archify 预设，右上角效果选择器切换）：
+   脉冲信号流 / 蓝图轨迹 / 亮色爬行 / 呼吸暗线 / 回声流水 */
+@keyframes fx-sweep { to { stroke-dashoffset: -1026 } }
+@keyframes fx-crawl { to { stroke-dashoffset: -8 } }
+@keyframes fx-breathe { 0%, 100% { opacity: 0.35 } 50% { opacity: 1 } }
+/* 脉冲信号流：亮点沿边扫过（深底霓虹感） */
+.edge-anim-pulse .edge-flow .react-flow__edge-path {
+  stroke-dasharray: 26 1000;
+  animation: fx-sweep 1.2s linear infinite;
+}
+/* 蓝图轨迹：亮点慢扫一次并定格（工程图纸感） */
+.edge-anim-blueprint .edge-flow .react-flow__edge-path {
+  stroke-dasharray: 26 1000;
+  animation: fx-sweep 2.6s linear 1 forwards;
+}
+/* 亮色爬行：虚线匀速爬行（常态数据流） */
+.edge-anim-crawl .edge-flow .react-flow__edge-path {
+  stroke-dasharray: 3 5;
+  animation: fx-crawl 0.5s linear infinite;
+}
+/* 呼吸暗线：周期明暗不位移（待机概览） */
+.edge-anim-breathe .edge-flow .react-flow__edge-path {
+  animation: fx-breathe 2.4s ease-in-out infinite;
+}
+/* 回声流水：多条边依次亮点（按 DOM 序错开 delay 形成先后） */
+.edge-anim-echo .edge-flow .react-flow__edge-path {
+  stroke-dasharray: 26 1000;
+  animation: fx-sweep 1.2s linear infinite;
+}
+.edge-anim-echo .react-flow__edge:nth-child(odd) .react-flow__edge-path { animation-delay: 0.18s }
+.edge-anim-echo .react-flow__edge:nth-child(3n) .react-flow__edge-path { animation-delay: 0.36s }
+/* 关闭效果（选择器里的「关闭」） */
+.edge-anim-off .edge-flow .react-flow__edge-path,
+.edge-anim-pulse .canvas-interacting ~ * .edge-flow .react-flow__edge-path { animation: none }
+/* 尊重系统减弱动效（archify 工程要点 #1） */
+@media (prefers-reduced-motion: reduce) {
+  .edge-flow .react-flow__edge-path { animation: none !important; stroke-dashoffset: 0 !important }
+}
+
+/* ★ archify 节奏升级 + 节点反馈（2026-11-01，移植 archify-node-pulse/intent-trace-flow）：
+   线条流动时节点同步脉冲发光（drop-shadow + 边框），效果关闭即静止 */
+@keyframes fx-flow-archify {
+  0% { opacity: 0.28; stroke-dashoffset: 0 }
+  12%, 78% { opacity: 0.94 }
+  100% { opacity: 0.28; stroke-dashoffset: -1026 }
+}
+/* ★ 归一化轨道（pathLength=1）：亮点占比/速度与边长无关——archify 原味 */
+.edge-fx-track { stroke: transparent; stroke-width: 2.2; fill: none; pointer-events: none }
+/* 脉冲信号流：亮点段（8%）沿归一化轨道扫过 + 辉光 */
+.edge-anim-pulse .edge-fx-track {
+  stroke: #7db2ff;
+  stroke-dasharray: 0.08 0.92;
+  animation: fx-sweep-norm 1.2s linear infinite;
+  filter: drop-shadow(0 0 5px rgba(110,160,255,0.85));
+}
+@keyframes fx-sweep-norm { to { stroke-dashoffset: -1 } }
+/* 蓝图轨迹：慢扫一次定格 */
+.edge-anim-blueprint .edge-fx-track {
+  stroke: #4d7dfd;
+  stroke-dasharray: 0.08 0.92;
+  animation: fx-sweep-norm 2.6s linear 1 forwards;
+}
+/* 亮色爬行：细虚线匀速爬行（归一化节距） */
+.edge-anim-crawl .edge-fx-track {
+  stroke: #5aa2e8;
+  stroke-dasharray: 0.03 0.05;
+  animation: fx-crawl-norm 0.55s linear infinite;
+}
+@keyframes fx-crawl-norm { to { stroke-dashoffset: -0.08 } }
+/* 回声流水：亮点扫过 + 按边序 delay 错开 */
+.edge-anim-echo .edge-fx-track {
+  stroke: #8ab6ff;
+  stroke-dasharray: 0.08 0.92;
+  animation: fx-sweep-norm 1.2s linear infinite;
+  filter: drop-shadow(0 0 5px rgba(110,160,255,0.85));
+}
+.edge-anim-echo .react-flow__edge:nth-child(odd) .edge-fx-track { animation-delay: 0.18s }
+.edge-anim-echo .react-flow__edge:nth-child(3n) .edge-fx-track { animation-delay: 0.36s }
+/* 呼吸暗线：轨道整体明暗不位移 */
+.edge-anim-breathe .edge-fx-track {
+  stroke: rgba(140,170,220,0.8);
+  animation: fx-breathe 2.4s ease-in-out infinite;
+}
+/* 关闭/原效果：轨道全透明 */
+.edge-anim-off .edge-fx-track,
+.edge-anim-pause .edge-fx-track { stroke: transparent; animation: none }
+@keyframes fx-node-pulse {
+  0%, 72%, 100% { box-shadow: none }
+  18%, 36% { box-shadow: 0 0 0 2px rgba(77,125,253,0.5), 0 0 18px rgba(77,125,253,0.4) }
+}
+/* 脉冲/回声：边用 archify 节奏（透明→亮→透明），节点同步脉冲（delay 错开） */
+.edge-anim-pulse .edge-flow .react-flow__edge-path,
+.edge-anim-echo .edge-flow .react-flow__edge-path {
+  animation-name: fx-flow-archify;
+  filter: drop-shadow(0 0 4px rgba(90,140,255,0.45));
+}
+/* ★ 底层连线保持可见（用户反馈「看不清上下游关联」）：亮点扫过时底层线半透明显示
+   作为「残影」，base 边透明度提亮到可辨识上下游的程度 */
+.edge-anim-pulse .react-flow__edge-path,
+.edge-anim-echo .react-flow__edge-path,
+.edge-anim-blueprint .react-flow__edge-path {
+  opacity: 0.55;
+  stroke-width: 1.4;
+}
+/* 节点反馈（★ 2026-11-01 修正「拖动节点就消失」：动画不能挂在 .react-flow__node
+   根元素上——React Flow 拖动靠根元素 transform 管线，animation 介入后拖动丢节点。
+   改为效果激活时的静态边框辉光，零动画零风险） */
+.edge-anim-pulse .react-flow__node,
+.edge-anim-echo .react-flow__node {
+  box-shadow: 0 0 0 1.5px rgba(77,125,253,0.45), 0 0 14px rgba(77,125,253,0.28);
+}
+.edge-anim-blueprint .react-flow__node,
+.edge-anim-crawl .react-flow__node,
+.edge-anim-breathe .react-flow__node {
+  box-shadow: 0 0 0 1px rgba(120,150,210,0.35);
+}
+
+/* ★ 视图设置下拉（2026-10-24 顶部 ribbon「视图」按钮） */
+.view-menu {
+  position: absolute;
+  top: 40px; right: 0;
+  min-width: 220px;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  overflow: hidden;
+}
+.view-menu-head {
+  padding: 8px 12px;
+  font-size: 12px; font-weight: 600; color: var(--c-text);
+  border-bottom: 1px solid var(--c-border);
+}
+.view-menu .ctx-item { padding: 8px 12px; font-size: 12px; }
+.view-menu .ctx-item.is-on { color: var(--c-blue); background: rgba(59, 130, 246, 0.08); }
+
+/* ★ 画布性能监控 HUD（2026-10-24） */
+.perf-hud {
+  position: absolute;
+  top: 8px; left: 8px;
+  z-index: 50;
+  background: rgba(20, 20, 20, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #ddd;
+  font: 11px/1.7 ui-monospace, Consolas, monospace;
+  padding: 6px 10px;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+}
+.perf-hud--mini { padding: 3px 8px; }
+.perf-hud-row { display: flex; justify-content: space-between; gap: 14px; min-width: 150px; }
+.perf-hud-row span:first-child { color: #999; }
+
+/* ★ 拖动 LOD 骨架（2026-10-24：拖动中 PDF 类卡片降级渲染） */
+.pn-lod {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--c-text2);
+  background: var(--c-bg1);
+  border: 1px dashed var(--c-border);
+  border-radius: 8px;
+  min-width: 180px;
+  opacity: 0.85;
+}
+
+/* ★ 拖动 LOD 轮廓档（2026-10-24 用户指令「拖动时只有轮廓的状态」）：纯形状框 */
+.pn-lod {
+  border: 2px dashed var(--c-blue);
+  background: rgba(59, 130, 246, 0.06);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+/* ★ 2026-10-24 用户「窗口不够大 右边不要折叠 左边可以隐藏」：
+   窄窗口渐进收缩——版本号先隐 → 文档名后隐，右侧动作区永不折叠。
+   媒体查询驱动（非点击切换），布局永不跳行。 */
+.brand-hide-ver { display: none !important; }
+.brand-hide-doc { display: none !important; }
+.brand-hide-logo { display: none !important; }
+
+.app-savebtn-more { font-size: 15px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
+
+/* ★ 2026-10-24 静态层缓存（DOM 近似——tldraw/Miro 思路）：
+   拖动期间把「静止节点」提升为独立合成层（浏览器拍位图缓存），
+   每帧合成只处理被拖节点+其边，静止部分 GPU 直接拷贝。
+   仅拖动期间生效（body.cb-dragging），结束移除——合成层内存不常驻。
+   .dragging 是 React Flow 内置的被拖节点标记。 */
+/* ★ 2026-10-24 回退静止节点批量提升：实测首次拖动批量创建合成层
+   卡 1-2s（层创建+位图化一次性开销>收益）——仅保留被拖节点自身提升 */
+.react-flow__node.dragging {
+  will-change: transform;
+}
+
+/* ★ 2026-10-25 OO 节点词条化（仿 PDF 词条行——用户指令「相同尺寸 词条样式」） */
+/* ★ 2026-10-25 对齐 PDF 词条视觉：水平退让 6px（=pn-root padding）、上下 4px */
+.oo-entry { align-items: center; margin: 4px 6px; }
+.oo-entry .oo-entry-btns { display: inline-flex; gap: 4px; margin-left: auto; align-items: center; }
+.oo-entry .rf-oo-btn { border-radius: 4px; }
+
+/* ═══ 文件族节点标准设置面板（2026-10-26）——只读清单行：内外标+名称 ═══ */
+.props-filelist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow: auto;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 4px;
+}
+.props-file-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 4px 7px;
+  border-radius: 6px;
+  transition: background 0.12s ease;
+}
+.props-file-row:hover {
+  background: var(--c-hover);
+}
+.props-file-nm {
+  font-size: 11px;
+  color: var(--c-text2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ═══ 文件输出节点（2026-10-26）——目录行/保存记录 ═══ */
+.fo-dir-row { cursor: pointer; width: 100%; text-align: left; }
+.fo-dir-ic { display: inline-flex; color: var(--c-text3); flex-shrink: 0; }
+.fo-dir-path {
+  font-size: 11px; color: var(--c-text2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.fo-saved-meta { font-size: 10px; color: var(--c-text4); flex-shrink: 0; margin-left: auto; }
+
+/* ═══ 文件输出节点（2026-10-26 用户截图指正「排列有点松散」二次修正）═══
+   废除 min-height:150+弹性占位钉底（卡片矮时中间一大块空白=松散根源）——
+   卡片高度随内容，装载条紧跟内容行，纵向节奏走 pn-root 标准 gap（3px） */
+.fo-root { display: flex; flex-direction: column; }
+/* 装载条嵌套变体：间距与共享按钮行（rf-oo-btns gap 4）完全同语言，
+   零侧距零上下 padding（pn-root 容器 10px 侧距 + gap 3px 已统一供给） */
+.nb-bar--flat { gap: 4px; padding: 0; }
+
+/* ═══ 套件中心（2026-10-26）═══ */
+.suite-mask {
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  background: rgba(1, 4, 9, 0.55);
+  display: flex; align-items: center; justify-content: center;
+}
+.suite-dialog {
+  width: min(640px, 92vw); max-height: 82vh;
+  display: flex; flex-direction: column;
+  background: var(--c-bg1); border: 1px solid var(--c-border); border-radius: 10px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+}
+.suite-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-bottom: 1px solid var(--c-line);
+}
+.suite-head b { font-size: 14px; }
+.suite-head-sub { flex: 1; font-size: 10.5px; color: var(--c-text4); }
+.suite-close {
+  width: 26px; height: 26px; padding: 0; border: 1px solid var(--c-border); border-radius: 6px;
+  background: transparent; color: var(--c-text3); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.suite-close:hover { background: var(--c-hover); color: var(--c-text); }
+.suite-body { flex: 1; min-height: 0; overflow: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.suite-card {
+  border: 1px solid var(--c-border); border-radius: 8px; padding: 10px 12px;
+  background: var(--c-bg0); display: flex; flex-direction: column; gap: 6px;
+}
+.suite-card--off { opacity: 0.62; }
+.suite-card-top { display: flex; align-items: center; gap: 8px; }
+.suite-name { font-size: 12.5px; }
+.suite-kind { font-size: 10px; color: var(--c-text4); border: 1px solid var(--c-border); border-radius: 999px; padding: 0 7px; }
+.suite-badge { font-size: 10px; border-radius: 4px; padding: 1px 7px; flex-shrink: 0; }
+.suite-badge--ok { background: rgba(87, 171, 90, 0.16); color: #57ab5a; }
+.suite-badge--warn { background: rgba(231, 138, 46, 0.16); color: #e78a2e; }
+.suite-badge--off { background: rgba(229, 83, 75, 0.14); color: #e5534b; }
+.suite-badge--idle { background: var(--c-hover); color: var(--c-text3); }
+.suite-desc { margin: 0; font-size: 11.5px; color: var(--c-text2); line-height: 1.55; }
+.suite-meta { display: flex; flex-direction: column; gap: 2px; font-size: 10.5px; color: var(--c-text4); }
+.suite-meta code { font-size: 10px; color: var(--c-text3); }
+.suite-ops { display: flex; gap: 6px; }
+.suite-btn {
+  padding: 4px 12px; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--c-border); border-radius: 6px;
+  background: transparent; color: var(--c-text2);
+}
+.suite-btn:hover { background: var(--c-hover); color: var(--c-text); }
+.suite-btn--on { background: var(--c-blue); border-color: var(--c-blue); color: #fff; }
+.suite-btn--warn { border-color: #d29922; color: #d29922; }
+.suite-foot {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; border-top: 1px solid var(--c-line);
+}
+.suite-foot-dir { flex: 1; font-size: 10.5px; color: var(--c-text4); }
+.suite-flash { font-size: 11px; color: #d29922; }
+
+/* ★ 全局滚动条重做（2026-11-01 用户指令「匹配主题颜色，整个软件」）：
+   细圆角滑块、透明轨道、悬停加亮；颜色跟随 data-theme（--sb-thumb）。
+   覆盖全软件所有滚动容器（节点下拉/属性栏/对话流/数据表等） */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
+  border-radius: 6px;
+  border: 2.5px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:active {
+  background: var(--sb-thumb-hover);
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── 运行状态条（2026-11-09）：条目动效全部内联在 RunStatusBar.tsx 的 Collapse 组件
+   （grid 0fr↔1fr 宽度让路 + translateX 方向位移：进入从左滑入、退出往右滑出渐隐）。 */
+
+/* ── 运行状态条 · 成功打钩（2026-11-09 用户指令「最后的成功了 来个动态的打钩」）：
+   圆圈描边画出（0.35s）→ 勾划出（延迟 0.2s，0.25s） */
+.runbar-check circle {
+  stroke-dasharray: 63;
+  stroke-dashoffset: 63;
+  animation: runbar-check-draw .35s ease-out forwards;
+}
+.runbar-check path {
+  stroke-dasharray: 16;
+  stroke-dashoffset: 16;
+  animation: runbar-check-draw .25s .2s ease-out forwards;
+}
+@keyframes runbar-check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── 运行状态条 · 失败/超时打叉（2026-11-09 用户指令「失败 超时等同等匹配的效果」）：
+   与打钩对称——红圈画出（0.35s）→ 两笔叉先后划出（延迟 0.2s / 0.32s） */
+.runbar-cross circle {
+  stroke-dasharray: 63;
+  stroke-dashoffset: 63;
+  animation: runbar-check-draw .35s ease-out forwards;
+}
+.runbar-cross .l1, .runbar-cross .l2 {
+  stroke-dasharray: 10;
+  stroke-dashoffset: 10;
+}
+.runbar-cross .l1 { animation: runbar-check-draw .18s .2s ease-out forwards; }
+.runbar-cross .l2 { animation: runbar-check-draw .18s .34s ease-out forwards; }

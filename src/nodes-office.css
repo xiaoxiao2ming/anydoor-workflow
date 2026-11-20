@@ -1,0 +1,5617 @@
+/* ============================================================
+   编辑器主题变量 —— 暗黑（默认）/ 明媚（白底）双模式
+   NodeEditor 挂 data-theme='light' 切换；所有 --ed-* 消费方自动跟随。
+   ============================================================ */
+:root {
+  --ed-bg0: #0d1117;      /* 最深底：编辑器本体 / 输入框 */
+  --ed-bg1: #12171e;      /* 功能区 / 标题栏底 */
+  --ed-bg2: #161b22;      /* 次底：下拉 / 提示条 */
+  --ed-bg3: #1c232c;      /* hover 底 */
+  --ed-border: #30363d;   /* 主边框 */
+  --ed-border2: #21262d;  /* 弱分隔线 */
+  --ed-text: #e8edf2;     /* 主文字 */
+  --ed-text1: #c9d1d9;    /* 次文字 */
+  --ed-text3: #8b949e;    /* 弱文字 */
+  --ed-text4: #6e7681;    /* 更弱 */
+  --ed-accent: #9fe1cb;   /* 强调绿（选中/激活） */
+  --ed-accent-bd: rgba(159, 225, 203, 0.42); /* 激活描边（强调绿的弱化版——满亮描边连成一排会吵） */
+  --ed-accent-bg: rgba(159, 225, 203, 0.14); /* 激活淡底（2026-10-19 重设计：激活=色底，不再描边） */
+  --ed-gold: #d4a24e;     /* 强调金（填充柄/警告） */
+  --ed-mask: rgba(1, 4, 9, 0.72);
+  --ed-grid-theme: dark;
+}
+:root[data-theme="light"] {
+  --ed-bg0: #ffffff;
+  --ed-bg1: #f6f8fa;
+  --ed-bg2: #ffffff;
+  --ed-bg3: #eaeef2;
+  --ed-border: #d0d7de;
+  --ed-border2: #d8dee4;
+  --ed-text: #1f2328;
+  --ed-text1: #424a53;
+  --ed-text3: #57606a;
+  --ed-text4: #6e7781;
+  --ed-accent: #0f766e;
+  --ed-accent-bd: rgba(15, 118, 110, 0.4);
+  --ed-accent-bg: rgba(15, 118, 110, 0.12);
+  --ed-gold: #b45309;
+  --ed-mask: rgba(140, 150, 160, 0.35);
+}
+/* ★ 粉色/商务灰（2026-10-20）：叠加在 light 之上的色调覆盖（OO 编辑器侧） */
+:root[data-theme="light"][data-tint="pink"] {
+  --ed-bg0: #fff7fa;
+  --ed-bg1: #fbf0f5;
+  --ed-bg2: #fff7fa;
+  --ed-bg3: #fbe0ec;
+  --ed-border: #eec3d6;
+  --ed-border2: #e0a8c0;
+  --ed-text: #432836;
+  --ed-text1: #5c3a4d;
+  --ed-text3: #96688a;
+  --ed-text4: #c48ba6;
+  --ed-accent: #db2777;
+  --ed-accent-bd: rgba(219, 39, 119, 0.4);
+  --ed-accent-bg: rgba(219, 39, 119, 0.12);
+  --ed-mask: rgba(210, 130, 170, 0.3);
+}
+:root[data-theme="light"][data-tint="gray"] {
+  --ed-bg0: #f7f7f8;
+  --ed-bg1: #ececee;
+  --ed-bg2: #f7f7f8;
+  --ed-bg3: #e0e1e3;
+  --ed-border: #c9ccd1;
+  --ed-border2: #b4b7bc;
+  --ed-text: #26292e;
+  --ed-text1: #3f434a;
+  --ed-text3: #5f6268;
+  --ed-text4: #8b8e94;
+  --ed-accent: #4b5563;
+  --ed-accent-bd: rgba(75, 85, 99, 0.45);
+  --ed-accent-bg: rgba(75, 85, 99, 0.12);
+  --ed-mask: rgba(120, 125, 135, 0.35);
+}
+/* 明亮模式：遮罩变浅、标题栏底与边框微调 */
+.node-editor-mask:has(.node-editor[data-theme='light']) {
+  background: var(--ed-mask);
+  backdrop-filter: none;
+}
+.node-editor[data-theme='light'] .ne-head {
+  background: var(--ed-bg1);
+}
+.node-editor[data-theme='light'] .ne-close:hover {
+  background: #c93c37;
+  border-color: #c93c37;
+  color: #fff;
+}
+/* 明亮模式：阅读模式/选区/域标记高亮改深色可读 */
+.node-editor[data-theme='light'] .wb-cell-cross {
+  background: rgba(180, 83, 9, 0.14) !important;
+}
+.node-editor[data-theme='light'] .wb-cell-inrange {
+  background: rgba(2, 122, 110, 0.14) !important;
+}
+.node-editor[data-theme='light'] .wb-cell-named {
+  background: rgba(9, 105, 218, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(9, 105, 218, 0.45);
+}
+/* 明亮模式：语义提示（警告/错误/成功）改深字色 */
+.node-editor[data-theme='light'] .wrp-warn,
+.node-editor[data-theme='light'] .xrp-warn {
+  background: rgba(180, 83, 9, 0.08);
+  border-color: #d4a72c;
+  color: #7a4b06;
+}
+.node-editor[data-theme='light'] .wrp-err,
+.node-editor[data-theme='light'] .wb-err-inline,
+.node-editor[data-theme='light'] .xrp-err {
+  color: #b3261e;
+}
+/* wb-err-inline 已悬浮在网格上（叠在格子内容之上）——亮主题需要不透明浅底才可读 */
+.node-editor[data-theme='light'] .wb-err-inline {
+  background: rgba(255, 244, 244, 0.96);
+  border-color: #d9302566;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+/* ============================================================
+   Word / Excel 节点（docx / xlsx）+ 放大态编辑器 + Excel 报表面板
+   —— 从 index.css 拆出来单独一份，避免继续往 1800 行的主样式表里堆。
+
+   配色沿用 GitHub Dark，与既有 6 种节点区分：
+     · docx 浅蓝 #79c0ff（区别于表节点的 #58a6ff）
+     · xlsx 浅绿 #7ee787（区别于参数表的 #3fb950）
+   徽章文字是深色 var(--ed-bg0)，所以底色必须够亮才看得清。
+   ============================================================ */
+
+.rf-badge--docx {
+  background: #79c0ff;
+}
+.rf-badge--xlsx {
+  background: #7ee787;
+}
+.rf-node--docx {
+  border-color: #79c0ff;
+}
+.rf-node--xlsx {
+  border-color: #7ee787;
+}
+
+/* 节点卡片上的「双击进入编辑」提示行 */
+.rf-field--hint {
+  color: #79c0ff;
+  font-style: italic;
+}
+.rf-field--hint .rf-type {
+  color: #7ee787;
+}
+
+/* 调色板图形：Word 是"折角文档"，Excel 是"网格" */
+.docx-shape {
+  background: #0f2436;
+  border: 1.5px solid #79c0ff;
+  border-radius: 3px 8px 3px 3px;
+}
+.xlsx-shape {
+  background: #10301c;
+  border: 1.5px solid #7ee787;
+  border-radius: 3px;
+  position: relative;
+}
+.xlsx-shape::before,
+.xlsx-shape::after {
+  content: '';
+  position: absolute;
+  background: #7ee78766;
+}
+.xlsx-shape::before {
+  left: 1px;
+  right: 1px;
+  top: 50%;
+  height: 1px;
+}
+.xlsx-shape::after {
+  top: 1px;
+  bottom: 1px;
+  left: 50%;
+  width: 1px;
+}
+
+/* ============================================================
+   态 B · 放大态编辑器浮层
+   Portal 到 document.body，刻意脱离 React Flow 的 transform 子树：
+   canvas 模糊 / fixed 被劫持 / 命中测试除 zoom / 退格删节点 / 多实例内存
+   —— 这五个问题全靠「不待在画布 DOM 里」一次性解决。
+   ============================================================ */
+
+.node-editor-mask {
+  position: fixed;
+  inset: 0;
+  /* 层级要卡在中间：
+       画布自己的浮层是 1500~2000（.props-panel / .canvas-tools / .canvas-topbar / .canvas-statbar / .trash-panel）
+       而本浮层内部又会弹出 .wrp-overlay(9999) 与 .oo-modal(10000)
+     所以取 8000 —— 盖得住画布 chrome，又不至于把内部的二级弹层压掉。 */
+  z-index: var(--z-node-editor);
+  /* 2026-09-26 用户拍板：遮罩近乎不透明（0.88），画布连线不再穿透显示；blur 已去除（连线模糊的来源） */
+  background: rgba(1, 4, 9, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+
+.node-editor {
+  display: flex;
+  flex-direction: column;
+  width: min(1180px, 100%);
+  height: 100%;
+  max-height: 100%;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 10px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  /* 毛玻璃后置连线模式：窗体要盖住 z0 的后置连线层 */
+  position: relative;
+  z-index: 1;
+  /* 备忘 · 让位/左扩/最大化的平滑动效（退出引用栏 → margin 254→0 = 左边框向左扩展） */
+  transition: margin-left 0.24s ease, width 0.24s ease, border-radius 0.24s ease;
+}
+
+.node-editor-mask {
+  transition: padding 0.24s ease; /* 备忘 · 最大化动效：ne-max-pad(padding 28→0) 平滑展开 */
+}
+
+/* 备忘：主窗体空间不够时，窗体右移让位（引用栏保持贴屏左，不叠在 Excel 上）
+   margin-left 222 = 目标窗体左缘 250(8+230+12) − mask padding 28；margin-right:auto 钉住左缘 */
+.node-editor.ne-refroom {
+  margin-left: 222px;
+  margin-right: auto;
+  width: min(1180px, calc(100% - 250px));
+}
+/* ★ 2026-10-19 右栏让位（用户「没有和左侧一样 让ooexcel主窗体退让」）：镜像——
+   窗体左移，右侧腾出 222px 给「数据预选」面板。 */
+.node-editor.ne-refroom-r {
+  margin-left: auto;
+  margin-right: 222px;
+  width: min(1180px, calc(100% - 250px));
+}
+/* 左右同时开：两侧都让 */
+.node-editor.ne-refroom.ne-refroom-r {
+  margin-left: 222px;
+  margin-right: 222px;
+  width: min(1180px, calc(100% - 500px));
+}
+
+/* 备忘 · 右键单元格菜单（WPS 常规项） */
+.wb-ctxmenu {
+  position: fixed;
+  z-index: 8200;
+  min-width: 210px;
+  max-height: 72vh;
+  overflow-y: auto;
+  background: var(--ed-bg1);
+  border: 1px solid var(--ed-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+  padding: 4px;
+}
+.wb-ctxmenu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--ed-text);
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.wb-ctxmenu-item:hover {
+  background: var(--ed-bg3);
+}
+.wb-ctxmenu-sep {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--ed-border2);
+}
+/* #33 二级子菜单（插入单元格▸ 等）：hover 父项浮出右侧；子菜单复用主菜单壳样式 */
+.wb-ctxmenu-itemwrap {
+  position: relative;
+}
+.wb-ctxmenu-arrow {
+  float: right;
+  margin-left: 18px;
+  opacity: 0.55;
+  font-size: 10px;
+  line-height: inherit;
+}
+.wb-ctxmenu.sub {
+  display: none;
+  position: absolute;
+  left: calc(100% - 2px);
+  top: -5px;
+  min-width: 178px;
+  max-height: none;
+  overflow: visible;
+}
+.wb-ctxmenu-itemwrap:hover > .wb-ctxmenu.sub {
+  display: block;
+}
+/* hover 父项时二级跟亮（父项 hover 态背景由 .wb-ctxmenu-item:hover 已覆盖） */
+
+/* 备忘 · 选区轮廓跑动特效：位置/尺寸平滑过渡到新选区 */
+.wb-seloutline {
+  /* 2026-09-26 用户拍板「滚动要直接放上面」：overlay 挂进 ag-grid 滚动容器内用 content 坐标定位，
+     随滚动原生移动零 JS 同步；原 fixed + scroll 事件重摆 + 160ms transition 是「滞后感」三件套（合成后事件 + 强制 layout + 弹簧动画） */
+  position: absolute;
+  z-index: 8070;
+  pointer-events: none;
+  border: 1.5px solid var(--ed-accent);
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+/* overlay 的 absolute 定位基准：portal 挂进视口后若其无 position 会向上逃逸（Electron Chrome 105+ 支持 :has） */
+.ag-body-viewport:has(> .wb-seloutline) {
+  position: relative;
+}
+
+.ne-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--ed-bg2);
+  border-bottom: 1px solid var(--ed-border);
+  flex-shrink: 0;
+  /* 备忘 · 拖窄总窗体时标题栏不得变高：不换行、内部文字不许折行、超高内容裁剪 */
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ne-head button {
+  white-space: nowrap;
+  flex-shrink: 0; /* 方形页签/图标按钮/关闭钮不挤压折行 —— 变窄时由名称/模板下拉让位 */
+}
+
+.ne-name {
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 5px 9px;
+  min-width: 90px; /* 备忘 · 原 180px：窄窗时名称框先让位，标题栏高度恒定 */
+  max-width: 340px;
+  flex: 0 1 auto;
+}
+.ne-name:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+
+.ne-kind {
+  color: var(--ed-text3);
+  font-size: 12px;
+}
+
+.ne-count {
+  color: var(--ed-text4);
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden; /* 窄窗最后让位：列行数先被裁剪，按钮组不折行 */
+}
+
+.ne-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+/* 备忘 · 页签换方形按钮（图标 + title 悬停全名；data-tab 供脚本定位） */
+.ne-tabs .tab {
+  width: 28px;
+  height: 26px;
+  padding: 0;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+/* ★ 2026-10-19 重设计：页签激活态从 index.css 的硬编码蓝框（#58a6ff）收编进
+ *   主题体系——与 is-on 同语言（accent 淡底 + accent 图标），整排一致。 */
+.ne-tabs .tab-active {
+  background: var(--ed-accent-bg);
+  border-color: transparent;
+  color: var(--ed-accent);
+}
+
+.ne-close {
+  width: 31px;
+  height: 31px;
+  line-height: 1;
+  font-size: 21px;
+  color: var(--ed-text3);
+  background: transparent;
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ne-close:hover {
+  color: #fff;
+  background: #a32d2d;
+  border-color: #a32d2d;
+}
+
+.ne-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 16px 24px;
+}
+
+.ne-empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--ed-text3);
+  font-size: 13px;
+}
+
+/* 只读输入数据视图 */
+.ne-table-wrap {
+  overflow: auto;
+}
+.ne-table {
+  border-collapse: collapse;
+  font-size: 12px;
+  width: 100%;
+}
+.ne-table th,
+.ne-table td {
+  border: 1px solid var(--ed-border2);
+  padding: 4px 9px;
+  text-align: left;
+  color: var(--ed-text1);
+  white-space: nowrap;
+}
+.ne-table th {
+  position: sticky;
+  top: 0;
+  background: var(--ed-border2);
+  color: var(--ed-text);
+  font-weight: 600;
+}
+.ne-more {
+  padding: 8px 2px;
+  color: var(--ed-text3);
+  font-size: 12px;
+}
+
+/* ============================================================
+   Excel 报表面板（xrp-，与 Word 侧的 wrp- 对称）
+   ============================================================ */
+
+.xrp {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.xrp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.xrp-tpl {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.xrp-title {
+  color: var(--ed-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.xrp-name {
+  color: #7ee787;
+  font-size: 12px;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xrp-empty {
+  color: var(--ed-text4);
+  font-size: 12px;
+}
+.xrp-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+/* 控件排直接作为「绑定与产出」的首行（原标题行已删），补上与下方内容的间距 */
+.xrp-actions-top {
+  margin-bottom: 10px;
+}
+/* 提示条右侧的关闭钮 */
+.wrp-warn-x {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.7;
+}
+.wrp-warn-x:hover {
+  opacity: 1;
+}
+.xrp-pick {
+  cursor: pointer;
+}
+.xrp-lib {
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.xrp-busy {
+  color: #e3b341;
+  font-size: 12px;
+}
+.xrp-err {
+  color: #f85149;
+  font-size: 12px;
+  background: #2d1418;
+  border: 1px solid #f8514955;
+  border-radius: 6px;
+  padding: 7px 10px;
+}
+.xrp-empty-box {
+  color: var(--ed-text3);
+  font-size: 12px;
+  line-height: 1.7;
+  background: var(--ed-bg2);
+  border: 1px dashed var(--ed-border);
+  border-radius: 8px;
+  padding: 16px;
+}
+.xrp-meta {
+  color: var(--ed-text3);
+  font-size: 12px;
+}
+.xrp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.xrp-item {
+  background: var(--ed-bg2);
+  border: 1px solid var(--ed-border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.xrp-item--table {
+  border-left: 3px solid #7ee787;
+}
+.xrp-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.xrp-kind {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ed-bg0);
+}
+.xrp-kind--name {
+  background: #79c0ff;
+}
+.xrp-kind--table {
+  background: #7ee787;
+}
+.xrp-key {
+  color: var(--ed-text);
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xrp-ref {
+  margin-left: auto;
+  color: var(--ed-text4);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.xrp-ctl {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.xrp-ctl select {
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12px;
+  padding: 4px 8px;
+  max-width: 100%;
+}
+.xrp-manual {
+  width: 100%;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 6px 8px;
+  resize: vertical;
+}
+.xrp-manual:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+.xrp-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 10px;
+  border-left: 2px solid var(--ed-border2);
+}
+.xrp-col {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.xrp-col-name {
+  width: 84px;
+  flex-shrink: 0;
+  color: var(--ed-text3);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xrp-col select {
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12px;
+  padding: 3px 6px;
+}
+.xrp-formula {
+  flex: 1;
+  min-width: 150px;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: #7ee787;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 3px 7px;
+}
+.xrp-formula:focus {
+  outline: none;
+  border-color: #7ee787;
+}
+.xrp-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ed-border2);
+}
+.xrp-ok {
+  color: #3fb950;
+  font-size: 12px;
+}
+.xrp-warn {
+  color: #e3b341;
+  font-size: 12px;
+  line-height: 1.7;
+  background: #2b2312;
+  border: 1px solid #e3b34155;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+/* 取值溯源：每个域「取到了什么、从哪来」 */
+.xrp-trace {
+  border: 1px solid var(--ed-border2);
+  border-radius: 6px;
+  background: #0f1318;
+}
+.xrp-trace > summary {
+  cursor: pointer;
+  padding: 7px 10px;
+  color: var(--ed-text3);
+  font-size: 12px;
+  user-select: none;
+}
+.xrp-trace > summary:hover {
+  color: var(--ed-text1);
+}
+.xrp-trace-body {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--ed-border2);
+  max-height: 220px;
+  overflow: auto;
+}
+.xrp-trace-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  border-bottom: 1px solid var(--ed-bg2);
+}
+.xrp-trace-row:last-child {
+  border-bottom: none;
+}
+.xrp-trace-row--bad .xrp-trace-val {
+  color: #f85149;
+}
+.xrp-trace-key {
+  color: var(--ed-text);
+  flex-shrink: 0;
+  min-width: 90px;
+}
+.xrp-trace-from {
+  color: #79c0ff;
+  flex-shrink: 0;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xrp-trace-val {
+  color: #7ee787;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   工作簿编辑器（wb-）—— 离线「在软件里打开 Excel」
+   与 OnlyOffice（在线重度编辑）互补：这条路零服务端依赖。
+   ============================================================ */
+
+.wb {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+.wb-loading {
+  padding: 32px;
+  text-align: center;
+  color: var(--ed-text3);
+  font-size: 13px;
+}
+
+.wb-err {
+  color: #f85149;
+  font-size: 13px;
+  line-height: 1.7;
+  background: #2d1418;
+  border: 1px solid #f8514955;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.wb-err-msg {
+  margin-top: 6px;
+  color: #ffa198;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+/* ★ 批次17：模板丢失时的自愈操作条 —— 报错不再等于死胡同 */
+.wb-err-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.wb-err-actions .ne-libsel {
+  min-width: 170px;
+  max-width: 260px;
+}
+.wb-empty {
+  color: var(--ed-text3);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* 工作表页签行 */
+.wb-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.wb-tab {
+  background: var(--ed-bg2);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px 6px 0 0;
+  color: var(--ed-text3);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 5px 12px;
+}
+.wb-tab:hover {
+  color: var(--ed-text1);
+  border-color: #484f58;
+}
+.wb-tab.on {
+  background: var(--ed-bg0);
+  border-color: #7ee787;
+  color: #7ee787;
+  font-weight: 600;
+}
+
+.wb-sp {
+  flex: 1;
+  min-width: 8px;
+}
+
+.wb-chip {
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 4px;
+    color: var(--ed-bg0);
+  font-weight: 600;
+}
+.wb-chip--named {
+  background: #79c0ff;
+}
+.wb-chip--table {
+  background: #7ee787;
+}
+.wb-stat {
+  color: var(--ed-text4);
+  font-size: 12px;
+}
+
+/* 归一化告知 */
+.wb-note {
+  flex-shrink: 0;
+  background: #2b2312;
+  border: 1px solid #e3b34155;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.wb-note > summary {
+  cursor: pointer;
+  padding: 7px 10px;
+  color: #e3b341;
+  user-select: none;
+}
+.wb-note-body {
+  padding: 0 10px 8px;
+  color: #d0b46a;
+  line-height: 1.7;
+}
+.wb-note-foot {
+  margin-top: 4px;
+  color: var(--ed-text3);
+}
+
+/* 网格：占满剩余高度，否则 ag-grid 不渲染 */
+.wb-grid {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative; /* 填充柄/预览框的定位基准 */
+  /* 关掉 ag-grid 自带的行悬停/列悬停高亮 —— 与阅读模式的行列十字叠在一起互相干扰 */
+  --ag-row-hover-color: transparent;
+  --ag-column-hover-color: transparent;
+}
+/* WPS 同款空心十字光标（白十字黑描边，SVG data-uri；数据区），表头保持默认
+   备忘 · 加宽：画布 25→31、臂宽 2→3（更接近 WPS 的粗空心十字），热点居中 15 15 */
+.wb-grid .ag-center-cols-container .ag-cell {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='31' height='31'><path d='M14 0.5 h3 v13.5 h13.5 v3 H17 v13.5 h-3 V17 H0.5 v-3 H14 Z' fill='%23ffffff' stroke='%2324292e' stroke-width='1'/></svg>") 15 15, crosshair;
+}
+/* 关掉 ag-grid 自带的 focus 格子框（它停留在最初点击的格子上，与选区边界亮显冲突） */
+.wb-grid .ag-cell-focus,
+.wb-grid .ag-cell-range-focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* 活动格（选区边界/最后点击）亮显 */
+/* 选区外轮廓亮显（Excel 同款）：边缘格按方向描边（CSS 变量组合，中间格不亮） */
+.wb-grid .wb-cell-edge {
+  box-shadow:
+    inset 0 2px 0 var(--eb-t, transparent),
+    inset 0 -2px 0 var(--eb-b, transparent),
+    inset 2px 0 0 var(--eb-l, transparent),
+    inset -2px 0 0 var(--eb-r, transparent) !important;
+}
+.wb-grid .wb-eb-t {
+  --eb-t: var(--ed-accent);
+}
+.wb-grid .wb-eb-b {
+  --eb-b: var(--ed-accent);
+}
+.wb-grid .wb-eb-l {
+  --eb-l: var(--ed-accent);
+}
+.wb-grid .wb-eb-r {
+  --eb-r: var(--ed-accent);
+}
+/* 智能填充柄（选区右下角小方块） */
+.wb-fill-handle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: var(--ed-gold);
+  border: 1px solid var(--ed-bg0);
+  border-radius: 1px;
+  z-index: 30;
+  cursor: crosshair;
+}
+/* 填充拖动的预览框（虚线金框） */
+.wb-fill-preview {
+  position: absolute;
+  border: 1.5px dashed var(--ed-gold);
+  background: rgba(212, 162, 78, 0.08);
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* #36 公式态拖拽选区间高亮（fx 栏/FCE 公式态按住拖动 = 选区间，mouseup 落 A1:B3 引用） */
+.wb-grid .wb-cell-dragrng {
+  box-shadow: inset 0 0 0 1.5px var(--ed-gold) !important;
+  background: rgba(212, 162, 78, 0.1) !important;
+}
+
+/* #11 补竖向网格线：横向（行分隔）ag-grid 自带、竖向（列分隔）无主题变量 ——
+   数据格/列头补右描边与横线一致，--ed-border2 双主题自动跟随。
+   行号列（pinned）不补：ag-grid 自带 pinned 区右缘分隔线，叠加会成 2px 粗线。
+   border-right 落在 ag-cell 元素上，与 cellStyle inline（background/color/字体）不冲突。 */
+.wb-grid .ag-center-cols-container .ag-cell,
+.wb-grid .ag-header-cell:not(.wb-rownum-header) {
+  border-right: 1px solid var(--ed-border2);
+}
+
+/* 行号底边拖拽手柄（#37 行高）：行号格下半 5px 热区，光标 row-resize。
+   视觉由 wb-rownum-grip 常显淡线提示（hover 行号格加深）。 */
+.wb-grid .wb-rownum {
+  position: relative;
+}
+.wb-grid .wb-rownum .wb-rownum-grip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  cursor: row-resize;
+}
+.wb-grid .wb-rownum .wb-rownum-grip::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: transparent;
+}
+.wb-grid .wb-rownum:hover .wb-rownum-grip::after {
+  background: var(--ed-accent);
+  opacity: 0.55;
+}
+/* 行高拖拽中的跟随基线（document 级，跟随鼠标 y） */
+.wb-rowheight-guide {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 2px dashed var(--ed-accent);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* #33A 筛选：值清单面板（列头右键「筛选…」弹出） */
+.wb-filterdlg {
+  position: fixed;
+  z-index: var(--z-modal, 9000);
+  width: 230px;
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  background: var(--ed-bg1);
+  border: 1px solid var(--ed-border);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  font-size: 12px;
+  color: var(--ed-text);
+}
+.wb-filterdlg-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--ed-border2);
+  font-weight: 600;
+}
+.wb-filterdlg-head .wb-filterdlg-col {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ed-accent);
+}
+.wb-filterdlg-list {
+  overflow: auto;
+  padding: 4px 6px;
+  flex: 1;
+  min-height: 0;
+}
+.wb-filterdlg-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+.wb-filterdlg-item:hover {
+  background: var(--ed-bg3);
+}
+.wb-filterdlg-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wb-filterdlg-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-top: 1px solid var(--ed-border2);
+}
+.wb-filterdlg-foot .spacer {
+  flex: 1;
+}
+/* 列头筛选标记（该列有筛选条件时列头字母后小漏斗） */
+.ag-header-cell.wb-head-filtered .wb-head-funnel {
+  color: var(--ed-accent);
+}
+.wb-head-funnel {
+  margin-left: 4px;
+  font-size: 10px;
+  color: var(--ed-text4);
+}
+
+.wb-rownum {
+  color: var(--ed-text4) !important;
+  background: var(--ed-bg2);
+  text-align: center;
+}
+.wb-head {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+/* 列选态的列头高亮（点列头 = 选中整列） */
+.ag-header-cell.wb-head-sel {
+  background: #1f3a5f !important;
+  color: #cfe8ff !important;
+}
+
+/* 域标记：命名区域指向的格子 / 表格范围内
+   ★ 背景不再 !important（#33 格式对话框批次）：用户显式设置的单元格填充（cellStyle inline）
+   必须盖过域标记 tint（WPS 同语义）；标记语义由 box-shadow 色条保留 */
+.wb-cell-named {
+  background: rgba(121, 192, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(121, 192, 255, 0.5);
+}
+.wb-cell-table {
+  background: rgba(126, 231, 135, 0.09);
+  box-shadow: inset 3px 0 0 0 rgba(126, 231, 135, 0.55);
+}
+
+/* 底部工具条 */
+.wb-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--ed-border2);
+}
+.wb-file {
+  color: var(--ed-text);
+  font-size: 12px;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wb-dirty {
+  color: #e3b341;
+  font-size: 12px;
+}
+.wb-ro,
+.wb-busy {
+  color: var(--ed-text3);
+  font-size: 12px;
+}
+
+/* 域清单弹层 */
+.wb-domains {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-editor-pop);
+  background: rgba(1, 4, 9, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+.wb-domains-box {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  max-height: 70vh;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 10px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.wb-domains-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--ed-bg2);
+  border-bottom: 1px solid var(--ed-border);
+  color: var(--ed-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.wb-domains-body {
+  padding: 10px 14px 14px;
+  overflow: auto;
+}
+.wb-domain-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ed-bg2);
+  font-size: 12px;
+}
+.wb-domain-key {
+  color: var(--ed-text);
+  font-weight: 600;
+  min-width: 110px;
+}
+.wb-domain-ref {
+  color: var(--ed-text4);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wb-domain-go {
+  flex-shrink: 0;
+}
+.wb-domains-foot {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ed-border2);
+  color: var(--ed-text3);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.wb-hl-named {
+  color: #79c0ff;
+}
+.wb-hl-table {
+  color: #7ee787;
+}
+
+/* 浮层内部不再滚动（网格自己滚） */
+.ne-body--flush {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 14px; /* 顶部/左右也归零 —— 功能区直接贴住标题栏 */
+}
+
+/* OO 节点：编辑器 iframe 四周全贴边（含底部——用户 2026-09-30 要求无任何空隙） */
+.ne-body--flush.ne-body--oo {
+  padding: 0;
+}
+
+/* OnlyOffice 弹层里的补充说明 */
+.oo-hint {
+  padding: 8px 14px;
+  color: var(--ed-text3);
+  font-size: 12px;
+  line-height: 1.7;
+  border-bottom: 1px solid var(--ed-border2);
+}
+
+/* ============================================================
+   打开失败提示（OpenFailureNotice）
+   ------------------------------------------------------------
+   刻意用「黄色警示」而不是红色报错：
+   多数打不开是「格式不符 / 解析器兼容性」，不是数据损坏，
+   用红色会让用户以为文件废了。红色留给真的丢数据。
+   ============================================================ */
+.open-fail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #2b2312;
+  border: 1px solid #e3b34155;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 12px;
+}
+.ne-body--flush .open-fail {
+  margin: 12px 0;
+}
+
+.open-fail-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.open-fail-head b {
+  color: var(--ed-text);
+  font-size: 13px;
+}
+.open-fail-kind {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 4px;
+  color: var(--ed-bg0);
+  background: #e3b341;
+}
+
+.open-fail-advice {
+  color: var(--ed-text1);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.open-fail-applied {
+  color: var(--ed-text3);
+  font-size: 11px;
+  line-height: 1.7;
+  padding-left: 2px;
+  border-left: 2px solid var(--ed-border);
+  padding-left: 10px;
+}
+
+.open-fail-hint {
+  color: #7ee787;
+  font-size: 11px;
+}
+
+.open-fail-detail summary {
+  color: var(--ed-text3);
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+}
+.open-fail-detail summary:hover {
+  color: var(--ed-text1);
+}
+.open-fail-pre {
+  margin: 8px 0 0;
+  padding: 9px 10px;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text3);
+  font-size: 11px;
+  line-height: 1.7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 220px;
+  overflow: auto;
+  user-select: text;
+}
+
+.open-fail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 操作期错误提示条（不替代网格，只在顶部提示） */
+.wb-err-inline {
+  /* 2026-09-26 用户拍板：提示悬浮在 excel 下方滚动条上面，不占文档流（原插在公式栏上方会把网格推挤移位）。
+     挂在 .wb-grid（已有 position:relative）内 absolute 底部居中；bottom 20px ≈ 水平滚动条(14px)上方 */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  z-index: 8060;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(80%, 680px);
+  padding: 7px 14px;
+  background: rgba(45, 20, 24, 0.94);
+  border: 1px solid #f8514955;
+  border-radius: 6px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  color: #ffa198;
+  font-size: 12px;
+  pointer-events: auto;
+}
+.wb-err-inline span {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+/* ============================================================
+   Ribbon · WPS 风格功能区（Excel / Word 编辑器共用壳）
+   行1 = 快捷区 + 页签 + 右侧钮；行2 = 分组工具区（组间竖线 + 底部组名）
+   ============================================================ */
+.rb {
+  background: var(--ed-bg1);
+  border-bottom: 1px solid var(--ed-border2);
+  flex-shrink: 0;
+  /* WPS 质感：功能区顶部一道内高光，底部分隔更实 */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.rb-row1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 0;
+  min-height: 30px;
+}
+.rb-tabs {
+  display: flex;
+  gap: 1px;
+}
+/* WPS 页签：字号 12.5、间距宽、选中下方 2px 强调条 + 文字加重 */
+.rb-tab {
+  padding: 6px 15px 7px;
+  font-size: 12.5px;
+  letter-spacing: 0.2px;
+  color: var(--ed-text1);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  border-radius: 5px 5px 0 0;
+  transition: background 0.12s, color 0.12s;
+}
+.rb-tab:hover {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+}
+.rb-tab.on {
+  color: var(--ed-text);
+  font-weight: 600;
+  border-bottom-color: var(--ed-accent);
+}
+/* 收起态（属性面板 compact 预览用的矮 Ribbon）：页签更小、边线弱化，
+   与编辑器内的完整功能区在视觉上一眼可分（否则属性面板会像「第二个 Word 菜单」）。
+   判定依据：收起的 Ribbon 没有 .rb-body 兄弟节点。 */
+.rb:not(:has(.rb-body)) {
+  border-bottom-color: var(--ed-border);
+  box-shadow: none;
+}
+.rb:not(:has(.rb-body)) .rb-row1 {
+  padding: 2px 10px;
+  min-height: 26px;
+}
+.rb:not(:has(.rb-body)) .rb-tab {
+  padding: 4px 11px 5px;
+  font-size: 11.5px;
+}
+.rb-collapse {
+  width: 22px;
+  height: 20px;
+  font-size: 11px;
+  color: var(--ed-text3);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.rb-collapse:hover {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+}
+/* 行1 快捷区方形按钮（撤销等快速操作，WPS 快速访问栏同位）——用户 2026-09-26「增加个撤销操作的按钮（方形按钮）」 */
+.rb-quickbtn {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ed-text1);
+  background: transparent;
+  border: 1px solid var(--ed-border);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.rb-quickbtn:hover:not(:disabled) {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+  border-color: var(--ed-border2);
+}
+.rb-quickbtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+/* ── 功能行（行2）：WPS 高度感 —— 按钮轨道 76px + 组名 18px ──
+   统一轨道（--rb-track）是关键：图标钮、纯文字钮、下拉框都在同一轨道内垂直居中，
+   否则会出现「B/I/U 很高、标题1/撤销很矮」的参差感（2026-09-28 实测 centerY 虽相同，
+   但视觉块高差异过大）。
+   尺寸预算：目标在 1280 视口（编辑器可用 ~974px）内放下「字体+段落+样式+编辑」四组。
+   1680 视口实测 1517px 溢出 337px，样式/编辑组完全在屏外 —— 这不是「好看不好看」，
+   是功能不可达。故全部尺寸按「够用即最小」取值。 */
+.rb-body {
+  --rb-track: 72px;
+  display: flex;
+  align-items: stretch;
+  /* 组间靠 .rb-group 的 padding 拉开，这里只留极小 gap 防止竖线贴边 */
+  padding: 4px 8px 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 0;
+  scrollbar-width: thin;
+}
+/* 组：WPS 组间是「大留白 + 细竖线」，不是紧凑排列。
+   flex:none 是关键 —— 组不允许被压窄，否则 inner 内容（按钮 flex:none 不收缩）
+   会溢出到邻组，出现「≡ 图标盖住『突出显示』文字」这种越界（2026-09-28 4x 放大实锤）。
+   宁可让 .rb-body 横向滚动，也不能让组内内容越界。 */
+.rb-group {
+  display: flex;
+  flex-direction: column;
+  padding: 0 11px;
+  border-right: 1px solid var(--ed-border2);
+  flex: none;
+}
+.rb-group:first-child {
+  padding-left: 5px;
+}
+.rb-group:last-child {
+  border-right: none;
+}
+.rb-group-items {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  min-height: var(--rb-track);
+  flex: none;
+  /* 刻意保持 visible：按钮的悬停边框 / 激活态阴影不能被裁。
+     因为 .rb-group 是 flex:none，理论上不会触发溢出裁切。 */
+  overflow: visible;
+}
+/* 组名：WPS 位于组下方、居中、弱灰字，与按钮有呼吸间距 */
+.rb-group-header {
+  font-size: 10.5px;
+  letter-spacing: 0.5px;
+  color: var(--ed-text4);
+  text-align: center;
+  padding: 2px 0 2px;
+  white-space: nowrap;
+  user-select: none;
+  /* 与上方按钮轨道留白，避免贴住 */
+  margin-top: 1px;
+}
+/* ── 按钮：默认「大图标 + 下方小字」竖排（WPS 主形态）── */
+.rb-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 48px;
+  max-width: 104px;
+  flex: none;
+  padding: 5px 6px;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ed-text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s;
+}
+/* 纯图标按钮（无 label）：WPS 里是一排等宽方块，比带字按钮窄 */
+.rb-btn.has-glyph:not(:has(.rb-label)) {
+  min-width: 32px;
+  max-width: 40px;
+  padding: 5px 3px;
+}
+/* 纯文字按钮（无 glyph）：横向单行，但高度仍走统一轨道，视觉块够大才不显碎 */
+.rb-btn:not(.has-glyph) {
+  flex-direction: row;
+  min-height: 32px;
+  min-width: 0;
+  max-width: 88px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+}
+/* 长文字（如「标题 1」）允许省略号，不撑破轨道 */
+.rb-btn > .rb-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.rb-btn:hover:not(:disabled) {
+  background: var(--ed-bg3);
+  border-color: var(--ed-border2);
+}
+.rb-btn:active:not(:disabled) {
+  background: var(--ed-bg0);
+}
+.rb-btn.disabled,
+.rb-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+/* 激活态（选区已加粗等）：WPS 那种按下灰底 + 实边 */
+.rb-btn.on {
+  background: var(--ed-bg3);
+  border-color: var(--ed-border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+/* 图标：WPS 大图标 ~22px；用系统字形贴近 Office 图标观感。
+   22 而非 24 —— 24 会让纯图标按钮省不下宽度，四组放不进 1280 视口。 */
+.rb-glyph {
+  font-size: 22px;
+  line-height: 24px;
+  font-family: 'Segoe UI Symbol', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+  display: inline-block;
+}
+/* 纯图标按钮的图标略小，保证按钮宽度可控 */
+.rb-btn.has-glyph:not(:has(.rb-label)) .rb-glyph {
+  font-size: 20px;
+  line-height: 22px;
+  font-weight: 600;
+}
+.rb-label {
+  font-size: 11px;
+  line-height: 13px;
+  color: var(--ed-text1);
+}
+/* 竖分隔：组内小节之间的细线，与组间的组边界线区分开（更短更淡） */
+.rb-vsep {
+  width: 1px;
+  flex: none;
+  background: var(--ed-border2);
+  height: 40px;
+  align-self: center;
+  margin: 0 6px;
+  opacity: 0.7;
+}
+/* ── 下拉框：WPS 宽扁圆角质感；宽度由调用方给，且保证够放下文字+箭头 ── */
+.rb-sel {
+  align-self: center;
+  flex: none;
+  background: var(--ed-bg2);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12.5px;
+  padding: 5px 6px 5px 9px;
+  min-height: 30px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  /* 中文候选文本不换行、不撑高 */
+  text-overflow: ellipsis;
+}
+.rb-sel:hover:not(:disabled) {
+  background: var(--ed-bg3);
+  border-color: var(--ed-border2);
+}
+.rb-sel:disabled {
+  opacity: 0.4;
+}
+
+/* ── 编辑器标题栏文件操作组（xlsx：历史下拉 + 改名 + 打开文件 + 保存 + 生成 Excel）── */
+.ne-fileops {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* ★ 2026-10-18 用户指令：标题栏操作按钮组靠右对齐（名称/行列数仍靠左） */
+  margin-left: auto;
+}
+/* ★ 2026-10-19 用户「按钮排列向右靠齐 间距统一」：主题/最大化/关闭收进尾组，
+ *   组内间距 4px 与文件操作组一致；OO 页签隐藏后两组相邻，整排贴右。 */
+.ne-headtail {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* 抵消 .ne-head 的 10px 组间距 → 与组内 4px 一致 */
+  margin-left: -6px;
+  flex-shrink: 0;
+}
+.ne-headtail .ne-maxbtn {
+  margin-left: 0;
+}
+/* 跟在按钮组后面的页签改固定间距（原 margin-left:auto 会与按钮组的 auto 平分空间，把按钮组挤到中间） */
+.ne-fileops + .ne-tabs {
+  margin-left: 10px;
+}
+.ne-libsel {
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12px;
+  padding: 4px 8px;
+  max-width: 190px;
+  flex: 0 1 auto; /* 窄窗时模板下拉与名称框一起让位，保标题栏恒高 */
+}
+.ne-setname {
+  padding: 4px 7px;
+  font-size: 12px;
+}
+/* 标题栏方形图标按钮（打开/保存/生成/改名） */
+.ne-iconbtn {
+  /* ★ 2026-10-19 用户「按钮再大30%」：24 → 31px，图标 15 → 19 */
+  width: 31px;
+  height: 31px;
+  padding: 0;
+  line-height: 1;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 未保存红点用绝对定位挂在右上角（2026-10-17） */
+  position: relative;
+  /* ★ 符号类图标（◧▣💾⤓）字形不对称、字体内留白不均，视觉上永远偏一边——
+     同一排里尤其明显（2026-10-04 用户报「数据引用的按钮没居中，比较丑」）。
+     这里不指望调 padding 修：直接给 svg 用 currentColor 描边，路径自己算好几何中心。 */
+  color: var(--ed-text3);
+  /* ★ 2026-10-19 重设计（用户「重新设计」）：整排统一语言——
+     默认透明底无框、hover 浮起（底+框）、激活=accent 淡底无框 + accent 图标。
+     之前"每个按钮自带灰框 + 激活换彩框"导致一排里框色杂乱。
+     ★ v3（用户「边缘轮廓参照最大化最小化按钮」）：默认就带 --ed-border 细灰框
+     （与 ⤡/× 同款轮廓），hover 只加底色。 */
+  background: transparent;
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.ne-iconbtn:hover {
+  color: var(--ed-text);
+  background: var(--ed-bg3);
+  border-color: var(--ed-border);
+}
+/* 激活态（开关型按钮）：accent 淡底 + accent 图标，无描边——安静、主题跟随 */
+.ne-iconbtn.is-on {
+  background: var(--ed-accent-bg);
+  border-color: transparent;
+  color: var(--ed-accent);
+}
+/* 空历史：只把图标调暗（★ 不用 opacity——会连边框一起变淡，轮廓就和别的不一样了） */
+.ne-iconbtn.is-empty {
+  color: var(--ed-text4);
+}
+/* 编辑器内浮层提示（2026-10-18）：着色开关/域刷新的结果。
+   过去结果只写进「参数引用」面板的 refreshMsg，面板没开时完全看不见 ⇒ 用户以为按钮坏了。 */
+.ne-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: min(560px, calc(100% - 32px));
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ed-text, #e8edf2);
+  background: rgba(22, 27, 34, 0.88);
+  border: 1px solid rgba(88, 166, 255, 0.38);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  animation: ne-toast-in 0.18s ease-out;
+}
+@keyframes ne-toast-in {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+:root[data-theme='light'] .ne-toast {
+  color: #1b2430;
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(52, 120, 208, 0.4);
+}
+/* svg 自身尺寸归一：按钮 26px，图标 16px，中心对齐由 flex 负责 */
+.ne-iconbtn > svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+}
+/* ★ 2026-10-17 有未保存修改：图标不再染琥珀（用户「颜色稍微统一一下」——一排里
+   橙色是唯一异色）——未保存信号由右上角红点 + 标题栏「● 未保存」承担。 */
+.ne-iconbtn.is-dirty {
+  color: var(--ed-text3);
+}
+.ne-iconbtn.is-dirty:hover {
+  color: var(--ed-text);
+}
+/* 标题栏「● 未保存」提示：hover 提亮，明确可点 */
+.ne-dirty:hover {
+  color: #f2b862;
+}
+.ne-maxbtn {
+  width: 31px;
+  height: 31px;
+  line-height: 1;
+  font-size: 13px;
+  margin-left: 4px;
+  background: transparent;
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  cursor: pointer;
+}
+.ne-maxbtn:hover {
+  color: var(--ed-text);
+  background: var(--ed-bg3);
+}
+
+/* ── 打开工作簿：未导入模板时的空态导入框 ── */
+.wb-hero {
+  max-width: 480px;
+  margin: 56px auto;
+  padding: 24px 26px;
+  background: #10161d;
+  border: 1px solid var(--ed-border);
+  border-radius: 12px;
+}
+.wb-hero-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ed-text);
+  margin-bottom: 14px;
+}
+.wb-hero-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.wb-hero-actions .primary {
+  background: #14532d;
+  border-color: #16a34a;
+  color: #dcfce7;
+}
+.wb-hero-actions .primary:hover {
+  background: #166534;
+}
+.wb-hero-history {
+  border-top: 1px solid var(--ed-border2);
+  padding-top: 10px;
+  margin-bottom: 10px;
+  max-height: 230px;
+  overflow-y: auto;
+}
+.wb-hero-h {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--ed-text3);
+  margin-bottom: 6px;
+}
+.wb-hero-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: var(--ed-text1);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.wb-hero-item:hover {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+}
+.wb-hero-hint {
+  font-size: 11px;
+  color: var(--ed-text3);
+}
+
+/* ── 明亮模式：Word 面板（.wrp 定义在 index.css，这里按主题覆写）── */
+.node-editor[data-theme='light'] .wrp-head {
+  background: var(--ed-bg1);
+  border-bottom-color: var(--ed-border);
+}
+.node-editor[data-theme='light'] .wrp-title {
+  color: var(--ed-text);
+}
+.node-editor[data-theme='light'] .wrp-tabs button {
+  background: transparent;
+  border-color: var(--ed-border);
+  color: var(--ed-text1);
+}
+.node-editor[data-theme='light'] .wrp-tabs button.on {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+}
+.node-editor[data-theme='light'] .wrp-row,
+.node-editor[data-theme='light'] .wrp-meta,
+.node-editor[data-theme='light'] .wrp-item,
+.node-editor[data-theme='light'] .wrp-trace,
+.node-editor[data-theme='light'] .wrp-empty,
+.node-editor[data-theme='light'] .wrp-overlay-bar,
+.node-editor[data-theme='light'] .wrp-preview-wrap {
+  background: var(--ed-bg0);
+  color: var(--ed-text);
+  border-color: var(--ed-border);
+}
+.node-editor[data-theme='light'] .wrp-tpl,
+.node-editor[data-theme='light'] .wrp-name,
+.node-editor[data-theme='light'] .wrp-resolved,
+.node-editor[data-theme='light'] .wrp-col-name,
+.node-editor[data-theme='light'] .wrp-sample {
+  color: var(--ed-text1);
+}
+.node-editor[data-theme='light'] .wrp-empty,
+.node-editor[data-theme='light'] .wrp-trace-key,
+.node-editor[data-theme='light'] .wrp-trace-from,
+.node-editor[data-theme='light'] .wrp-hint,
+.node-editor[data-theme='light'] .wrp-overlay-hint {
+  color: var(--ed-text3);
+}
+.node-editor[data-theme='light'] .wrp-err {
+  background: rgba(179, 38, 30, 0.08);
+  border-color: #e5484d;
+  color: #b3261e;
+}
+.node-editor[data-theme='light'] .wrp-overlay {
+  background: rgba(80, 90, 100, 0.55);
+}
+/* 明亮模式：通用 tab / bar-btn（全局类）在编辑器内的形态 */
+.node-editor[data-theme='light'] .tab {
+  background: transparent;
+  border-color: var(--ed-border);
+  color: var(--ed-text1);
+}
+.node-editor[data-theme='light'] .tab-active {
+  background: #fff;
+  border-color: var(--ed-border);
+  color: var(--ed-text);
+  font-weight: 600;
+}
+.node-editor[data-theme='light'] .bar-btn {
+  background: transparent;
+  border-color: var(--ed-border);
+  color: var(--ed-text1);
+}
+.node-editor[data-theme='light'] .bar-btn:hover:not(:disabled) {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+}
+.node-editor[data-theme='light'] .bar-btn:disabled {
+  opacity: 0.45;
+}
+.node-editor[data-theme='light'] .ne-name,
+.node-editor[data-theme='light'] .ne-libsel {
+  background: var(--ed-bg0);
+  border-color: var(--ed-border);
+  color: var(--ed-text);
+}
+
+/* ── 属性引用栏（Excel 编辑器左侧）── */
+.wb {
+  position: relative; /* 引用连线 SVG 的定位基准 */
+}
+.wb-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+}
+.wb-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.wb-refline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 45;
+}
+.wb-refline path {
+  stroke: var(--ed-gold);
+  stroke-width: 1.5;
+  fill: none;
+}
+.wb-cell-refurn {
+  box-shadow: inset 0 0 0 1.5px var(--ed-gold) !important;
+  background: rgba(212, 162, 78, 0.1) !important;
+}
+/* WPS 语义 · 公式态点格高亮：被点格 = 当前活跃引用（金色选框 + 浅金底；再次点格替换 / 编辑态结束清除） */
+.wb-cell-pickref {
+  box-shadow: inset 0 0 0 2px var(--ed-gold) !important;
+  background: rgba(212, 162, 78, 0.18) !important;
+}
+/* 亮主题：pickref 用深金描边保证可见 */
+:root[data-theme='light'] .wb-cell-pickref {
+  box-shadow: inset 0 0 0 2px #a97c2f !important;
+  background: rgba(212, 162, 78, 0.22) !important;
+}
+/* WPS 语义 · 编辑态已引用格（内部 A1 + 外部 URN 引用格）：亮显但不是最亮 —— 浅蓝底 + 圆角静态框
+   （用户 2026-09-27：「显示所有该单元格已经引用的外部和内部单元格（亮色但是不是最亮的）」） */
+.wb-cell-refdim {
+  outline: 1px solid rgba(94, 140, 200, 0.55);
+  outline-offset: -2px;
+  border-radius: 7px;
+  background: rgba(74, 158, 255, 0.1) !important;
+}
+:root[data-theme='light'] .wb-cell-refdim {
+  outline-color: rgba(70, 110, 170, 0.6);
+  background: rgba(74, 158, 255, 0.13) !important;
+}
+/* WPS 语义 · 公式里选中的引用 = 最亮：底色加深 + 虚线边框旋转流动（蚂蚁线，蓝=点公式里的引用 / 金=点格新增） */
+.wb-cell-refglow {
+  outline: none !important;
+  background: rgba(74, 158, 255, 0.22) !important;
+}
+.wb-cell-pickref {
+  outline: none !important;
+  background: rgba(212, 162, 78, 0.24) !important;
+}
+:root[data-theme='light'] .wb-cell-pickref {
+  background: rgba(212, 162, 78, 0.28) !important;
+}
+/* 蚂蚁线：四边 repeating-gradient 虚线段 + background-position 一个周期位移（7px）无缝循环，顺时针流动 */
+.wb-cell-refglow::after,
+.wb-cell-pickref::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 7px;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(90deg, var(--ants-c) 0 3px, transparent 3px 7px),
+    repeating-linear-gradient(90deg, var(--ants-c) 0 3px, transparent 3px 7px),
+    repeating-linear-gradient(0deg, var(--ants-c) 0 3px, transparent 3px 7px),
+    repeating-linear-gradient(0deg, var(--ants-c) 0 3px, transparent 3px 7px);
+  background-size: 1.6px 100%, 1.6px 100%, 100% 1.6px, 100% 1.6px;
+  background-position: 0 0, 100% 0, 0 0, 0 100%;
+  background-repeat: no-repeat;
+  animation: wb-ants-run 0.55s linear infinite;
+}
+.wb-cell-refglow::after {
+  --ants-c: #4a9eff;
+}
+:root[data-theme='light'] .wb-cell-refglow::after {
+  --ants-c: #1d6fd1;
+}
+.wb-cell-pickref::after {
+  --ants-c: #d4a24e;
+}
+:root[data-theme='light'] .wb-cell-pickref::after {
+  --ants-c: #a97c2f;
+}
+@keyframes wb-ants-run {
+  to {
+    background-position: 0 7px, 100% -7px, 7px 0, -7px 100%;
+  }
+}
+/* WPS 语义 · 点公式里的引用 → 对应格亮显（蓝框 + 浅蓝底） */
+.wb-cell-refglow {
+  box-shadow: inset 0 0 0 2px #4a9eff !important;
+  background: rgba(74, 158, 255, 0.16) !important;
+}
+:root[data-theme='light'] .wb-cell-refglow {
+  box-shadow: inset 0 0 0 2px #1d6fd1 !important;
+  background: rgba(74, 158, 255, 0.2) !important;
+}
+/* 备忘 2026-09-27 ⑤ · hover 预览亮显（悬停公式里的 A1 引用 / 胶囊对应的 URN 引用格）——
+   比点击态（refglow/pickref）淡一档、无蚂蚁线动画，动画留给点击态 */
+.wb-cell-hoverglow {
+  box-shadow: inset 0 0 0 1.5px rgba(74, 158, 255, 0.6) !important;
+  background: rgba(74, 158, 255, 0.12) !important;
+}
+:root[data-theme='light'] .wb-cell-hoverglow {
+  box-shadow: inset 0 0 0 1.5px rgba(29, 111, 209, 0.65) !important;
+  background: rgba(74, 158, 255, 0.16) !important;
+}
+.wb-cell-hoverurn {
+  outline: 1.5px solid rgba(94, 140, 200, 0.7);
+  outline-offset: -2px;
+  border-radius: 7px;
+  background: rgba(74, 158, 255, 0.14) !important;
+}
+:root[data-theme='light'] .wb-cell-hoverurn {
+  outline-color: rgba(70, 110, 170, 0.75);
+  background: rgba(74, 158, 255, 0.18) !important;
+}
+.ref-panel {
+  /* portal 到 body 的画布级侧栏：位置/高度/圆角/边框由 WorkbookEditor 按两态规范内联下发
+     （常规=窗体外、边缘与窗体一致；最大化=功能区下方、窗体内左缘）
+     ★ z-index 必须用变量，不能写死：侧边栏要「浮在放大态窗体之上、弹窗之下」。
+       曾写死 8100 而弹窗是 500 → 侧边栏浮到遮罩之上，点弹窗被侧边栏压住，
+       关掉弹窗侧边栏还在，用户以为没响应（2026-10-04 报）。 */
+  position: fixed;
+  box-sizing: border-box; /* 内联 height 含自身边框 —— 与窗体边缘严格平齐（差 2px 实测） */
+  z-index: var(--z-editor-side, 8100);
+  width: 230px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--ed-bg1);
+  border: 1px solid var(--ed-border);
+  min-height: 0;
+  overflow: hidden;
+}
+.ref-head {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px 4px;
+}
+.ref-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ed-text);
+}
+.ref-sp {
+  flex: 1;
+}
+.ref-x {
+  background: transparent;
+  border: none;
+  color: var(--ed-text3);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.ref-x:hover {
+  color: var(--ed-text);
+}
+.ref-search {
+  margin: 2px 8px 6px;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12px;
+  padding: 5px 8px;
+  outline: none;
+}
+.ref-search:focus {
+  border-color: var(--ed-accent);
+}
+.ref-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0 4px 6px;
+}
+/* ★ 滚动条配色（2026-10-04 用户报：常规视口 + 最大化两态下滚动条颜色都不随深色主题变）
+   根因：.ref-list 只写了 scrollbar-width，从未定义 ::-webkit-scrollbar 伪元素
+   → 深色主题下走浏览器默认亮灰，在一片深色面板里刺眼。
+   Chromium 系（Electron/msedge）走webkit 伪元素；Firefox 走 scrollbar-color。
+   两套都写，避免换壳子就失效。 */
+.ref-list::-webkit-scrollbar {
+  width: 9px;
+}
+.ref-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ref-list::-webkit-scrollbar-thumb {
+  background: var(--ed-text3);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.ref-list::-webkit-scrollbar-thumb:hover {
+  background: var(--ed-text2);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+/* Firefox 系：thin + 跟随主题色 */
+.ref-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ed-text3) transparent;
+}
+/* 亮主题单独调（--ed-text3 在亮色下偏浅，压到 #c3c9d1 才看得见轨道边界） */
+:where([data-theme='light']) .ref-list::-webkit-scrollbar-thumb {
+  background: #c3c9d1;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+:where([data-theme='light']) .ref-list::-webkit-scrollbar-thumb:hover {
+  background: #a8b0ba;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+/* 常规态容器是 10px 圆角（WorkbookEditor 内联下发 radius:10）。
+   贴底的 .ref-tip 才是真正触到容器底边的元素，圆角该落在它身上；
+   .ref-list 后面还隔着 .ref-tip，列表收圆会在两段之间留一道假缺口，故列表不圆。
+
+   ★ 容器圆角是**内联值**（CSS 读不到），所以由 WorkbookEditor 同时下发
+     --ref-radius 变量，底栏据此收圆 —— 最大化态 radius:0 时变量为 0，
+     底栏自动变直角，不会出现「直角容器里有个圆角底栏」。 */
+.ref-panel .ref-tip {
+  border-radius: 0 0 var(--ref-radius, 9px) var(--ref-radius, 9px);
+}
+.ref-empty {
+  padding: 14px 10px;
+  font-size: 12px;
+  color: var(--ed-text3);
+}
+.ref-node-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 4px 6px;
+  background: transparent;
+  border: none;
+  color: var(--ed-text);
+  font-size: 12.5px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+}
+.ref-node-row:hover {
+  background: var(--ed-bg3);
+}
+.ref-node-row.on {
+  background: var(--ed-bg3);
+}
+.ref-caret {
+  color: var(--ed-text3);
+  font-size: 10px;
+  width: 10px;
+}
+.ref-node-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ref-kind {
+  font-size: 10px;
+  color: var(--ed-text3);
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.ref-fields {
+  padding-left: 16px;
+}
+.ref-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 3px 6px;
+  background: transparent;
+  border: none;
+  color: var(--ed-text1);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+}
+.ref-field:hover {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+}
+.ref-field.on {
+  background: var(--ed-bg3);
+  color: var(--ed-accent);
+}
+.ref-fname {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ref-fval {
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10.5px;
+  color: var(--ed-text4);
+}
+.ref-field-empty {
+  padding: 3px 6px;
+  font-size: 11px;
+  color: var(--ed-text4);
+}
+.ref-tip {
+  /* ★ 补底色（2026-10-04 用户报「颜色不匹配」）：原来是透明，底栏与上方列表同底成一片，
+     只有一条 border-top 撑着，看着像列表突然截断。给 --ed-bg2 做一档，底栏自成一条。 */
+  background: var(--ed-bg2);
+  padding: 6px 10px;
+  font-size: 10.5px;
+  color: var(--ed-text4);
+  border-top: 1px solid var(--ed-border2);
+}
+
+/* ── 批次 1-4 引用栏改版：节点下拉 + 优先参数区 + 参数行星标 + 星标参数区 ── */
+.ref-nodesel {
+  margin: 0 8px 4px;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  color: var(--ed-text1);
+  font-size: 12px;
+  padding: 4px 6px;
+  outline: none;
+  cursor: pointer;
+  width: calc(100% - 16px);
+}
+.ref-nodesel:focus {
+  border-color: var(--ed-accent);
+}
+/* 收藏区容器：优先（顶部）/ 星标（底部）两块，内容多时自身滚动，不挤参数树 */
+.ref-sec {
+  margin: 0 8px 4px;
+  border: 1px solid var(--ed-border2);
+  border-radius: 6px;
+  background: var(--ed-bg2);
+  max-height: 148px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.ref-sec-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px 2px;
+}
+.ref-sec-cnt {
+  font-size: 10px;
+  color: var(--ed-text4);
+}
+/* 「优先参数」异色标签：节点徽章（.ref-kind）同款结构，专属色 + 可点态（选中引用格时才可点） */
+.ref-sec-tag {
+  font-size: 10px;
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  background: transparent;
+  color: var(--ed-text3);
+  cursor: pointer;
+  font-family: inherit;
+}
+.ref-sec-tag.prio {
+  color: var(--nk-param-500);
+  border-color: var(--nk-param-500);
+}
+.ref-sec-tag.prio:hover:not(:disabled) {
+  background: var(--ed-bg3);
+}
+.ref-sec-tag.prio.on {
+  /* 已收录当前选中格：实底高亮（再点=移出） */
+  background: var(--nk-param-500);
+  color: #06240f;
+}
+.ref-sec-tag.prio:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.ref-sec-tag.star {
+  color: #e3b341;
+  border-color: #e3b341;
+  cursor: default;
+}
+.ref-sec-empty {
+  padding: 3px 8px 6px;
+  font-size: 10.5px;
+  color: var(--ed-text4);
+}
+.ref-pinlist {
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0 2px 4px;
+}
+/* 收藏行：布局同 .ref-field（div 版），点击 = 写入选中格引用；失效 = 半透明+红边 */
+.ref-pin {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--ed-text1);
+  font-size: 12px;
+}
+.ref-pin:hover {
+  background: var(--ed-bg3);
+}
+.ref-pin .ref-capsule {
+  flex-shrink: 1;
+  min-width: 0;
+}
+.ref-pin.dead {
+  opacity: 0.62;
+}
+.ref-pin.dead .ref-capsule {
+  outline: 1px solid #f85149;
+}
+.ref-pin-x {
+  margin-left: auto;
+  color: var(--ed-text4);
+  font-size: 13px;
+  padding: 0 2px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.ref-pin-x:hover {
+  color: #f85149;
+  background: var(--ed-bg0);
+}
+/* 参数树行内星标钮（.ref-field 已从 button 改 div —— 行内才能嵌星标小钮） */
+.ref-starbtn {
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ed-text4);
+  cursor: pointer;
+  border-radius: 3px;
+  line-height: 1;
+  padding: 1px 0;
+}
+.ref-starbtn:hover {
+  color: #e3b341;
+  background: var(--ed-bg0);
+}
+.ref-starbtn.on {
+  color: #e3b341;
+}
+/* 亮主题：星黄压深一档保对比 */
+:where([data-theme='light']) .ref-sec-tag.star,
+:where([data-theme='light']) .ref-starbtn.on,
+:where([data-theme='light']) .ref-starbtn:hover {
+  color: #9a6700;
+}
+:where([data-theme='light']) .ref-sec-tag.prio.on {
+  color: #ffffff;
+}
+
+/* ── 文本节点 / 引用栏折叠 ── */
+.rf-textnode-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ed-text, #e6edf3);
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+.pp-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: 12.5px;
+  padding: 8px 10px;
+  outline: none;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+.pp-textarea:focus {
+  border-color: #58a6ff;
+}
+
+/* ── 批次 8 · 统一引用胶囊（两段式）──
+   左段=节点名（deep 深底）· 右段=参数名（soft 浅底+类型色字）· 中间细缝 · 左缘类型色点；
+   色值全部引用 index.css :root 节点类型色谱标准（--nk-*，同一 kind 任何地方颜色一致）；
+   明暗双主题；失效引用追加 .dead 红边。结构约定见 src/ref/capsule.ts。 */
+.ref-capsule {
+  --cap: var(--nk-table-500);        /* 类型主色（色点；默认回退 = table 蓝） */
+  --cap-soft: var(--nk-table-soft);  /* 右段浅底 */
+  --cap-soft-ink: var(--nk-table-ink); /* 右段字色 */
+  --cap-node-bg: var(--nk-table-deep); /* 左段深底 */
+  --cap-node-ink: #e6edf3;           /* 左段字色 */
+  --cap-seam: rgba(0, 0, 0, 0.35);   /* 中间细缝 */
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 17px;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ref-capsule.cap-text  { --cap: var(--nk-text-500);  --cap-soft: var(--nk-text-soft);  --cap-soft-ink: var(--nk-text-ink);  --cap-node-bg: var(--nk-text-deep); }
+.ref-capsule.cap-xlsx  { --cap: var(--nk-xlsx-500);  --cap-soft: var(--nk-xlsx-soft);  --cap-soft-ink: var(--nk-xlsx-ink);  --cap-node-bg: var(--nk-xlsx-deep); }
+.ref-capsule.cap-docx  { --cap: var(--nk-docx-500);  --cap-soft: var(--nk-docx-soft);  --cap-soft-ink: var(--nk-docx-ink);  --cap-node-bg: var(--nk-docx-deep); }
+.ref-capsule.cap-param { --cap: var(--nk-param-500); --cap-soft: var(--nk-param-soft); --cap-soft-ink: var(--nk-param-ink); --cap-node-bg: var(--nk-param-deep); }
+
+/* ── 行内胶囊（批次 12）—— 文字中间夹着的胶囊 ────────────────
+   复用 .ref-capsule 的两段式配色与分色，只补行内排版：
+   ① 与文字基线对齐且不撑行高；② 文字可换行时胶囊不被拆散；
+   ③ 失效态红边（节点被删）走 .dead。 */
+.inline-cap {
+  vertical-align: baseline;
+  margin: 0 1px;
+  line-height: inherit;
+  /* 允许整颗胶囊作为一个整体换行，不在两段之间断开 */
+  break-inside: avoid;
+  white-space: nowrap;
+}
+/* 画布节点正文里的胶囊略小一号，避免撑破节点宽度 */
+.rf-textnode-val .inline-cap {
+  font-size: 11px;
+  line-height: 15px;
+}
+.ref-capsule .cap-dot {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 5px;
+  height: 5px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: var(--cap);
+}
+.ref-capsule .cap-node {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 150px; /* 胶囊长度限定（用户 2026-09-26）：长名截断省略，title 仍有全名 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 1px 6px 1px 4px;
+  background: var(--cap-node-bg);
+  color: var(--cap-node-ink);
+}
+.ref-capsule .cap-field {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 1px 7px 1px 6px;
+  background: var(--cap-soft);
+  color: var(--cap-soft-ink);
+  border-left: 1px solid var(--cap-seam);
+}
+/* 失效态：节点/字段不存在 → 红边 + 右段降红（失效语义独立于类型色谱） */
+.ref-capsule.dead {
+  box-shadow: 0 0 0 1.5px #f85149;
+}
+.ref-capsule.dead .cap-field {
+  --cap-soft: rgba(248, 81, 73, 0.14);
+  --cap-soft-ink: #ff8b85;
+}
+/* 明亮主题：左段 hue 浅底（比右段深）、右段近白深字、细缝变淡 —— 500/soft/ink 全走 --nk-*L 档 */
+:root[data-theme='light'] .ref-capsule {
+  --cap-node-bg: var(--nk-table-deepL);
+  --cap-node-ink: #24292f;
+  --cap-seam: rgba(0, 0, 0, 0.12);
+}
+:root[data-theme='light'] .ref-capsule.cap-text  { --cap: var(--nk-text-500L);  --cap-soft: var(--nk-text-softL);  --cap-soft-ink: var(--nk-text-inkL);  --cap-node-bg: var(--nk-text-deepL); }
+:root[data-theme='light'] .ref-capsule.cap-xlsx  { --cap: var(--nk-xlsx-500L);  --cap-soft: var(--nk-xlsx-softL);  --cap-soft-ink: var(--nk-xlsx-inkL);  --cap-node-bg: var(--nk-xlsx-deepL); }
+:root[data-theme='light'] .ref-capsule.cap-docx  { --cap: var(--nk-docx-500L);  --cap-soft: var(--nk-docx-softL);  --cap-soft-ink: var(--nk-docx-inkL);  --cap-node-bg: var(--nk-docx-deepL); }
+:root[data-theme='light'] .ref-capsule.cap-param { --cap: var(--nk-param-500L); --cap-soft: var(--nk-param-softL); --cap-soft-ink: var(--nk-param-inkL); --cap-node-bg: var(--nk-param-deepL); }
+:root[data-theme='light'] .ref-capsule.dead .cap-field { --cap-soft-ink: #c93c37; }
+/* 面板参数行：胶囊在左（可截断）、当前值预览在右（flex-shrink 0） */
+.ref-field .ref-capsule {
+  flex: 0 1 auto;
+}
+.ref-field .ref-fval {
+  flex: 0 0 auto;
+}
+.ref-chip-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+/* 信息栏 chip：两段式胶囊化（批次 8）—— 配色/结构由 .ref-capsule 提供，这里只留按钮行为 */
+.ref-chip {
+  cursor: pointer;
+  padding: 1px 0;
+  white-space: nowrap;
+}
+.ref-chip:hover {
+  filter: brightness(1.1);
+}
+.ref-chip-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 90;
+  min-width: 180px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--ed-bg2);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  padding: 3px 0;
+}
+.ref-chip-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 10px;
+  background: transparent;
+  border: none;
+  color: var(--ed-text1);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+.ref-chip-item:hover {
+  background: var(--ed-bg3);
+  color: var(--ed-text);
+}
+.ref-chip-item.on {
+  color: var(--ed-accent);
+  font-weight: 600;
+}
+.ref-chip-sample {
+  font-size: 10.5px;
+  color: var(--ed-text4);
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 备忘 · 引用栏一退一进（普通视图开/关） */
+@keyframes refpanel-in {
+  from {
+    transform: translateX(-110%);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes refpanel-out {
+  from {
+    transform: none;
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-110%);
+    opacity: 0;
+  }
+}
+.ref-panel-anim-in {
+  animation: refpanel-in 0.24s ease both;
+}
+.ref-panel-anim-out {
+  animation: refpanel-out 0.22s ease both;
+}
+/* 备忘 · 右栏「数据预选追加」：从右侧一退一进 */
+@keyframes refpanel-in-r {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes refpanel-out-r {
+  from {
+    transform: none;
+    opacity: 1;
+  }
+  to {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+}
+.ref-panel-anim-in-r {
+  animation: refpanel-in-r 0.24s ease both;
+}
+.ref-panel-anim-out-r {
+  animation: refpanel-out-r 0.22s ease both;
+}
+/* 右栏勾选行（label + checkbox） */
+.ref-node-check {
+  cursor: pointer;
+  user-select: none;
+}
+.ref-node-check input[type='checkbox'] {
+  accent-color: var(--ed-accent);
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  flex: none;
+}
+.ref-field-ro {
+  cursor: default;
+}
+.ref-field-ro:hover {
+  border-color: var(--ed-border2);
+}
+
+/* 备忘 · 引用栏/连线浮层层级：压过编辑器遮罩（--z-node-editor: 8000；面板/rail 主块已带 z，此处保留连线） */
+.wb-refline {
+  z-index: 8090;
+}
+
+/* ── 批次1-1 · 引线交互：hover 命中条 + 加粗高亮 + 两端点亮 + 详情提示 ── */
+.wb-refline .wb-refline-hit {
+  stroke: transparent;
+  stroke-width: 14;
+  fill: none;
+  /* 父级 svg pointer-events:none —— 只有命中条沿线 14px 可 hover，不挡格子点击 */
+  pointer-events: stroke;
+  cursor: pointer;
+}
+.wb-refline g.urn-hover .wb-refline-line {
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 3px var(--ed-gold));
+}
+/* 备忘 · 全部连线（前端层）：灰色实线（原虚线），弱于选中线 */
+.wb-refline path.wb-refline-all {
+  stroke: var(--ed-text4);
+  stroke-width: 1.3;
+  opacity: 0.9;
+  fill: none;
+}
+/* 备忘 · 全部连线后端模式：线条在窗体后面（被窗体遮挡），露出的部分毛玻璃模糊 */
+.wb-refline-back {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(3px);
+  opacity: 0.6;
+}
+/* ── 备忘 · 连线后端态联动（已废弃）──
+   2026-09-26 早：用户曾拍板「切到后面时 excel 和节点数据引用要足够透明露线」，加了 body.wb-lines-back-on 透明化；
+   2026-09-26 晚：用户实测反馈「毛玻璃很乱，窗体要完全不透明、连线清晰」→ 透明化废弃。
+   body class 不再由 JS 触发；以下两条规则已删除。若复活此功能，恢复 .node-editor{opacity:.62}/.ref-panel{opacity:.5!important} 即可 */
+/* ── 批次 8-b · fx 公式栏胶囊镜像层（input 文字透明，上层把 node:// 区间画成胶囊）── */
+.wb-fx-mirror {
+  font-family: Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--ed-text);
+}
+.wb-fx-mirror .ref-capsule {
+  vertical-align: middle;
+}
+/* fx 行高紧凑：胶囊上下 padding 归零（17px ≤ 18px 行高，不撑行） */
+.wb-fx-mirror .ref-capsule .cap-node {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.wb-fx-mirror .ref-capsule .cap-field {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+/* ── 批次 8-c · 对照体系假光标/假选区（fx 栏与格内编辑器镜像层共用）──
+   原生 caret 在 mirror-on 时 caretColor:transparent，光标由镜像层 .fake-caret 接管；
+   选区由 .fake-sel 高亮（原生选区透出的 HighlightText 底色由覆盖文字层遮住） */
+.fake-caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  background: var(--ed-text);
+  vertical-align: text-bottom;
+  animation: wb-fake-caret-blink 1.06s step-end infinite;
+}
+@keyframes wb-fake-caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.fake-sel {
+  background: rgba(120, 160, 230, 0.38);
+}
+/* 对照体系 · 选中态去原生层：mirror-on 时 Chromium 选中文字强制 HighlightText 蓝底白字绘制
+   （color:transparent 被覆盖，第十二轮实锤）——与胶囊/假选区叠成「上下两层」（用户 2026-09-27 截图）。
+   自定义 ::selection 透明后原生层消失，选中视觉由镜像 .fake-sel 全权负责 */
+[data-fx-wrap] input[data-mirror='on']::selection,
+.wb-celleditor-input[data-mirror='on']::selection {
+  background: transparent;
+  color: transparent;
+}
+/* 批次1-3 · 常显锁定态按钮 */
+.wb-foot .bar-btn.wb-alllock {
+  color: var(--ed-gold);
+  border-color: var(--ed-gold);
+  font-weight: 600;
+}
+/* 两端点亮：引用格（ag-grid cell）与引用栏参数项/节点标题 */
+.urn-endpoint-hl {
+  box-shadow: inset 0 0 0 2px var(--ed-gold) !important;
+  background: rgba(212, 162, 78, 0.16) !important;
+}
+.ref-panel .ref-node-row.urn-endpoint-hl,
+.ref-panel .ref-field.urn-endpoint-hl {
+  background: rgba(212, 162, 78, 0.16) !important;
+  outline: 1.5px solid var(--ed-gold);
+}
+/* 引线 hover 详情提示（portal 到 body；--ed-* 已提升 :root，两主题通用） */
+.wb-refline-tip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 10px));
+  z-index: 8110;
+  pointer-events: none;
+  background: var(--ed-bg1);
+  border: 1px solid var(--ed-gold);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ed-text);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  max-width: 340px;
+  white-space: nowrap;
+}
+.wb-refline-tip .tip-go {
+  color: var(--ed-text3);
+}
+.wb-refline-tip .tip-v {
+  color: var(--ed-text1);
+  font-size: 11.5px;
+}
+/* 孤儿引用提示条（画布删线后遗留的引用格：值保留 + 一键清空） */
+.wb-orphanbar {
+  /* 2026-09-26 用户拍板：孤儿提示同错误提示悬浮在网格底部滚动条上方，不占文档流；
+     bottom 比 wb-err-inline(20px) 高一档，两条同显时上下错开不重叠 */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 62px;
+  z-index: 8060;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(80%, 680px);
+  padding: 7px 14px;
+  font-size: 12.5px;
+  color: var(--ed-text);
+  background: rgba(212, 162, 78, 0.14);
+  border: 1px solid rgba(212, 162, 78, 0.55);
+  border-radius: 6px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+.wb-orphanbar .bar-btn {
+  flex: none;
+}
+
+/* 缩放百分比：双击恢复 100%（hover 提示可点） */
+.zoom-val {
+  cursor: pointer;
+  user-select: none;
+}
+.zoom-val:hover {
+  color: #7ee787;
+}
+
+/* ── 属性引用栏：节点条目 = 圆角矩形元件卡（点击展开参数）── */
+/* ★ 圆角必须用变量，不能写死（2026-10-04 用户报「右下圆角不对」）：
+     容器圆角是 WorkbookEditor **内联**下发的（常规态 10 / 最大化态 0），
+     CSS 的 border-radius 赢不过内联值 → 这里写 12 会与内联的 10打架，
+     底栏 .ref-tip 又按 9 收角，三层圆角各不相同 → 右下角错位露缝。
+     现在统一由 --ref-radius 传递，值由内联那侧下发，四角必然一致。 */
+.ref-panel {
+  border-radius: var(--ref-radius, 10px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+.node-editor[data-theme='light'] .ref-panel {
+  box-shadow: 0 12px 36px rgba(80, 90, 100, 0.25);
+}
+.ref-node-row {
+  /* ★ 卡底用 --ed-bg3（#1c232c）而非 --ed-bg2（#161b22，2026-10-04 用户报「颜色不匹配」）：
+     bg2 与面板底 bg1(#12171e) 只差 4 级明度，节点卡糊成一片、看不出边界。
+     提到 bg3 后卡与面板有明确层次；hover/选中另用 --ed-accent描边表达，不靠底色区分。 */
+  background: var(--ed-bg3);
+  border: 1px solid var(--ed-border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  /* 备忘 · button 的 width:auto 是收缩语义 —— 用 calc 扣掉左右 margin，左右间隙对称（各 2px） */
+  width: calc(100% - 4px);
+  margin: 3px 2px;
+}
+.ref-node-row:hover {
+  border-color: var(--ed-accent);
+}
+.ref-fields {
+  /* 左缩进 12px 与节点卡形成树状节奏；右缘 2px 与节点卡对齐 */
+  padding: 0 2px 4px 12px;
+}
+.ref-field {
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin: 2px 0;
+}
+.ref-field:hover {
+  border-color: var(--ed-gold);
+}
+.ref-field.on {
+  border-color: var(--ed-gold);
+  background: rgba(212, 162, 78, 0.08);
+}
+
+/* ============================================================
+   Word 编辑器窗体（wrp--editor）—— 对齐 Excel 的 wb 窗体架构：
+   wrp-main（左右让位容器）+ wrp-col（中段列）+ 底栏两侧开关 + 左右 RefPanel。
+   .wrp 本体定义在 index.css（属性面板紧凑态同用），这里只写放大态窗体部分。
+   ============================================================ */
+
+.wrp--editor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.wrp-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+}
+.wrp-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* 中段滚动：预览页放开高度铺满；绑定页清单放开 320px 上限 */
+.wrp--editor .wrp-preview-wrap--editor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.wrp--editor .wrp-preview {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+.wrp--editor .wrp-list {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+/* 空态 hero（复用 Excel 的 wb-hero 样式）：放大态里水平垂直居中 */
+.wrp--editor .wb-hero {
+  margin: auto;
+  width: 100%;
+}
+/* 底栏弹性分隔（对齐 wb-sp） */
+.wrp-sp {
+  flex: 1;
+  min-width: 8px;
+}
+/* 激活域（左栏选参数的落点）：金色描边 —— 与引用连线语义同色 */
+.wrp-item--active {
+  border-color: var(--ed-gold) !important;
+  box-shadow: inset 0 0 0 1px var(--ed-gold);
+}
+/* 明亮模式：激活域深金描边保证可见 */
+.node-editor[data-theme='light'] .wrp-item--active {
+  border-color: #a97c2f !important;
+  box-shadow: inset 0 0 0 1px #a97c2f;
+}
+
+/* ============================================================
+   WPS 式就地编辑面（wrp-edit）—— contenteditable 直改绑定产物。
+   纸面观感对齐 WPS：白纸居中 + 灰底 + 投影；暗色主题下编辑区同样是白纸
+   （「所见即所导」—— 编辑时看到的颜色就是导出 Word/PDF 的颜色）。
+   ============================================================ */
+
+/* 编辑器态底栏贴齐：index.css 的 .wrp-foot { margin-top: 10px } 在属性面板里是
+   段落间隔，窗体里底栏贴底，10px 间隙会把「上下都展开」撕出一条缝（用户实测反馈） */
+.wrp--editor .wrp-foot {
+  margin-top: 0;
+}
+
+.wrp-edit-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  /* 底部 padding 收窄到 12px：原 28px 在滚到底时会露出一段灰底，
+     被用户读成「下面全是空的」。纸张层已足够留白，这里只保留必要的呼吸边。
+     注意：这个值参与了 .wrp-pages 的 top 计算（top = 10 + 17 + 8 = 35px），改 padding-top 要同步。 */
+  padding: 10px 24px 12px;
+  background: var(--ed-bg2);
+  position: relative;
+}
+/* 编辑稿模式提示：右上角悬浮胶囊（不占文档流、不横亘在纸张上方） */
+.wrp-editbar {
+  position: absolute;
+  top: 12px;
+  right: 36px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 12px;
+  font-size: 11px;
+  color: var(--ed-gold);
+  background: rgba(212, 162, 78, 0.12);
+  border: 1px solid var(--ed-gold);
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+.wrp-editbar span {
+  flex: none;
+}
+.wrp-editbar .bar-btn {
+  min-height: 0;
+  padding: 1px 8px;
+  font-size: 11px;
+}
+/* WPS 式水平标尺：两端深色段 = 页边距 3.18cm，中间可排版区 1cm 刻度 + 每 2cm 数字。
+   ★ 几何必须与 .wrp-edit 的内容盒逐像素对齐（794px 居中盒 + 左右各 120px 页边距）。
+   ★ 旧版三个错误（用户 2026-09-28「标尺和 A4 图幅没搞好」）：
+     1) 数字 left=(i+1)*75.6 但背景刻度是 37.8 步长，两者基准不同；
+     2) 数字额外 `transform: translateX(2px)` + 容器 border 2px → 实测整体偏 5px；
+     3) 数字压在两条刻度线**之间**，读不出"2cm 在哪"，且两端边距段无任何标注。
+     现在：刻度线用独立 <i> 元素（由 JS 按同一常量摆放），数字 `translateX(-50%)` 居中压在长刻度线上。 */
+.wrp-ruler {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  width: 794px;
+  flex: none;
+  height: 20px;
+  margin: 0 auto 8px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+/* 两端页边距段：深色 + 斜纹，与中间刻度区一眼可辨 */
+.wrp-ruler-mar {
+  width: 120px;
+  flex: none;
+  background-color: var(--ed-bg3);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 3px,
+    color-mix(in srgb, var(--ed-border) 55%, transparent) 3px 4px
+  );
+  border: 1px solid var(--ed-border);
+  border-bottom: none;
+  box-sizing: border-box;
+}
+.wrp-ruler-scale {
+  position: relative;
+  flex: 1;
+  /* 不再用 background-image 画刻度（与 DOM 刻度线双份会重影）——刻度全部由 <i> 承担 */
+  background-color: #f6f6f6;
+  border: 1px solid #cfcfcf;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+/* 1cm 细刻度线：从底部起 5px */
+.wrp-ruler-tick {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 5px;
+  margin-left: -0.5px; /* 让线中心落在 left 指定处，而不是线的左沿 */
+  background: #b9b9b9;
+}
+/* 2cm 长刻度线：半高 */
+.wrp-ruler-tick.is-major {
+  height: 9px;
+  background: #8f8f8f;
+}
+/* 数字：以刻度线为轴居中（translateX(-50%)，不再 +2px 偏移） */
+.wrp-ruler-scale b {
+  position: absolute;
+  bottom: 9px;
+  transform: translateX(-50%);
+  font-weight: 400;
+  font-size: 9px;
+  color: #777;
+  background: #f6f6f6;
+  padding: 0 2px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+/* 可排版区宽度标注 —— 已移除（2026-09-28）：
+   放在刻度区右上角会与 14cm 的数字**重叠**（截图实测 "14" 与 "14cm" 挤在一起，
+   像素验收里多出一个假墨迹簇，偏差正好 75.6px = 2cm）。
+   刻度线 + 数字本身已足够读出图幅，边距语义由两端深色段的 title 提示承担。 */
+.node-editor[data-theme='light'] .wrp-ruler-mar {
+  background-color: #dcdcdc;
+  border-color: #bfbfbf;
+}
+
+/* ── 文档区 + 缩略图导航窗格（WPS 借鉴）── */
+.wrp-doc-area { display: flex; align-items: stretch; flex: 1; min-height: 0; }
+.wrp-thumbs {
+  flex: none;
+  width: 86px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--ed-bg2);
+  border-right: 1px solid var(--ed-border);
+  box-sizing: border-box;
+}
+.wrp-thumb {
+  flex: none;
+  width: 100%;
+  min-height: 30px;
+  border: 1px solid var(--ed-border);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--ed-text2);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.wrp-thumb::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: #fafafa;
+  border: 1px solid #eee;
+}
+.wrp-thumb span { position: relative; z-index: 1; }
+.wrp-thumb.is-cur { border-color: var(--ed-accent); box-shadow: 0 0 0 1px var(--ed-accent); }
+.wrp-thumb.is-cur::before { background: #eef4ff; }
+
+/* ── 可拖标尺（WPS 借鉴）── */
+.wrp-ruler-h { width: 794px; }
+.wrp-ruler-mar.wrp-mar-l,
+.wrp-ruler-mar.wrp-mar-r { cursor: col-resize; }
+/* 缩进三角：首行（顶三角）/ 悬挂（底三角） */
+.wrp-indent {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  cursor: col-resize;
+  z-index: 3;
+}
+.wrp-indent-first { border-bottom: 9px solid #5b7cff; transform: translateX(-5px); }
+.wrp-indent-hang { border-top: 9px solid #5b7cff; bottom: 9px; transform: translateX(-5px); }
+/* 制表位：小箭头 */
+.wrp-ruler-tab {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 8px solid #c0392b;
+  transform: translateX(-4px);
+  z-index: 3;
+}
+/* ── 画布层：唯一挂 zoom 的承载层 ──
+   层间偏移（top:28 等）与层内尺寸同处一个缩放坐标系，任何 zoom 下各层起点互相对齐。
+   曾把 zoom 分别挂在标尺/纸/遮断条/影子头/正文五层上，层间偏移却是不缩放的 px 常量，
+   zoom≠100% 时纸与正文错开 (1123+8)·zoom px（scripts/_diag_zoomfit.mjs 缩放矩阵实测）。 */
+.wrp-canvas { position: relative; }
+
+/* 垂直标尺：绝对定位在纸左侧留白槽（left = 50% − 397 − 24，留 4px 缝隙），
+   不占文档流 —— 曾是 column flex 的流式子元素，独占 1123px 整行，
+   把水平标尺/正文压到一屏之外、纸与正文分离 1134px（用户看到的是一张没有字的大白纸）。
+   top:28 与 .wrp-pages 同源（标尺高 20 + margin 8），zoom 缩放时与纸顶同步对齐。 */
+.wrp-ruler-v {
+  position: absolute;
+  top: 28px;
+  left: calc(50% - 421px);
+  z-index: 2;
+  width: 20px;
+  height: 1123px;
+  display: flex;
+  flex-direction: column;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+.wrp-ruler-v > .wrp-ruler-mar { width: auto; border-right: none; }
+.wrp-ruler-scale-v {
+  position: relative;
+  flex: 1;
+  background: #f6f6f6;
+  border: 1px solid #cfcfcf;
+  border-right: none;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.wrp-ruler-tick-v {
+  position: absolute;
+  left: 0;
+  width: 5px;
+  height: 1px;
+  margin-top: -0.5px;
+  background: #b9b9b9;
+}
+.wrp-ruler-tick-v.is-major { width: 9px; background: #8f8f8f; }
+
+/* ── 状态栏：视图切换 + 缩放滑块 ── */
+.wrp-status-view { display: inline-flex; gap: 2px; margin: 0 6px; }
+.wrp-status-view button {
+  border: 1px solid var(--ed-border);
+  background: var(--ed-bg2);
+  color: var(--ed-text2);
+  border-radius: 3px;
+  padding: 1px 7px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.wrp-status-view button.is-on { background: var(--ed-accent); color: #fff; border-color: var(--ed-accent); }
+.wrp-status-zoom input[type='range'] { width: 90px; vertical-align: middle; cursor: pointer; }
+.wrp-status-zoom b { cursor: pointer; user-select: none; }
+
+/* ── 视图模式：Web 版式（连续无页缝）/ 草稿（隐标尺与分页装饰）── */
+.wrp-edit-wrap[data-view='web'] .wrp-pages,
+.wrp-edit-wrap[data-view='web'] .wrp-cutters,
+.wrp-edit-wrap[data-view='web'] .wrp-shadow-heads { display: none; }
+.wrp-edit-wrap[data-view='draft'] .wrp-ruler,
+.wrp-edit-wrap[data-view='draft'] .wrp-pages,
+.wrp-edit-wrap[data-view='draft'] .wrp-cutters,
+.wrp-edit-wrap[data-view='draft'] .wrp-shadow-heads { display: none; }
+
+/* ── 选区浮工具条（WPS 借鉴）── */
+.wrp-float-bar {
+  position: fixed;
+  z-index: 40;
+  transform: translate(-50%, -100%);
+  display: flex;
+  gap: 2px;
+  padding: 3px 5px;
+  background: #2b2b2b;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.wrp-float-bar button {
+  border: none;
+  background: transparent;
+  color: #eee;
+  padding: 2px 8px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.wrp-float-bar button:hover { background: rgba(255, 255, 255, 0.15); }
+.wrp-float-bar button.is-on { background: var(--ed-accent); color: #fff; }
+.wrp-fb-sep { width: 1px; background: rgba(255, 255, 255, 0.25); margin: 2px 2px; }
+/* ── 右键上下文菜单（WPS 借鉴）── */
+.wrp-ctx-menu {
+  position: fixed;
+  z-index: 45;
+  min-width: 140px;
+  background: var(--ed-bg);
+  border: 1px solid var(--ed-border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+.wrp-ctx-menu button {
+  border: none;
+  background: transparent;
+  color: var(--ed-text);
+  text-align: left;
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.wrp-ctx-menu button:hover { background: var(--ed-bg3); }
+.wrp-ctx-sep { height: 1px; background: var(--ed-border); margin: 3px 0; }
+/* ── 一屏多页背景层（WPS 观感）──
+   .wrp-pages 绝对定位铺在内容层之下，按 A4（794×1123）+ 页隙 24px 的周期重复白纸。
+   .wrp-edit 透明浮在其上，只负责排版与页边距。
+   这样「内容少」时纸张也铺满可视区（不再是一张纸 + 大片灰底），
+   「内容多」时页数自动增加（bgPageCount 由 React 按内容与视口算出）。 */
+/* .wrp-pages 是 absolute 且 pointer-events:none 的纯视觉层。
+   注意：绝对定位元素在 overflow:auto 容器里仍会撑开「可滚动溢出」——
+   若纸张层比内容层高，wrap 的 scrollHeight 会被顶大，滚动条凭空变长且滚到底露灰底。
+   因此纸张数由 React 严格按内容页数给出（bgPageCount），不多铺一张。 */
+.wrp-pages {
+  position: absolute;
+  /* 起点必须与内容层 .wrp-edit 完全一致。
+     自画布(.wrp-canvas)内容起点算：标尺高(20px) + 标尺 margin-bottom(8px) = 28px。
+     （wrap 的 padding-top 10px 在画布外不参与；旧值 35 是「标尺高 17」时代的遗留，
+      实际标尺高 20，曾让纸比正文整体高出 3px。）
+     背景纸比内容层偏上会出现「纸比文字高出一截」（2026-09-28 实测 from 25px 差 -10px）。 */
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 794px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  /* 纯视觉层：不拦截点击/选区；不参与 z 序之上的交互 */
+  pointer-events: none;
+  z-index: 0;
+}
+.wrp-page {
+  position: relative;
+  flex: none;
+  width: 794px;
+  height: 1123px;
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+/* 页码：WPS 在每张纸的页脚居中显示；这里放在纸的下沿内 */
+.wrp-page-no {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 44px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.28);
+  user-select: none;
+}
+
+/* ── 页隙遮断条（把穿过页隙的内容切断，避免两页被表格"缝合"）──
+   ★ 为什么需要：内容层是一整条连续流（表格不会被浏览器分页），
+     而 .wrp-edit 在 .wrp-pages 之上 —— 表格的边框会连续穿过页隙，
+     视觉上把两页连成一片（用户 2026-09-28：「为什么表格两页连在一起」）。
+   做法：每处页隙盖一条与页隙等高、与 wrap 底色一致的不透明条，
+     层级高于内容层（z-index 5），把穿过来的内容遮住。
+   纯视觉层：不写回文档模型（用户拍板：展示分页、不真拆表）。
+
+   ⚠ 验收陷阱：本条 pointer-events:none，而浏览器的命中测试
+     （elementFromPoint / elementsFromPoint）会把 pointer-events:none 的元素
+     整个排除 —— 于是采样永远返回底下的 td，得到恒假的「未遮住」。
+     2026-09-28 据此误判过一次。**验收必须走像素**：
+     比较「页隙带亮像素占比」与「带上方表格区亮像素占比」，
+     见 scripts/_diag_cutter.mjs。 */
+.wrp-cutters {
+  position: absolute;
+  top: 28px; /* 与 .wrp-pages / .wrp-edit 同起点 */
+  left: 0;
+  right: 0;
+  height: 0; /* 子元素绝对定位，自身不占位 */
+  /* 纯视觉层，不拦截编辑区的点击/选区 */
+  pointer-events: none;
+  /* 高于 .wrp-edit(z-index:1)，低于标尺/浮层。
+     自身建立层叠上下文，确保子条稳定压在内容层之上。 */
+  z-index: 5;
+  isolation: isolate;
+}
+.wrp-cutter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 24px; /* = PAGE_GAP */
+  /* 与 .wrp-edit-wrap 的底色一致，读起来就是"页与页之间的空白" */
+  background: var(--ed-bg2);
+  /* 两端各压过纸边一点点，避免 1px 闪烁透出下面的表格线 */
+  box-shadow: 0 -1px 0 var(--ed-bg2), 0 1px 0 var(--ed-bg2);
+  /* 子条自身也在层叠上下文里参与排序 */
+  z-index: 1;
+}
+/* ── 跨页断行线（用户 2026-09-28：「为什么没有跨页断行」）──
+   WPS/Word 在表格跨页处，纸的下沿/上沿就是天然的"断行"标记。
+   我们的分页是视觉层，页隙只是一条纯色带 —— 表格断开处因此**看不出"断"**。
+   这里在页隙带的正中画一条细虚线，把"表格在这里被分页切断"明示出来。
+   只画在纸面宽度内（左右各留出页边距），避免横贯整个灰底显得像 UI 分隔条。 */
+.wrp-cutter::after {
+  content: '';
+  position: absolute;
+  left: 120px;   /* = 页面左右页边距，与纸面文本带对齐 */
+  right: 120px;
+  top: 50%;
+  height: 0;
+  border-top: 1px dashed rgba(128, 128, 128, 0.55);
+}
+/* 明亮模式：灰底更浅，虚线略深才看得见 */
+.node-editor[data-theme='light'] .wrp-cutter::after {
+  border-top-color: rgba(96, 96, 96, 0.6);
+}
+/* 明亮模式：纸外底色是中性灰，遮断条必须同色，否则页隙处露白/露灰不一致 */
+.node-editor[data-theme='light'] .wrp-cutter {
+  background: #e6e6e6;
+  box-shadow: 0 -1px 0 #e6e6e6, 0 1px 0 #e6e6e6;
+}
+/* ── 影子表头（跨页时每页页顶重复表头行，纯视觉层）──
+   对应导出件里的 <w:tblHeader/>：Word 会自己每页重画表头，
+   但编辑区是一整条连续流 + 手搓假分页，浏览器不分页 → 下一页页顶是空的。
+   这里把表格首行克隆一份画到每页页顶，补上「表头随页面重复」的观感。
+
+   ★ 几何必须与 .wrp-edit 的**内容盒**对齐（这是第一版做错的地方）：
+     .wrp-edit 是 max-width:794px + margin:0 auto + padding:96px 120px
+     —— 它居中，所以纸张内容盒左边缘 = (wrap 宽 - 794)/2 + 120，
+     而本层若写 left:120px 是按 **wrap 左边缘**量，wrap 比 794 宽时整体偏左
+     （实测：影子头画在表格左侧外面，像"漏出来的幽灵文字"）。
+     正解：本层复制同一个 794px 居中盒，表头再在盒内退 120px 页边距。
+
+   ★ 层级：夹在 .wrp-pages(z-index:0) 与 .wrp-cutter(z-index:5) **之间** ——
+     z-index 必须 > 1（否则被正文盖住）且 < 5（否则反盖住遮断条）。 */
+.wrp-shadow-heads {
+  position: absolute;
+  top: 28px; /* 与 .wrp-pages / .wrp-edit / .wrp-cutters 同起点 */
+  left: 0;
+  right: 0;
+  height: 0; /* 子元素绝对定位，自身不占位 */
+  /* 与 .wrp-edit 同款居中盒：794px 居中，页边距在盒内退 120px */
+  max-width: 794px;
+  margin: 0 auto;
+  pointer-events: none; /* 纯装饰，不吃编辑区点击 */
+  z-index: 2;
+}
+.wrp-shadow-head {
+  position: absolute;
+  left: 120px;  /* = .wrp-edit 的左右页边距 */
+  right: 120px;
+  /* ★ 必须不透明：它的作用是**遮住底下真实流过的表格行**，
+     半透明会让真实行透出来变成重影（第一版就是这样，看着像幻影）。
+     底色钉死为纸色（白），不跟随界面主题 —— 纸永远是白的。 */
+  background: #fff;
+  box-shadow: 0 -1px 0 #fff, 0 1px 0 #fff;
+}
+.wrp-shadow-head > table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 列宽由 colgroup 的百分比给出（与真表严格对齐） */
+  margin: 0;
+  /* ★ 影子头是「纸面上的内容」，必须用纸的配色（浅底深字），
+     不能用编辑器的界面主题色 —— 本层在 .wrp-edit 之外，不继承它的
+     color:#222，深色主题下会变成「深底浅字」，与真表头（浅底深字）判若两表。
+     实测：真表头 rgb(239,239,239)/rgb(34,34,34)，
+           本层若跟随界面主题是 rgb(42,42,42)/rgb(230,237,243)（深色）→ 观感错位。
+     所以这里显式钉死纸面配色，不跟随 data-theme。 */
+  color: #222;
+  font-family: '宋体', SimSun, 'Times New Roman', serif;
+  font-size: 10.5pt;
+}
+.wrp-shadow-head td,
+.wrp-shadow-head th {
+  border: 1px solid #999;
+  padding: 3pt 6pt;
+  font-size: 10.5pt;
+  vertical-align: top;
+  min-width: 1em;
+}
+/* 表头底色与 .wrp-edit th 严格一致（浅灰 #efefef + 加粗）——
+   影子的意义是「看起来就是原表头」，配色差一点就不像了 */
+.wrp-shadow-head th {
+  background: #efefef;
+  font-weight: 700;
+}
+.wrp-shadow-head p {
+  margin: 0;
+}
+
+/* 内容层：透明 + 去掉阴影（阴影交给 .wrp-pages 的背景纸），页边距 padding 与 A4 一致。
+   必须 position:relative + z-index:1 才浮在背景纸层之上（否则文字被纸盖住）。
+
+   A4 纸（794×1123px @96dpi）；页边距对齐 Word 默认（上下 2.54cm=96px / 左右 3.18cm=120px）。
+   box-sizing 必须显式 border-box：width/max/min 全部含页边距 —— content-box 会把纸张
+   撑到 1034×1315（padding 外挂），既超版面又让页数估算翻倍。
+
+   ★ 一屏多页（用户 2026-09-28「纸张下方整个区域是空的」→ 要 WPS 多页观感）：
+   分层 = .wrp-pages（背景白纸，绝对定位，按页数铺）+ .wrp-edit（本层，透明，只排版）。
+   高度用 min-height 由 React 按视口/内容算出（paperMinH），不再是 flex:1
+   —— flex:1 会把纸张拉长到容器高度，内容少时就是「一张超长白纸」。
+   分页属于编辑视图的视觉呈现，不影响导出（导出走 OOXML 连续流）。 */
+.wrp-edit {
+  box-sizing: border-box;
+  background-color: transparent;
+  background-image: none;
+  position: relative;
+  z-index: 1;
+  /* 不再 flex:1（那会让纸张被拉长到容器高度，内容少时=超长白纸）；
+     改为 min-height 保底铺满视口，内容超出时自然增长 */
+  flex: none;
+  width: 100%;
+  max-width: 794px;
+  /* 至少一张 A4；视口更高时铺满（由 paperMinH 内联样式覆盖） */
+  min-height: 1123px;
+  margin: 0 auto;
+  color: #222;
+  padding: 96px 120px;
+  box-shadow: none;
+  outline: none;
+  cursor: text;
+  font-family: '宋体', SimSun, 'Times New Roman', serif;
+  font-size: 12pt;
+  line-height: 1.6;
+}
+/* Tiptap 在 .wrp-edit 内再包一层（.tiptap.ProseMirror）：
+   纸张内边距留在外层（页边距语义），内容层只负责排版，避免双层 padding 叠加 */
+.wrp-edit .ProseMirror {
+  outline: none;
+  min-height: 100%;
+}
+
+/* ── 表格行跨页避让（WPS/Word 行为：一行的内容不在页边界处被拆开）──
+   分页是视觉层（页隙由 .wrp-pages 提供），不是浏览器真实分页，
+   所以 break-inside:avoid 不起作用 —— 必须由 JS 量出「与页底相交的行」并推挤。
+
+   ★ 危险带必须是「页底越界带」而不是「页隙带」（2026-09-28 修正）。
+     页面可排版文本带 = [96, pageBottom-96]（pageBottom = N*(1123+24)-24）。
+     只挡页隙带 [pageBottom-24, pageBottom) 会漏掉 (pageBottom-96, pageBottom-24]
+     这 72px —— 落在里面的行既不压页隙带、又已越出文本带，
+     肉眼就是「表格被纸下沿切断」（用户：「表格现在都是跨页的」）。
+     正解：危险带 = [pageBottom - 96, pageBottom)。
+     详见 WordReportPanel 的 PAGE_PAD_BOT / computeAvoidPlan 注释。
+
+   推挤**不能**写成行内 style：tr 的 DOM 由 ProseMirror 拥有，
+   setContent / 事务重绘会从文档模型重建它，抹掉一切外部写入（实测确认）。
+   所以规则由 WordReportPanel 以 state 驱动、注入为 <style>，
+   选择器形如
+     .wrp-edit .ProseMirror table:nth-of-type(N) tbody > tr:nth-child(M) > td { padding-bottom: Xpx }
+   （推挤实现 = 撑高上一行的 padding-bottom，把目标行真实推过页底；
+     不用 margin —— collapse 表格里 tr 的 margin 被规范忽略；
+     不用本行 padding-top —— 那样只把内容下压，行顶边不动，仍跨页底。）
+
+   本文件不放具体数值，只提供被推挤行的视觉修饰下面这条。
+   详见 WordReportPanel 的 avoidTableRowSplit() / avoidCss 注释。 */
+.wrp-edit .ProseMirror > * + * {
+  margin-top: 0;
+}
+.wrp-edit:focus {
+  outline: none;
+}
+.wrp-edit:empty::before {
+  content: '开始输入…';
+  color: #bbb;
+}
+/* 排版基础：p/h/列表/表格 —— 与 htmlToOoxml 的解析子集一一对应 */
+.wrp-edit p {
+  margin: 0 0 8pt;
+  min-height: 1em;
+}
+/* 单元格内段落零间距（Word 语义：格内段间距由 pPr spacing 控制，无 spacing 即紧凑单行。
+   不清零的话每个 p 背 8pt 段后距 + 1em min-height，李渡 166 行表行高 30→64px、页数 6→10） */
+.wrp-edit td p,
+.wrp-edit th p {
+  margin: 0;
+  min-height: 0;
+  /* 单倍行距：strut 用 td 默认字号的 normal(≈1.6) 会把 9pt 文本撑进 22px 行框，
+     Word 单倍行距 ≈ 字号×1.2 —— 李渡表基准行高 30.27px 就是 9pt×1.2 + padding */
+  line-height: 1.2;
+}
+.wrp-edit h1 {
+  font-size: 22pt;
+  font-weight: 700;
+  margin: 14pt 0 10pt;
+}
+.wrp-edit h2 {
+  font-size: 16pt;
+  font-weight: 700;
+  margin: 12pt 0 8pt;
+}
+.wrp-edit h3 {
+  font-size: 14pt;
+  font-weight: 700;
+  margin: 10pt 0 6pt;
+}
+.wrp-edit h4,
+.wrp-edit h5,
+.wrp-edit h6 {
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 8pt 0 6pt;
+}
+.wrp-edit ul,
+.wrp-edit ol {
+  margin: 0 0 8pt;
+  padding-left: 2.4em;
+}
+.wrp-edit table {
+  border-collapse: collapse;
+  margin: 8pt 0;
+  width: 100%;
+  /* Word 语义：列宽是硬约束 —— fixed 严格按 colgroup/首行分配；
+     auto 会按内容重新瓜分表格总宽（302px 名称列被压到 259px，长串列反被撑肥） */
+  table-layout: fixed;
+}
+.wrp-edit td,
+.wrp-edit th {
+  border: 1px solid #999;
+  padding: 3pt 6pt;
+  font-size: 10.5pt;
+  vertical-align: top;
+  min-width: 1em;
+  overflow-wrap: break-word; /* fixed 布局下列宽不再让步，长西文串在格内断行（Word 窄列行为） */
+}
+.wrp-edit th {
+  background: #efefef;
+  font-weight: 700;
+}
+.wrp-edit img {
+  max-width: 100%;
+  height: auto;
+}
+/* 浮动环绕图（data-wrap=square/topBottom 由写回/回读两侧约定）：基础留白，
+   具体 float/display 走内联样式（applyWrap 与 ooxml2html 双侧一致） */
+.wrp-edit img[data-wrap='square'],
+.wrp-edit img[data-wrap='topBottom'] {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+/* media 缺失占位图：灰框虚线，一眼看出「这里有图但拿不到」 */
+.wrp-edit img[data-img-missing] {
+  display: inline-block;
+  min-width: 120px;
+  min-height: 60px;
+  background: #f3f3f3 repeating-linear-gradient(45deg, #e8e8e8 0 8px, #f3f3f3 8px 16px);
+  border: 1px dashed #bbb;
+  object-fit: contain;
+}
+/* 图片环绕浮层：点选图片在图片右上角浮出（挂不滚动的 editzone） */
+.wrp-wrap-pop {
+  position: absolute;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 5px;
+  background: var(--ed-bg3);
+  border: 1px solid var(--ed-border2);
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+.wrp-wrap-pop-t {
+  font-size: 10px;
+  color: var(--ed-text3);
+  margin-right: 2px;
+}
+.wrp-wrap-pop button {
+  min-height: 0;
+  padding: 2px 7px;
+  font-size: 11px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ed-text1);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.wrp-wrap-pop button:hover {
+  background: var(--ed-bg2);
+  border-color: var(--ed-border);
+}
+/* 明亮模式：纸外底色用中性灰 */
+.node-editor[data-theme='light'] .wrp-edit-wrap {
+  background: #e6e6e6;
+}
+.node-editor[data-theme='light'] .wrp-edit {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* ── WPS 式状态栏（foot 右侧段）：页码 / 字数 / 缩放 ── */
+.wrp-status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--ed-text3);
+  white-space: nowrap;
+}
+.wrp-status-item {
+  display: inline-flex;
+  align-items: center;
+}
+.wrp-status-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.wrp-status-zoom button {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--ed-text1);
+  background: transparent;
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.wrp-status-zoom button:hover {
+  background: var(--ed-bg3);
+  border-color: var(--ed-border2);
+}
+.wrp-status-zoom button.wrp-status-fit {
+  width: auto;
+  padding: 0 5px;
+  font-size: 10px;
+}
+.wrp-status-zoom b {
+  min-width: 40px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--ed-text1);
+}
+/* 明亮主题：标尺底色与状态栏沿用 */
+/* 纯图标按钮（glyph-only，WPS B/I/U/S、对齐钮同款）与激活态的规则已上移到 Ribbon 区段，
+   此处不再重复定义 —— 避免两处特异性竞争导致改一处失效一处。 */
+/* 编辑区外层锚：不滚动（editbar 悬浮的包含块）—— 滚动发生在 .wrp-edit-wrap 内部，
+   否则 absolute 的 editbar 会随内容滚出视野（2026-09-27 实测 top:12 却出现在 Ribbon 下） */
+.wrp-editzone {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ────────────── 设置单元格格式对话框（#33 第二块）────────────── */
+/* 形态与章节窗体/批注清单同款：fixed 遮罩 + 居中卡片 + --z-modal；
+   配色走 --ed-* 双主题变量（与 .wb-ctxmenu 同一套视觉语言） */
+.wb-fmtdlg {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: var(--ed-mask, rgba(0, 0, 0, 0.5));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+}
+.wb-fmtdlg-box {
+  width: 460px;
+  max-width: calc(100vw - 40px);
+  max-height: 74vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ed-bg1);
+  border: 1px solid var(--ed-border);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+.wb-fmtdlg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ed-text);
+  border-bottom: 1px solid var(--ed-border);
+}
+.wb-fmtdlg-x {
+  border: 0;
+  background: transparent;
+  color: var(--ed-text2);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.wb-fmtdlg-x:hover { color: var(--ed-text); }
+.wb-fmtdlg-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid var(--ed-border);
+}
+.wb-fmtdlg-tabs button {
+  border: 0;
+  background: transparent;
+  color: var(--ed-text2);
+  font-size: 12.5px;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+}
+.wb-fmtdlg-tabs button:hover { color: var(--ed-text); }
+.wb-fmtdlg-tabs button.on {
+  color: var(--ed-accent);
+  background: var(--ed-bg2);
+  box-shadow: inset 0 -2px 0 var(--ed-accent);
+}
+.wb-fmtdlg-body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wb-fmtdlg-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ed-text);
+}
+.wb-fmtdlg-row > label:first-child { min-width: 58px; color: var(--ed-text2); }
+.wb-fmtdlg-row input[type='text'],
+.wb-fmtdlg-row input:not([type]),
+.wb-fmtdlg-row input[type='number'] {
+  flex: 1;
+  min-width: 0;
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 5px;
+  color: var(--ed-text);
+  padding: 4px 8px;
+  font-size: 12.5px;
+}
+.wb-fmtdlg-row input[type='number'] { flex: 0 0 76px; }
+.wb-fmtdlg-row input[type='color'] {
+  width: 34px;
+  height: 24px;
+  padding: 1px;
+  border: 1px solid var(--ed-border);
+  border-radius: 5px;
+  background: var(--ed-bg0);
+  cursor: pointer;
+}
+.wb-fmtdlg-row select {
+  background: var(--ed-bg0);
+  border: 1px solid var(--ed-border);
+  border-radius: 5px;
+  color: var(--ed-text);
+  padding: 4px 6px;
+  font-size: 12.5px;
+}
+.wb-fmtdlg-row button,
+.wb-fmtdlg-foot button {
+  border: 1px solid var(--ed-border);
+  background: var(--ed-bg2);
+  color: var(--ed-text);
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wb-fmtdlg-row button:hover:not(:disabled),
+.wb-fmtdlg-foot button:hover:not(:disabled) { border-color: var(--ed-accent); }
+.wb-fmtdlg-row button:disabled { opacity: 0.45; cursor: default; }
+.wb-fmtdlg-row label { display: inline-flex; align-items: center; gap: 4px; }
+.wb-fmtdlg-row .wb-fmtdlg-gap { margin-left: 10px; min-width: 0; }
+.wb-fmtdlg-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ed-text);
+  padding: 2px 0;
+  cursor: pointer;
+}
+.wb-fmtdlg-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  padding: 4px 0;
+}
+.wb-fmtdlg-swatches button {
+  height: 22px;
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.wb-fmtdlg-swatches button:hover { outline: 2px solid var(--ed-accent); }
+.wb-fmtdlg-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--ed-border);
+}
+.wb-fmtdlg-foot .wb-fmtdlg-ok {
+  background: var(--ed-accent);
+  border-color: var(--ed-accent);
+  color: #fff;
+}
+
+/* ═══ 外部数据引用更新（标题栏方形按钮 + 设置卡，2026-10-18 用户指令「放在标题栏 方形按钮上」） */
+.ne-refupd-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.ne-iconbtn.is-refupd-off {
+  color: var(--ed-text4);
+}
+.ne-refupd-pop {
+  /* ★ fixed 而非 absolute：.ne-head 有 overflow:hidden 会裁剪子级弹层；
+     top/right 由 JS 按按钮 rect 计算（见 NodeEditor toggleRefUpdPop）。 */
+  position: fixed;
+  z-index: 200;
+  width: 268px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  background: var(--ed-bg2);
+  color: var(--ed-text);
+  border: 1px solid var(--ed-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: left;
+}
+.ne-refupd-hd {
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.ne-refupd-info {
+  color: var(--ed-text3);
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+.ne-refupd-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  margin: 0 0 2px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--ed-text);
+  font: inherit;
+}
+.ne-refupd-row:hover {
+  background: var(--ed-bg3);
+}
+.ne-refupd-row.is-cur {
+  background: var(--ed-bg3);
+  box-shadow: inset 0 0 0 1px var(--ed-accent);
+}
+.ne-refupd-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 6px 1px 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--ed-text3);
+  vertical-align: middle;
+}
+.ne-refupd-row.is-cur .ne-refupd-dot {
+  background: var(--ed-accent);
+  border-color: var(--ed-accent);
+}
+.ne-refupd-name {
+  font-weight: 600;
+}
+.ne-refupd-desc {
+  display: block;
+  margin: 1px 0 0 14px;
+  color: var(--ed-text3);
+  font-size: 11px;
+}
+.ne-refupd-ft {
+  border-top: 1px solid var(--ed-border2);
+  margin-top: 6px;
+  padding-top: 6px;
+  color: var(--ed-text4);
+  font-size: 11px;
+}
+
+/* ══════════════ 双击打开编辑器 · app 式展开动效（2026-10-23 用户指令
+   「像打开 app 一样 苹果那种丝滑展开」）══════════════
+   窗体从双击节点的屏幕位置放大展开（translate+scale，iOS spring 近似缓动），
+   遮罩同步淡入。起点由 JS 写 CSS 变量（--ne-dx/--ne-dy/--ne-s）。
+   transform/border-radius 走 animation（优先于既有 transition，不冲突：
+   既有 transition 只管 margin-left/width——让位/最大化布局动画照常）。 */
+.node-editor.ne-app-open {
+  animation: ne-app-open 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+@keyframes ne-app-open {
+  0% {
+    transform: translate(var(--ne-dx, 0px), var(--ne-dy, 0px)) scale(var(--ne-s, 0.12));
+    opacity: 0;
+    border-radius: 22px;
+  }
+  30% { opacity: 1; }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    border-radius: 10px;
+  }
+}
+.node-editor-mask.ne-mask-fade {
+  animation: ne-mask-fade 0.26s ease-out;
+}
+@keyframes ne-mask-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ══════════════ 关闭编辑器 · 收缩动效（2026-10-23 用户指令「关闭节点也做个特效」）══════════════
+   打开动画的逆向：窗体收回到双击节点的位置并淡出（270ms ease-in forwards），
+   动画结束才真正卸载（NodeEditor.closeWithAnim 延时调 onClose）。
+   全局特效开关 uiFx（工具带 ✨）关闭时打开/关闭都直通。 */
+.node-editor.ne-app-close {
+  animation: ne-app-close 0.27s cubic-bezier(0.4, 0, 1, 1) forwards;
+  transform-origin: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+@keyframes ne-app-close {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    border-radius: 10px;
+  }
+  100% {
+    transform: translate(var(--ne-dx, 0px), var(--ne-dy, 0px)) scale(var(--ne-s, 0.12));
+    opacity: 0;
+    border-radius: 22px;
+  }
+}
+.node-editor-mask.ne-mask-fadeout {
+  animation: ne-mask-fadeout 0.27s ease-in forwards;
+}
+@keyframes ne-mask-fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ══════════════ PDF 合并节点 · 行式列表（2026-10-23 用户指令重做）══════════════
+   「合并PDF做成方形按钮放节点最下面；每一行一个节点，拖动后跟随；
+    第一行设置默认保存文件名」——走主题变量，与节点卡同语言。 */
+.pm-root {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 6px 6px;
+}
+.pm-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pm-name-label {
+  font-size: 10px;
+  color: var(--c-text4);
+  flex-shrink: 0;
+}
+.pm-name-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  padding: 3px 6px;
+  border: 1px solid var(--c-border);
+  border-radius: 3px;
+  background: var(--c-bg0);
+  color: var(--c-text);
+}
+.pm-name-input:focus {
+  outline: none;
+  border-color: var(--c-blue2);
+}
+.pm-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  font-size: 11px;
+  color: var(--c-text2);
+  background: var(--c-hover);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.14s ease, opacity 0.14s ease, border-color 0.14s ease;
+}
+.pm-row:hover { border-color: var(--c-border2); color: var(--c-text); }
+/* 行 hover 时把手加深——「这里能拖」的可发现性 */
+.pm-row:hover .pm-grip { color: var(--c-text2); }
+.pm-row--drag {
+  /* ★ 提起态（2026-10-23 交互清晰化）：不消失——实色边框 + 提亮 + 微放大 +
+     投影，光标拖影已隐藏（1px 透明画布），行本体就是拖动主角 */
+  opacity: 1;
+  border: 2px solid var(--c-blue2);
+  background: var(--c-bg1);
+  color: var(--c-text);
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  cursor: grabbing;
+  z-index: 2;
+}
+.pm-row--drag .pm-idx {
+  background: var(--c-blue);
+  color: #fff;
+  border-radius: 3px;
+}
+/* 悬停行（插入位）：上缘蓝色指示线——「将换到这行」 */
+.pm-row--over {
+  border-color: var(--c-blue2);
+  box-shadow: inset 0 3px 0 -1px var(--c-blue2);
+}
+/* 落位确认：闪绿 500ms——「已放到这里」 */
+.pm-row--dropped {
+  animation: pm-dropped 0.5s ease;
+}
+@keyframes pm-dropped {
+  0% { background: var(--c-green2); border-color: var(--c-green); }
+  100% { background: var(--c-hover); border-color: var(--c-border); }
+}
+.pm-idx {
+  width: 14px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--c-text4);
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+.pm-nm {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pm-grip {
+  color: var(--c-text4);
+  flex-shrink: 0;
+  letter-spacing: -1px;
+  cursor: grab;
+}
+.pm-empty {
+  font-size: 11px;
+  color: var(--c-text4);
+  padding: 4px 2px;
+}
+.pm-merge-btn {
+  margin-top: 4px;
+  padding: 6px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 4px; /* ★ 方形按钮（用户指令）：小圆角直角感 */
+  border: 1px solid var(--c-blue);
+  background: var(--c-blue);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.pm-merge-btn:hover { background: var(--c-blue2); border-color: var(--c-blue2); }
+.pm-merge-btn:disabled { opacity: 0.55; cursor: default; }
+.pm-msg {
+  font-size: 10.5px;
+  color: var(--c-text3);
+  line-height: 1.5;
+}
+:root[data-theme='light'] .pm-merge-btn { color: #fff; }
+
+/* ★ 2026-10-23 pdfmerge 行内锚点 + 拖拽区：行是 positioned 祖先（Handle 定位基准），
+   nodrag 已挂行/文件名/按钮（RF 节点拖拽不抢 mousedown——「没法拖动」的根因修复） */
+.pm-row { position: relative; }
+.pm-handle {
+  width: 8px;
+  height: 8px;
+  left: -5px;
+  top: 50%;
+  background: var(--c-blue2);
+  border: 1px solid var(--c-bg0);
+  min-width: 0;
+  min-height: 0;
+}
+.pm-handle:hover { background: var(--c-blue3); }
+
+/* ══════════════ 照片/照片组节点 · 卡片（2026-10-23 用户指令）══════════════
+   📷 导入（多选 jpg/png ≤8MB/张，最多 24 张，base64 随画布走）
+   → 缩略图网格（hover 删单张）→ 连 PDF 合并节点（每图一页 A4 适配）。 */
+.pn-root {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 6px 6px;
+}
+.pn-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pn-import {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid var(--c-border);
+  background: transparent;
+  color: var(--c-text2);
+  cursor: pointer;
+}
+.pn-import:hover { border-color: var(--c-blue2); color: var(--c-text); }
+.pn-count {
+  font-size: 10px;
+  color: var(--c-text4);
+}
+.pn-empty {
+  font-size: 11px;
+  color: var(--c-text4);
+  padding: 2px 2px 4px;
+}
+.pn-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+.pn-cell {
+  position: relative;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--c-bg0);
+  aspect-ratio: 1;
+}
+.pn-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pn-del {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: none;
+  background: rgba(1, 4, 9, 0.72);
+  color: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  padding: 0;
+}
+.pn-cell:hover .pn-del { opacity: 1; }
+.pn-del:hover { background: var(--c-red); }
+.pn-nm {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 9px;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(1, 4, 9, 0.75));
+  padding: 6px 4px 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pn-msg {
+  font-size: 10.5px;
+  color: var(--c-text3);
+}
+
+/* ══════════════ 照片节点 · 行式列表（2026-10-23 用户指令
+   「导入后以列表的形式。类似于PDF合并」）——与 pm-row 同交互语言 ══════════════ */
+.pn-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* ★ 2026-10-23 用户指令「量 oo节点尺寸 重做 pdf 行」：对齐 .rf-field 实测
+     （字号 12px、padding 3px 10px、侧距 10px） */
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--c-text2);
+  background: var(--c-hover);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.14s ease, opacity 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.pn-row:hover { border-color: var(--c-border2); color: var(--c-text); }
+.pn-row:hover .pn-grip { color: var(--c-text2); }
+.pn-row--drag {
+  opacity: 1;
+  border: 2px solid var(--c-blue2);
+  background: var(--c-bg1);
+  color: var(--c-text);
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  cursor: grabbing;
+  z-index: 2;
+}
+.pn-row--drag .pn-idx {
+  background: var(--c-blue);
+  color: #fff;
+  border-radius: 3px;
+}
+.pn-row--over {
+  border-color: var(--c-blue2);
+  box-shadow: inset 0 3px 0 -1px var(--c-blue2);
+}
+.pn-row--dropped {
+  animation: pm-dropped 0.5s ease;
+}
+.pn-idx {
+  width: 14px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--c-text4);
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+.pn-thumb {
+  width: 26px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid var(--c-border);
+  flex-shrink: 0;
+  background: var(--c-bg0);
+}
+.pn-row .pn-nm {
+  position: static;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: inherit;
+  background: none;
+  padding: 0;
+}
+.pn-row .pn-del {
+  position: static;
+  opacity: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--c-text4);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.12s ease;
+}
+.pn-row:hover .pn-del { opacity: 1; }
+.pn-row .pn-del:hover { background: var(--c-red); color: #fff; }
+.pn-grip {
+  color: var(--c-text4);
+  flex-shrink: 0;
+  letter-spacing: -1px;
+  cursor: grab;
+}
+
+/* ★ 2026-10-23 PDF 合并行格式徽章（用户指令「序号后面文件名前加文件格式logo」）
+   Word 蓝 / Excel 绿 / 照片青——Office 品牌色同语言 */
+.pm-fmt {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.pm-fmt-word { background: #2b579a; }
+/* 百度品牌蓝（引擎切换钮 logo——品牌色例外，同 pm-fmt-word 既有先例） */
+.pm-fmt-baidu { background: #2932e1; }
+.pm-fmt-sheet { background: #217346; }
+.pm-fmt-photo { background: #0e7490; }
+
+/* ★ 2026-10-23 照片行紧凑化（用户指令「每一行的宽度做小一点」）：
+   不撑满卡片——fit-content + 更小的缩略图/间距，节点随内容收窄 */
+.pn-row {
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  padding: 2px 5px;
+  gap: 4px;
+  font-size: 10.5px;
+}
+.pn-thumb {
+  width: 20px;
+  height: 20px;
+}
+.pn-root { gap: 3px; padding: 3px 4px 5px; }
+
+/* ★ 2026-10-23 照片点击右侧预览浮层（用户指令「点击每一行在右边有预览」）：
+   fixed 画布右缘居中，暗遮罩可点关，卡内大图等比适配 */
+.pn-preview {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(1, 4, 9, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 28px;
+  cursor: pointer;
+}
+.pn-preview-card {
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-width: min(480px, 40vw);
+  cursor: default;
+}
+.pn-preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--c-line);
+  border-bottom: 1px solid var(--c-border);
+}
+.pn-preview-nm {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pn-preview-close {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid var(--c-border);
+  background: transparent;
+  color: var(--c-text3);
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+}
+.pn-preview-close:hover { border-color: var(--c-red); color: var(--c-red); }
+.pn-preview-img {
+  display: block;
+  max-width: min(480px, 40vw);
+  max-height: 70vh;
+  object-fit: contain;
+  background: var(--c-bg0);
+}
+
+/* ══════════════ 节点顶部运行状态徽章（2026-10-23 用户指令
+   「节点上方显示关键过程 参照其他画布软件」——n8n/Dify 风格）══════════════
+   悬浮节点顶缘中央：running 蓝底 spinner / ok 绿底（耗时）/ error 红底（摘要）。
+   ok 8s 自动淡出（core/nodeRunStatus），非持久内存态。 */
+.rn-badge {
+  position: absolute;
+  /* ★ 2026-10-26 用户指令「提示信息有点和节点重合了 再往上移动一些」：-13 → -26
+     （胶囊完全悬在节点上方，留 ~13px 间隙，不再压住头部） */
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+.rn-badge--running {
+  background: var(--c-blue);
+  color: #fff;
+}
+.rn-spin {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rn-spin 0.7s linear infinite;
+}
+@keyframes rn-spin {
+  to { transform: rotate(360deg); }
+}
+.rn-badge--ok {
+  background: var(--c-green);
+  color: #fff;
+}
+/* running 实时耗时（2026-10-26 用户指令）：与标签同行，弱化色 */
+.rn-badge .rn-elapsed { color: var(--c-text3); font-weight: 500; margin-left: 2px; }
+
+.rn-badge--error {
+  background: var(--c-red);
+  color: #fff;
+}
+
+/* ★ 2026-10-23 方形「PDF」合并按钮（用户指令「圆角矩形正方形 放在和锁定组并排」）：
+   31×31 与 GrpLockButton 同语言；6px 圆角矩形；busy 转圈禁点 */
+.pm-sq-btn {
+  width: 31px;
+  height: 31px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--c-blue);
+  background: var(--c-blue);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.pm-sq-btn:hover { background: var(--c-blue2); border-color: var(--c-blue2); }
+.pm-sq-btn:disabled { opacity: 0.6; cursor: default; }
+.pm-sq-txt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.pm-spin-dark {
+  border-color: rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+}
+
+/* ★ 2026-10-23 照片预览改「节点右侧 popover」（用户指令「不要在上方」）：
+   portal 到 body + fixed 定位节点右缘，无全屏遮罩；点卡片外空白关闭 */
+.pn-preview {
+  position: fixed;
+  /* ★ 必须 inset:auto 抵消旧全屏遮罩规则的 inset:0——残留 right:0/bottom:0
+     会把容器拉成「节点右缘→屏幕右下」的一大块透明区域，拦截点击
+     （用户实测「影响下一步操作」的根因）；同时清 flex/padding/遮罩底色 */
+  inset: auto;
+  display: block;
+  z-index: var(--z-modal);
+  background: none;
+  padding: 0;
+  cursor: default;
+}
+.pn-preview-card {
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-width: 40vw;
+  cursor: default;
+}
+.pn-preview-img {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  background: var(--c-bg0);
+}
+
+/* ★ 2026-10-23 补 pm-del 样式——PDF 合并行 × 按钮此前无定义落浏览器默认
+   （白底黑字块，与照片行的淡 × 不一致，用户截图指出）。同款淡色 hover 显形。 */
+.pm-del {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--c-text4);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  flex-shrink: 0;
+}
+.pm-row:hover .pm-del { opacity: 1; }
+.pm-del:hover { background: var(--c-red); color: #fff; }
+
+/* ★ 2026-10-23 照片节点拖放导入高亮：拖文件悬停时虚线框 + 微提亮 */
+.pn-root--over {
+  outline: 2px dashed var(--c-blue2);
+  outline-offset: -2px;
+  border-radius: 6px;
+  background: var(--c-hover);
+}
+
+/* ★ 2026-10-23 照片导入按钮（用户指令「放在下面 做成圆角矩形长方形按钮，
+   和锁定组按钮并排 大小一致」）：31px 高与 GrpLockButton 同语言，
+   宽度按内容（长方形），渲染在节点首行锁定组旁 */
+.pn-import-btn {
+  height: 31px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--c-text2);
+  background: transparent;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.12s ease, color 0.12s ease;
+  white-space: nowrap;
+}
+.pn-import-btn:hover { border-color: var(--c-blue2); color: var(--c-text); }
+.pn-import-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* ★ 2026-10-23 PDF 文件节点：行复用照片行（pn-*）语言 + 合并行红 P 徽章 */
+.pn-pdf-ico {
+  flex-shrink: 0;
+  font-size: 13px;
+  line-height: 1;
+}
+.pm-fmt-pdf { background: #b02a2a; }
+
+/* ★ 2026-10-23 PDF 合并·存画布/历史按钮 + 历史列表 + PDF 预览浮层 */
+.pm-hist-btn--on {
+  border-color: var(--c-blue2);
+  color: var(--c-text);
+  background: var(--c-hover);
+}
+/* ★ 2026-10-25 对齐词条统一标准：左右退让 6px、上下 4px（与 pn-root 同规格） */
+.pm-hist {
+  border-top: 1px dashed var(--c-border);
+  margin-top: 4px;
+  padding: 4px 6px 6px;
+}
+.pm-hist-cap {
+  font-size: 10px;
+  color: var(--c-text4);
+  padding: 1px 2px 2px;
+}
+.pm-hist-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  font-size: 10.5px;
+  color: var(--c-text2);
+  background: var(--c-hover);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 2px;
+}
+.pm-hist-row:hover { border-color: var(--c-blue2); color: var(--c-text); }
+.pm-hist-at {
+  margin-left: auto;
+  font-size: 9.5px;
+  color: var(--c-text4);
+  flex-shrink: 0;
+}
+.pm-pdfpreview { z-index: var(--z-modal); }
+.pm-pdfpreview-card { width: 620px; max-width: 60vw; }
+.pm-preview-frame {
+  width: 100%;
+  height: 72vh;
+  border: none;
+  background: var(--c-bg0);
+}
+
+/* ★ 2026-10-23 历史来源徽标 + 居中预览窗（用户指令：画布/外部区分 + 预览居中
+   类似 ooword 窗体大小；历史列表移到「🕘 历史」按钮正下方=卡片最顶） */
+.pm-hist-src {
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+  font-size: 11px;
+}
+.pm-hist-src--canvas { color: var(--c-green); }
+.pm-hist-src--ext { color: var(--c-text4); }
+.pm-pdfpreview {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(1, 4, 9, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.pm-pdfpreview-card {
+  width: min(1180px, 92vw);
+  height: 82vh;
+  cursor: default;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+.pm-preview-frame {
+  width: 100%;
+  flex: 1;
+  border: none;
+  background: var(--c-bg0);
+}
+
+/* ★ 2026-10-23 存画布/历史改 31×31 方形圆角图标钮（用户指令「做成一行
+   都是正方形的圆角的」）——同 GrpLockButton 幽灵语言；历史开启态亮边 */
+.pm-sq-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--c-border);
+  color: var(--c-text2);
+  font-size: 14px;
+}
+.pm-sq-btn--ghost:hover { background: var(--c-hover); border-color: var(--c-blue2); color: var(--c-text); }
+.pm-sq-btn--ghost:disabled { opacity: 0.6; }
+.pm-sq-btn--on { border-color: var(--c-blue); background: var(--c-hover); }
+/* ★ 2026-10-29 生成钮 busy 态：图标转圈（rn-spin 同款）——转化状态提示之一（节点徽章报进度） */
+.pm-sq-btn--busy svg { animation: rn-spin 0.7s linear infinite; }
+
+/* ★ 2026-10-26 节点底部按钮装载条（用户指令「创建一套长方形空间 专门在上面装载方形按钮
+   增加一个就排列上去一个」——节点规范.md 第五章配套，唯一实现 src/ui/NodeBtnBar.tsx）：
+   长方形全宽条状空间：flex 自动排列 + 溢出换行——新按钮追加进 children 即排上；
+   侧距 10px 与 .pn-root 容器单一真相源对齐；条上起手不拖动画布（组件已带 nodrag nopan） */
+.nb-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 31px;
+  padding: 4px 10px 6px;
+}
+/* 需要可见长方形空间时加变体（默认透明融入卡片） */
+.nb-bar--boxed {
+  margin: 0 6px;
+  padding: 4px 4px 4px 4px;
+  border: 1px dashed var(--c-border);
+  border-radius: 6px;
+  background: var(--c-hover);
+}
+
+/* ★ 2026-10-23 历史行 × 删除（用户指令「历史记录增加删除」）：hover 显形同 pm-del */
+.pm-hist-row .pm-del { margin-left: 2px; }
+.pm-hist-row:hover .pm-del { opacity: 1; }
+
+/* ★ 2026-10-23 照片双击大窗（用户指令「双击打开 类似ooexcel大小」）：
+   居中 min(1180px,92vw) 卡内大图 flex 撑满 contain */
+.pm-preview-img-big {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  background: var(--c-bg0);
+}
+
+/* ★ 2026-10-23 历史条目右键菜单（用户指令「右键 另存为」） */
+.pm-ctx-menu {
+  position: fixed;
+  min-width: 150px;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  z-index: calc(var(--z-modal) + 1);
+}
+.pm-ctx-item {
+  padding: 7px 12px;
+  font-size: 12px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--c-text2);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.pm-ctx-item:hover { background: var(--c-hover); color: var(--c-text); }
+
+/* ★ 2026-10-23 pdf.js 查看器（PdfViewer）容器 */
+.pm-preview-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pv-root {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--c-bg0);
+}
+.pv-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--c-line);
+  border-bottom: 1px solid var(--c-border);
+  flex-shrink: 0;
+}
+.pv-btn {
+  min-width: 26px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 5px;
+  border: 1px solid var(--c-border);
+  background: transparent;
+  color: var(--c-text2);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+.pv-btn:hover:not(:disabled) { border-color: var(--c-blue2); color: var(--c-text); }
+.pv-btn:disabled { opacity: 0.4; cursor: default; }
+.pv-page { font-size: 11.5px; color: var(--c-text2); min-width: 52px; text-align: center; }
+.pv-sep { width: 1px; height: 16px; background: var(--c-border); margin: 0 4px; }
+.pv-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
+.pv-canvas { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35); background: #fff; align-self: flex-start; }
+.pv-err { padding: 20px; color: var(--c-red); font-size: 12px; }
+
+/* ★ 2026-10-23 历史右键颜色标记（用户指令「右键设置颜色 来标记版本」）：
+   菜单底部色块行 + 列表行左缘色条 */
+.pm-ctx-colors {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--c-border);
+  margin-top: 4px;
+}
+.pm-ctx-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid var(--c-border);
+  cursor: pointer;
+  padding: 0;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--c-text3);
+  text-align: center;
+}
+.pm-ctx-color:hover { transform: scale(1.15); }
+.pm-hist-color {
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ★ 2026-10-23 用户截图指令：导入按钮改正方形（31×31 同锁定组）；
+   条目行撑满卡片宽（左右边距对称——此前 pn-row fit-content 右侧留大空隙） */
+.pn-import-btn {
+  width: 31px;
+  height: 31px;
+  padding: 0;
+  justify-content: center;
+  font-size: 14px;
+}
+.pn-row {
+  /* ★ 2026-10-23 修「词条长度超了」：width:100% + 行自身 padding/border
+     （box-sizing 非 border-box 时）= 溢出父宽 → 把手跑出节点右缘。
+     块级默认 width:auto 已撑满父内容宽且含 padding 自适应。 */
+  width: auto;
+}
+.pn-root { padding: 4px 10px 6px; }
+.pm-root { padding: 4px 10px 6px; }
+
+/* ★ 2026-10-23 用户截图指令「下面的词条宽度和上面对齐」：
+   历史区与按钮行左右对齐——rf-oo-btns 左右 padding 10px，
+   pm-root padding 8px → 历史区补 2px margin 凑齐 */
+.pm-hist {
+  margin: 3px 2px 0;
+}
+.pm-hist-row { margin-bottom: 3px; }
+
+/* ★ 2026-10-23 行拖拽释放态（用户截图「蓝框残留」）：outline 一律不画 */
+.pn-row, .pm-row { outline: none; }
+
+/* ★ 2026-10-23 PDF 预览最大化（参照 ooexcel 样式）：满屏/无圆角/无边框/无阴影。
+   ★ 不做 width/height 过渡（用户实测：过渡逐帧 resize 使 Chromium 内嵌 PDF
+     查看器重绘异常白屏——「最大化就没了/缩小也没了」），切换为即时生效；
+   iframe 以 key=视图态强制重建，PDF viewer 按新尺寸重新加载。 */
+.pm-card-max {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.pm-card-max {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ★ 2026-10-23 PDF 预览最大化（用户指令「像 ooexcel 那样 重做」）：
+   独立满屏容器分支（fixed inset 0、顶部条+iframe flex 撑满）——
+   与标准卡片完全独立 DOM，不共享样式链（前四轮 className 切换
+   均因样式链冲突白屏/消失，全部排除） */
+.pm-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 3);
+  background: var(--c-bg0);
+  display: flex;
+  flex-direction: column;
+}
+.pm-fs-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--c-line);
+  border-bottom: 1px solid var(--c-border);
+  flex-shrink: 0;
+}
+.pm-fs-sp { flex: 1; }
+.pm-fs-frame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* ★ 2026-10-23 用户指令「量 oo节点按钮 显示的尺寸 重做预览窗按钮」：
+   OO 节点按钮实测（.pm-sq-btn，锁定组/导入/四钮同款语言）：
+   31×31、圆角 6px、1px 边框、inline-flex 居中——预览窗
+   ⤢/❐/× 按此重做（Ghost 态：透明底 hover 亮）。 */
+.pn-preview-bar, .pm-fs-bar { gap: 4px; padding: 4px 8px; min-height: 39px; }
+.pn-preview-bar .pn-preview-nm, .pm-fs-bar .pn-preview-nm { margin: 0 8px 0 4px; }
+.pn-preview-bar .libpick-select { margin-right: 4px; }
+.pn-preview-bar .pn-preview-close,
+.pm-fs-bar .pn-preview-close {
+  width: 31px;
+  height: 31px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--c-border);
+  background: transparent;
+  color: var(--c-text3);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.pn-preview-bar .pn-preview-close:hover,
+.pm-fs-bar .pn-preview-close:hover {
+  background: var(--c-hover);
+  color: var(--c-text);
+}
+
+/* ★ react-pdf 查看器（pv-*）——2026-10-23 */
+.pv-page-box { position: relative; overflow: hidden; }
+.pv-page-box canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+.pv-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  background: var(--c-line);
+  border-bottom: 1px solid var(--c-border);
+  flex-shrink: 0;
+}
+.pv-btn {
+  min-width: 31px;
+  height: 31px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--c-border);
+  background: transparent;
+  color: var(--c-text3);
+  cursor: pointer;
+  font-size: 13px;
+}
+.pv-btn:hover:not(:disabled) { background: var(--c-hover); color: var(--c-text); }
+.pv-btn:disabled { opacity: 0.4; cursor: default; }
+.pv-btn--on { border-color: var(--c-blue); color: var(--c-blue); }
+.pv-page-input {
+  width: 44px;
+  height: 31px;
+  padding: 0 6px;
+  text-align: center;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--c-border);
+  background: var(--c-bg0);
+  color: var(--c-text);
+}
+.pv-page-input:focus { outline: none; border-color: var(--c-blue2); }
+.pv-page { font-size: 12px; color: var(--c-text3); }
+.pv-sep { width: 1px; height: 20px; background: var(--c-border); margin: 0 6px; }
+
+/* ★ PDF 智能控件（识别/定位/标记）样式——2026-10-24 */
+.pv-search-input::placeholder { color: var(--c-text3); }
+.pv-mark-hl {
+  position: absolute;
+  background: rgba(255, 213, 79, 0.45);
+  border: 1px solid rgba(255, 193, 7, 0.7);
+  border-radius: 2px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.pv-mark-hl:hover { background: rgba(255, 213, 79, 0.65); }
+.pv-markbtn {
+  position: absolute;
+  z-index: 20;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--c-blue);
+  background: var(--c-bg0);
+  color: var(--c-blue);
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.pv-markbtn:hover { background: var(--c-hover); }
+.pv-marklist {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 280px;
+  max-height: 70%;
+  overflow: auto;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  z-index: 30;
+}
+.pv-marklist-head {
+  display: flex; align-items: center;
+  padding: 6px 10px;
+  font-size: 12px; font-weight: 600; color: var(--c-text);
+  border-bottom: 1px solid var(--c-border);
+}
+.pv-marklist-empty { padding: 12px 10px; font-size: 12px; color: var(--c-text3); }
+.pv-markitem {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px;
+  font-size: 12px; color: var(--c-text2);
+  cursor: pointer;
+  border-bottom: 1px solid var(--c-border);
+}
+.pv-markitem:hover { background: var(--c-hover); }
+.pv-markitem-page { flex-shrink: 0; color: var(--c-blue); font-weight: 600; }
+.pv-markitem-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-markitem-del { flex-shrink: 0; border: none; background: none; color: var(--c-text3); cursor: pointer; font-size: 14px; }
+.pv-markitem-del:hover { color: #e53935; }
+::highlight(pdf-hits) { background-color: rgba(255, 213, 79, 0.55); color: inherit; }
+
+/* ★ PDF 智能控件（识别/定位/标记）样式——2026-10-24 */
+.pv-search-input::placeholder { color: var(--c-text3); }
+.pv-mark-hl {
+  position: absolute;
+  background: rgba(255, 213, 79, 0.45);
+  border: 1px solid rgba(255, 193, 7, 0.7);
+  border-radius: 2px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.pv-mark-hl:hover { background: rgba(255, 213, 79, 0.65); }
+.pv-markbtn {
+  position: absolute;
+  z-index: 20;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--c-blue);
+  background: var(--c-bg0);
+  color: var(--c-blue);
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.pv-markbtn:hover { background: var(--c-hover); }
+.pv-marklist {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 280px;
+  max-height: 70%;
+  overflow: auto;
+  background: var(--c-bg0);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  z-index: 30;
+}
+.pv-marklist-head {
+  display: flex; align-items: center;
+  padding: 6px 10px;
+  font-size: 12px; font-weight: 600; color: var(--c-text);
+  border-bottom: 1px solid var(--c-border);
+}
+.pv-marklist-empty { padding: 12px 10px; font-size: 12px; color: var(--c-text3); }
+.pv-markitem {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px;
+  font-size: 12px; color: var(--c-text2);
+  cursor: pointer;
+  border-bottom: 1px solid var(--c-border);
+}
+.pv-markitem:hover { background: var(--c-hover); }
+.pv-markitem-page { flex-shrink: 0; color: var(--c-blue); font-weight: 600; }
+.pv-markitem-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-markitem-del { flex-shrink: 0; border: none; background: none; color: var(--c-text3); cursor: pointer; font-size: 14px; }
+.pv-markitem-del:hover { color: #e53935; }
+::highlight(pdf-hits) { background-color: rgba(255, 213, 79, 0.55); color: inherit; }
+
+/* ★ 2026-10-25 PDF 替换页节点（pr-*）——词条行复用 pn-row/pm-fmt，补组头/页码/历史 */
+.pr-root { display: flex; flex-direction: column; gap: 4px; padding: 4px 14px 6px; }
+.pr-group-head {
+  font-size: 10.5px; color: var(--ed-text3, var(--c-text3));
+  /* ★ 2026-10-25 用户指令「去掉竖条 锚点和文字往左靠」：去 border-left、左 padding 2px */
+  padding: 1px 2px; letter-spacing: 0.2px;
+}
+.pr-group { display: flex; flex-direction: column; gap: 4px; min-height: 18px; }
+.pr-page { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; color: var(--ed-text3, var(--c-text3)); flex-shrink: 0; }
+.pr-page input {
+  width: 38px; padding: 0 3px; font-size: 11.5px; text-align: center;
+  border: 1px solid var(--c-border); border-radius: 3px;
+  background: var(--c-bg1); color: var(--ed-text1, var(--c-text1));
+}
+.pr-sz { font-size: 10.5px; color: var(--ed-text3, var(--c-text3)); flex-shrink: 0; margin-left: auto; }
+.pr-actions { display: flex; align-items: center; gap: 6px; padding: 2px 6px; }
+.pr-pair-hint { font-size: 10.5px; color: var(--ed-text3, var(--c-text3)); }
+.pr-msg { font-size: 10.5px; color: var(--ed-text2, var(--c-text2)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-hist { display: flex; flex-direction: column; gap: 2px; }
+.pr-diff {
+  width: 22px; height: 22px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-border); border-radius: 4px; background: transparent;
+  color: var(--ed-text3, var(--c-text3)); cursor: pointer; flex-shrink: 0;
+}
+.pr-diff:hover { color: var(--c-blue, #3b82f6); border-color: var(--c-blue, #3b82f6); }
+
+/* ★ 2026-10-25 替换节点两段式：右匹配列（pr-root--row 布局 + 匹配行样式） */
+.pr-root--row { flex-direction: row; gap: 8px; align-items: flex-start; }
+.pr-root--row .pr-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pr-match {
+  flex: 0 0 auto; max-width: 170px; display: flex; flex-direction: column; gap: 2px;
+  border-left: 1px dashed var(--c-border); padding-left: 8px;
+}
+.pr-match-row { display: flex; align-items: center; gap: 4px; font-size: 10.5px; padding: 1px 0; }
+.pr-match-arrow { color: var(--ed-text3, var(--c-text3)); flex-shrink: 0; }
+.pr-match-nm { color: var(--ed-text2, var(--c-text2)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-match-sim { flex-shrink: 0; font-weight: 600; }
+.pr-match-sim.hi { color: #2da44e; }
+.pr-match-sim.mid { color: #d29922; }
+.pr-match-sim.lo { color: #b02a2a; }
+
+/* ★ 2026-10-25 替换节点拖入贴入提示（用户指令「像PDF节点一样 也不要弹窗」）：
+   悬停对应组高亮 + 「松手加入」提示——同 pn-root--over 语言 */
+.pr-group { transition: background 0.12s ease, box-shadow 0.12s ease; border-radius: 4px; }
+.pr-group--over {
+  background: rgba(59, 130, 246, 0.12);
+  box-shadow: inset 0 0 0 1.5px var(--c-blue, #3b82f6);
+}
+.pr-group-head--over { color: var(--c-blue, #3b82f6); font-weight: 600; }
+
+/* ★ 2026-10-25 空态导入长条按钮（用户指令「做成导入文件的长条按钮」）：
+   全宽虚线长条 + hover 高亮——PDF/PDF替换页空态通用（pn-empty 的可点版） */
+.pn-empty-btn {
+  width: 100%; padding: 3px 10px;
+  font-size: 11px; color: var(--ed-text3, var(--c-text3)); text-align: center;
+  background: transparent; border: 1px dashed var(--c-border); border-radius: 4px;
+  cursor: pointer; transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+  /* ★ 单行省略——长文案换行会把高度撑到两倍（用户指令「按拖入后的高度来」） */
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pn-empty-btn:hover {
+  color: var(--c-blue, #3b82f6); border-color: var(--c-blue, #3b82f6);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* ═══════════ PDF 替换页 · 匹配确认弹窗 + 差异缩略图（2026-10-25 用户令「根据本来的UI优化」）═══════════ */
+.pr-mask {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex; align-items: center; justify-content: center;
+}
+.pr-confirm {
+  width: min(780px, 94vw); max-height: 82vh;
+  display: flex; flex-direction: column;
+  background: var(--c-bg1, #0d1117); border: 1px solid var(--c-border);
+  border-radius: 8px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.pr-confirm-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; font-size: 13px; font-weight: 600;
+  background: var(--c-line); border-bottom: 1px solid var(--c-border);
+}
+.pr-confirm-head b { color: var(--c-blue, #3b82f6); }
+.pr-cf-table { overflow: auto; padding: 6px 10px; display: flex; flex-direction: column; gap: 3px; }
+.pr-cf-row {
+  display: grid;
+  grid-template-columns: 24px 76px 60px 1fr 44px 1fr;
+  align-items: center; gap: 8px;
+  padding: 4px 8px; font-size: 12px;
+  background: var(--c-hover); border: 1px solid var(--c-border); border-radius: 4px;
+}
+.pr-cf-row--head {
+  background: transparent; border: none; border-radius: 0;
+  font-size: 10.5px; color: var(--c-text4); font-weight: 600;
+  padding: 2px 8px;
+}
+.pr-cf-page { white-space: nowrap; }
+.pr-cf-page b { font-size: 14px; color: var(--c-text); }
+.pr-cf-src { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.pr-cf-src .pn-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-cf-pp { font-size: 10.5px; color: var(--c-text4); flex-shrink: 0; }
+.pr-cf-tgt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--c-text3); font-size: 11.5px; }
+.pr-sim {
+  display: inline-block; padding: 1px 7px; border-radius: 10px;
+  font-size: 11px; font-weight: 700;
+}
+.pr-sim--hi  { background: rgba(34, 197, 94, 0.16); color: #22c55e; }
+.pr-sim--mid { background: rgba(234, 179, 8, 0.14); color: #eab308; }
+.pr-sim--low { background: rgba(239, 68, 68, 0.13); color: #ef4444; }
+.pr-confirm-foot {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 8px 12px; border-top: 1px solid var(--c-border);
+}
+.pr-btn {
+  padding: 5px 14px; border-radius: 6px; font-size: 12.5px;
+  border: 1px solid var(--c-border); background: var(--c-bg2, #161b22); color: var(--c-text);
+  cursor: pointer;
+}
+.pr-btn:hover { border-color: var(--c-blue, #3b82f6); }
+.pr-btn--go { background: var(--c-blue, #3b82f6); border-color: var(--c-blue, #3b82f6); color: #fff; font-weight: 600; }
+.pr-btn--go:hover { filter: brightness(1.12); }
+
+/* 差异缩略浮层（并排两页） */
+.pr-thumbs {
+  background: var(--c-bg1, #0d1117); border: 1px solid var(--c-border);
+  border-radius: 8px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  max-width: 92vw; overflow: hidden;
+}
+.pr-thumbs-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px; font-size: 12px;
+  background: var(--c-line); border-bottom: 1px solid var(--c-border);
+}
+.pr-thumbs-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-thumbs-err { padding: 20px 30px; font-size: 12px; color: #ef4444; }
+.pr-thumbs-body { display: flex; align-items: flex-start; gap: 14px; padding: 12px 16px; }
+.pr-thumb-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pr-thumb-cap { font-size: 11px; color: var(--c-text3); }
+.pr-thumb-loading { width: 120px; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--c-text4); border: 1px dashed var(--c-border); border-radius: 4px; }
+.pr-thumb-col canvas { border: 1px solid var(--c-border); border-radius: 4px; background: #fff; }
+.pr-thumb-vs { align-self: center; font-size: 12px; font-weight: 700; color: var(--c-text4); padding-top: 24px; }
+
+/* ═══════════ 修改前后整档对比视图（左右两列+点位跳转+同步滚动）═══════════ */
+.pr-cmp {
+  width: 94vw; height: 88vh;
+  display: flex; flex-direction: column;
+  background: var(--c-bg1, #0d1117); border: 1px solid var(--c-border);
+  border-radius: 8px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.pr-cmp-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 12px; font-size: 12.5px;
+  background: var(--c-line); border-bottom: 1px solid var(--c-border);
+}
+.pr-cmp-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.pr-cmp-sync { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--c-text3); cursor: pointer; flex-shrink: 0; }
+.pr-cmp-points {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 6px 12px; border-bottom: 1px solid var(--c-border); font-size: 11.5px;
+}
+.pr-cmp-pt {
+  padding: 2px 10px; border-radius: 12px; font-size: 11.5px;
+  border: 1px solid var(--c-border); background: var(--c-bg2, #161b22); color: var(--c-text);
+  cursor: pointer;
+}
+.pr-cmp-pt:hover { border-color: var(--c-blue, #3b82f6); }
+.pr-cmp-pt--on { background: var(--c-blue, #3b82f6); border-color: var(--c-blue, #3b82f6); color: #fff; font-weight: 600; }
+.pr-cmp-body { flex: 1; display: flex; min-height: 0; }
+.pr-cmp-col {
+  flex: 1; overflow-y: auto; padding: 10px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.pr-cmp-col + .pr-cmp-col { border-left: 1px solid var(--c-border); }
+.pr-cmp-page {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 5px; border: 1.5px solid transparent; border-radius: 6px;
+  cursor: pointer;
+}
+.pr-cmp-page--point { border-color: var(--c-blue, #3b82f6); }
+.pr-cmp-page--point .pr-cmp-pp { color: var(--c-blue, #3b82f6); font-weight: 600; }
+.pr-cmp-page--cur { background: rgba(59, 130, 246, 0.1); border-color: var(--c-blue2, #60a5fa); }
+.pr-cmp-pp { font-size: 10.5px; color: var(--c-text4); }
+
+/* 对比页适配窗体（canvas 渲染分辨率=列宽，显示 100% 宽自适应） */
+.pr-cmp-page canvas { width: 100%; height: auto; }
+
+/* 替换点页放大钮 + 高清差异浮层（红框标注+自动定位修改处） */
+.pr-zoom-btn {
+  margin-left: 6px; padding: 0 6px; height: 16px;
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: 10px; border-radius: 3px;
+  border: 1px solid var(--c-blue, #3b82f6); background: rgba(59, 130, 246, 0.12); color: var(--c-blue, #3b82f6);
+  cursor: pointer;
+}
+.pr-zoom-btn:hover { background: var(--c-blue, #3b82f6); color: #fff; }
+.pr-zoom {
+  width: 92vw; height: 88vh;
+  display: flex; flex-direction: column;
+  background: var(--c-bg1, #0d1117); border: 1px solid var(--c-border);
+  border-radius: 8px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.pr-zoom-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px; font-size: 12.5px; font-weight: 600;
+  background: var(--c-line); border-bottom: 1px solid var(--c-border);
+}
+.pr-zoom-body { flex: 1; display: flex; align-items: stretch; gap: 12px; padding: 12px 16px; min-height: 0; overflow: hidden; }
+.pr-zoom-col { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pr-zoom-pagebox {
+  flex: 1; overflow: auto; position: relative;
+  background: var(--c-bg2, #161b22); border: 1px solid var(--c-border); border-radius: 6px;
+  padding: 8px;
+}
+.pr-zoom-pagebox canvas { width: 100%; height: auto; display: block; background: #fff; border-radius: 3px; }
+.pr-zoom-mark {
+  position: absolute;
+  border: 1.5px solid #ef4444; background: rgba(239, 68, 68, 0.14);
+  border-radius: 2px; pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+/* 页槽撑满列宽（修正：holder 塌缩导致渲染宽度只吃到 220px 兜底） */
+.pr-cmp-page { width: 100%; }
+
+/* ZoomDiff：fit 整页（打开即整页可见）+ 红框点击页内放大到修改内容 */
+.pr-zoom-pagebox canvas {
+  width: auto; height: auto;
+  max-width: 100%; max-height: calc(88vh - 150px);
+}
+.pr-zoom-wrap { position: relative; width: fit-content; margin: 0 auto; transition: transform 0.18s ease; }
+.pr-zoom-wrap--zoomed { transform: scale(2.4); }
+.pr-zoom-mark { cursor: zoom-in; pointer-events: auto; }
+.pr-zoom-mark--on { border-color: #f59e0b; background: rgba(245, 158, 11, 0.18); box-shadow: 0 0 0 1.5px rgba(245, 158, 11, 0.6); }
+.pr-zoom-pts { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+/* ═══ 确认弹窗加大 + 差异预览内嵌下方左右分裂（用户令「窗体太小/预览在页面下方左右分裂」）═══ */
+.pr-confirm { width: 97vw; max-height: 94vh; }
+.pr-cf-row { padding: 6px 10px; font-size: 13px; gap: 10px; }
+.pr-cf-page b { font-size: 15px; }
+.pr-cf-row--on { border-color: var(--c-blue, #3b82f6); background: rgba(59, 130, 246, 0.08); }
+.pr-diff--on { border-color: var(--c-blue, #3b82f6); background: rgba(59, 130, 246, 0.15); }
+.pr-inline-preview {
+  margin: 4px 2px 2px; border: 1px solid var(--c-border); border-radius: 6px;
+  background: var(--c-bg2, #161b22); overflow: hidden;
+}
+.pr-ip-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 6px 10px; font-size: 12px; font-weight: 600;
+  background: var(--c-line); border-bottom: 1px solid var(--c-border);
+}
+.pr-ip-body {
+  display: flex; align-items: flex-start; justify-content: center; gap: 16px;
+  padding: 12px; max-height: 52vh; overflow: auto;
+}
+.pr-ip-body .pr-thumb-col { max-width: 46%; }
+.pr-ip-body canvas { width: 100%; height: auto; max-height: 48vh; object-fit: contain; background: #fff; border: 1px solid var(--c-border); border-radius: 4px; }
+
+/* 容差设置（换钮左侧——复用 pr-page 的 label+input 语言） */
+.pr-tol { margin-right: 2px; }
+
+/* ═══ 容差设置改版：方钮 + 下方滑条面板（用户令「点击方形按钮 下方有个左右滑动的」）═══ */
+.pr-tol-wrap { position: relative; display: inline-flex; }
+.pr-tol-panel {
+  width: 260px; padding: 10px 12px;
+  background: var(--c-bg1, #0d1117); border: 1px solid var(--c-border); border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pr-tol-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--c-text2); }
+.pr-tol-row b { font-size: 13px; }
+.pr-tol-panel input[type='range'] { width: 100%; accent-color: var(--c-blue, #3b82f6); cursor: pointer; }
+.pr-tol-hint { display: flex; justify-content: space-between; font-size: 10px; color: var(--c-text4); }
+
+/* 确认弹窗行可点击展开预览（用户令「点击即预览」+不点周边退出） */
+.pr-cf-row--click { cursor: pointer; }
+.pr-cf-row--click:hover { border-color: var(--c-blue2, #60a5fa); }
+
+/* 确认弹窗底部按钮组（左：取消/执行；右：复制差异/关闭）+ 预览切换 */
+.pr-confirm-foot { justify-content: flex-start; }
+.pr-confirm-foot .pr-btn--tail:first-of-type { margin-left: auto; }
+.pr-confirm-foot .pr-btn--tail + .pr-btn--tail { margin-left: 0; }
+.pr-btn--sm { padding: 2px 10px; font-size: 11.5px; }
+.pr-ip-head { gap: 12px; }
+.pr-ip-switch { display: flex; align-items: center; gap: 8px; flex-shrink: 0; font-size: 11.5px; color: var(--c-text3); }
+.pr-ip-cap { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+
+/* 跳过详情提示条（被容差过滤/无文本的页可见化） */
+.pr-cf-skip {
+  margin: 2px 2px 0; padding: 5px 10px; font-size: 11.5px;
+  color: #eab308; background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.35); border-radius: 4px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* 低相似警告（容差=警告线：行微红底+⚠低标记，配对仍进列表由用户确认） */
+.pr-cf-row--low { background: rgba(239, 68, 68, 0.05); }
+.pr-cf-lowwarn {
+  margin-left: 4px; padding: 0 4px; font-size: 9.5px; border-radius: 3px;
+  color: #ef4444; background: rgba(239, 68, 68, 0.12); flex-shrink: 0;
+}
+
+/* ═══ 文件来源标记（2026-10-25 用户令「增加内部/外部标记」）═══
+   内=字节在软件库（随工程文件走）；外=外部引用（易丢） */
+.pn-loc {
+  flex-shrink: 0;
+  width: 14px; height: 14px; border-radius: 3px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; line-height: 1;
+}
+.pn-loc--in  { background: rgba(34, 197, 94, 0.16); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
+.pn-loc--ext { background: rgba(148, 163, 184, 0.16); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
+
+/* ═══ 保存工程弹窗（参照替换对比弹窗语言，2026-10-25）═══ */
+.pr-cf-tabs { display: flex; gap: 6px; padding: 8px 12px 0; }
+.pr-cf-tab {
+  padding: 4px 14px; font-size: 12px; border-radius: 6px 6px 0 0;
+  border: 1px solid transparent; border-bottom: none; background: transparent;
+  color: var(--c-text3); cursor: pointer;
+}
+.pr-cf-tab--on {
+  background: var(--c-hover); border-color: var(--c-border);
+  color: var(--c-text); font-weight: 600;
+}
+.pr-cf-group { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+.pr-cf-group-head {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 6px; font-size: 12px; font-weight: 600; color: var(--c-text2);
+}
+.pr-cf-file {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 6px 3px 18px; font-size: 11.5px;
+  background: var(--c-hover); border: 1px solid var(--c-border); border-radius: 4px;
+}
+.pr-cf-file .pn-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-btn--hist-off { opacity: 0.75; }
+.pr-confirm-foot label { user-select: none; }
+
+/* 保存工程弹窗专属尺寸（用户令「小一点」——清单弹窗不需要全屏宽） */
+.pr-confirm--save { width: min(860px, 90vw); max-height: 88vh; }
+
+/* ★ 2026-10-22 修「节点名称全部不显示」：.pn-nm 全局是 absolute（词条行专用），
+   落进 pr-cf-* 的 grid 行就脱离文档流=文字消失——弹窗内恢复流式 + 省略号 */
+.pr-cf-row .pn-nm,
+.pr-cf-file .pn-nm,
+.pr-cf-group-head .pn-nm {
+  position: static;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* ═══ 保存弹窗简洁卡片风 v2（2026-10-25 用户「太丑了」——去行边框/统一缩进/层次分明）═══ */
+.pr-save-list { display: flex; flex-direction: column; gap: 10px; }
+.pr-save-card {
+  border: 1px solid var(--c-border); border-radius: 8px;
+  background: var(--c-hover); overflow: hidden;
+}
+.pr-save-card-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; font-size: 12.5px; font-weight: 600;
+  background: var(--c-line);
+}
+.pr-save-card-head:hover { filter: brightness(1.08); }
+.pr-save-file {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 12px 4px 26px; font-size: 11.5px;
+}
+.pr-save-file:hover { background: var(--c-hover); }
+.pr-save-file.is-skip .pr-save-name { opacity: 0.45; text-decoration: line-through; }
+.pr-save-check { cursor: pointer; }
+.pr-save-check input { accent-color: var(--c-blue, #3b82f6); cursor: pointer; }
+.pr-save-dots {
+  width: 10px; height: 10px; flex-shrink: 0;
+  border-left: 1.5px solid var(--c-border); border-bottom: 1.5px solid var(--c-border);
+  border-radius: 0 0 0 4px; margin-left: -14px;
+}
+.pr-save-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-save-meta { flex-shrink: 0; font-size: 11px; color: var(--c-text3); }
+
+/* 孤立节点不保存：卡片降透明 */
+.pr-save-card.is-dim { opacity: 0.55; }
+
+/* ★ 2026-10-25 用户「logo 比其他的有点小」：弹窗内类型方块放大到 18px（词条行保持 16 标准） */
+.pr-save-card-head .pm-fmt,
+.pr-save-file .pm-fmt {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* ═══ 保存弹窗设计 v3（界面设计美化专家方案——令牌化+层次+分段控件+等宽数字）═══ */
+/* 设计令牌 */
+.pr-confirm--save {
+  --sv-radius: 10px;
+  --sv-gap: 10px;
+  width: min(760px, 92vw);
+  max-height: 88vh;
+  border-radius: var(--sv-radius);
+}
+.pr-confirm--save .pr-confirm-head { padding: 12px 16px; gap: 10px; }
+.pr-save-title { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; }
+.pr-save-page {
+  padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  background: rgba(59, 130, 246, 0.14); color: var(--c-blue2, #60a5fa);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+.pr-save-total {
+  flex: 1; text-align: right; font-size: 11.5px; color: var(--c-text3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 分段控件（segmented） */
+.pr-cf-tabs {
+  margin: 10px 16px 0; padding: 3px;
+  background: var(--c-bg3, rgba(128,128,128,0.14)); border-radius: 8px;
+  gap: 2px;
+}
+.pr-cf-tab {
+  flex: 1; padding: 5px 0; font-size: 12px; border-radius: 6px;
+  border: none; background: transparent; color: var(--c-text3); cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.pr-cf-tab:hover { color: var(--c-text2); }
+.pr-cf-tab--on {
+  background: var(--c-bg1, #0d1117); color: var(--c-text); font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.pr-cf-tab--on:hover { background: var(--c-bg1, #0d1117); }
+
+/* 卡片：accent 竖条 + 层次 */
+.pr-save-card { border-radius: var(--sv-radius); }
+.pr-save-card-head { padding: 9px 12px; gap: 9px; position: relative; }
+.pr-save-name { font-size: 12.5px; }
+.pr-save-file .pr-save-name { font-size: 12px; color: var(--c-text2); }
+.pr-save-meta { font-variant-numeric: tabular-nums; min-width: 88px; text-align: right; }
+
+/* 底栏：摘要+锚定按钮 */
+.pr-confirm--save .pr-confirm-foot { padding: 12px 16px; }
+.pr-save-sum { font-size: 11.5px; color: var(--c-text3); font-variant-numeric: tabular-nums; }
+.pr-confirm--save .pr-btn--go { padding: 6px 18px; }
+
+/* 保存完成条（折叠/展开清单） */
+.pr-save-done {
+  display: flex; align-items: center; gap: 10px;
+  margin: 10px 16px 0; padding: 8px 12px;
+  background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 8px;
+  font-size: 12.5px;
+}
+.pr-save-done-ic {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  background: #22c55e; color: #fff; font-size: 11px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.pr-save-done-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--c-text); }
+
+/* ══════════════ PDF 拖入空白区五选一（2026-10-26 用户指令）══════════════
+   遮罩点击/Esc/× = 取消（什么都不做）；数字键 1-5 快选。pr-confirm 同语言。 */
+.pd-choose-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: calc(var(--z-modal) + 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pd-choose {
+  width: 400px;
+  max-width: 92vw;
+  background: var(--c-bg1);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  padding: 12px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pd-choose-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+  padding: 0 2px 2px;
+}
+.pd-choose-x {
+  width: 22px; height: 22px;
+  border: none; background: transparent; color: var(--c-text4);
+  border-radius: 5px; cursor: pointer; font-size: 15px; line-height: 1;
+}
+.pd-choose-x:hover { background: var(--c-hover); color: var(--c-text); }
+.pd-choose-names {
+  font-size: 10.5px;
+  color: var(--c-text3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 0 2px 4px;
+}
+.pd-choose-opt {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px;
+  background: var(--c-hover);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.pd-choose-opt:hover { border-color: var(--c-blue2); background: var(--c-bg1); }
+.pd-choose-key {
+  width: 18px; height: 18px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  background: var(--c-bg3, #8882);
+  color: var(--c-text2);
+  font-size: 10.5px; font-weight: 700;
+}
+.pd-choose-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.pd-choose-t b { font-size: 12px; color: var(--c-text); font-weight: 600; }
+.pd-choose-t i { font-size: 10.5px; color: var(--c-text3); font-style: normal; }
+.pd-choose-opt--none .pd-choose-t b { color: var(--c-text3); font-weight: 500; }
+.pd-choose-opt--none:hover { border-color: var(--c-red); }
+.pd-choose-hint {
+  font-size: 10px; color: var(--c-text4);
+  text-align: center; padding: 2px 0 2px;
+}

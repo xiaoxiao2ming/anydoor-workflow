@@ -1,0 +1,53 @@
+=== 1. 双击 xlsx 节点 ===
+  页签: ["绑定与产出","打开工作簿","输入数据"]
+  含「打开工作簿」: ✅
+
+=== 2. 导入合成模板（有命名区域 + Table）===
+  发现域: 3 ✅
+
+=== 3. 打开工作簿页签 ===
+  工作表页签: ["汇总表","工程量表"]
+  含 汇总表/工程量表: ✅
+  统计栏: 2 行 × 2 列 · 非空 4
+  域徽章: ["命名区域 2"]
+  网格可见行数: 60 ✅
+  命名区域高亮格: 2 / 表格范围格: 0
+  网格含「工程名称/设计流量」: ✅
+  截图 → sample-template/wb-1-grid.png
+
+=== 3b. 切到工程量表（Table 所在表）===
+  含「名称/数量/单价/合价」: ✅
+  表格范围高亮格: 8 ✅
+  该表域徽章: ["表格 1"]
+
+=== 4. 改一个单元格 ===
+  出现「已改 N 处」: ✅ 已改 1 处
+
+=== 5. 域位置弹层 ===
+  列出域: 3 → ["工程名称","设计流量","材料表"]
+  引用显示: ["汇总表!$B$1","汇总表!$B$2","工程量表!A1:D2"]
+  表名重复（回归项）: ✅ 已修
+
+=== 6. 换成真实 WPS 文件（190KB，改造前打不开）===
+  文件存在: true  201KB
+  绑定面板无报错 ✅
+  工作表: ["Sheet189"]
+  ✅ 打开了
+  统计: 296 行 × 197 列 · 非空 43675
+  无归一化告知（说明这个文件没命中补丁，或没打开成功）
+  网格可见行: 76
+  网格含「序号」: ❌
+  截图 → sample-template/wb-3-real-wps.png
+
+=== 7. 控制台错误 ===
+  ❌ 4 条：
+    [console] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+    [console] [底座] 初始化失败，使用空画布 Error: listPages failed: 500
+    at Module.listPages (http://127.0.0.1:5173/src/core/api.ts:10:20)
+    at async init (http://127.0.0.1:5173/src/core/store.ts?t=1790266988065:141:21)
+    [console] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+    [console] [底座] 初始化失败，使用空画布 Error: listPages failed: 500
+    at Module.listPages (http://127.0.0.1:5173/src/core/api.ts:10:20)
+    at async init (http://127.0.0.1:5173/src/core/store.ts?t=1790266988065:141:21)
+
+=== 8. 清理完成 ===

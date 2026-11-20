@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>docxToHtml 探针</title>
+  </head>
+  <body>
+    <p>仅供 scripts/pdf-check.mjs 调用，不是产品页面。</p>
+    <script type="module">
+      import JSZip from 'jszip'
+      import { docxToHtml } from '/src/docx/toHtml.ts'
+
+      const b64ToBytes = (b64) => {
+        const bin = atob(b64)
+        const arr = new Uint8Array(bin.length)
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i)
+        return arr
+      }
+
+      // 把 base64 还原成字节再交给转换器，模拟真实调用
+      window.docxToHtmlB64 = async (b64) => await docxToHtml(b64ToBytes(b64))
+
+      /**
+       * XML 合法性校验：Word 对 malformed XML 是零容忍的，直接拒绝打开。
+       * 用浏览器原生 DOMParser 逐个部件解析，比在 Node 里正则瞎猜可靠得多。
+       */
+      window.validateDocxB64 = async (b64) => {
+        const zip = await JSZip.loadAsync(b64ToBytes(b64))
+        const bad = []
+        let checked = 0
+        for (const [name, entry] of Object.entries(zip.files)) {
+          if (entry.dir) continue
+          if (!/\.xml$|\.rels$/.test(name)) continue
+          const text = await entry.async('string')
+          checked++
+          const doc = new DOMParser().parseFromString(text, 'application/xml')
+          const err = doc.querySelector('parsererror')
+          if (err) bad.push({ name, msg: (err.textContent || '').slice(0, 160) })
+        }
+        return { checked, bad }
+      }
+
+      window.probeReady = true
+    </script>
+  </body>
+</html>

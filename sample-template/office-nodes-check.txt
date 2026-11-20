@@ -1,0 +1,46 @@
+=== 1. 页面加载 ===
+  title = 客户端底座 client-base
+  节点库条目: 表 / 参数表 / 对照表 / 排序 / 输出 / 开始 / Word / Excel
+  节点库含 Word: ✅ / 含 Excel: ✅
+  清理历史测试节点: 1 个
+
+=== 2. 建 docx / xlsx 节点 ===
+  addTable 结果: {"did":"docx_1789877154443","xid":"xlsx_1789877154443"}
+  .rf-node--docx 数量: 1 ✅
+  .rf-node--xlsx 数量: 1 ✅
+  docx 节点徽章文字: ["Word"] ✅
+  xlsx 节点徽章文字: ["Excel"] ✅
+  节点卡片提示行: ["双击进入编辑\n未绑模板","双击进入编辑\n未绑工作簿"]
+  截图 → sample-template/office-nodes-1-canvas.png
+
+=== 3. 双击 docx 节点 ===
+  .node-editor-mask 出现: 1 ✅
+  编辑器标题: Word 文档
+  编辑器里的节点名: Word 测试文档
+  Portal 校验: ✅ 已脱离 react-flow（body 直属）
+  截图 → sample-template/office-nodes-2-word-editor.png
+
+=== 4. 编辑器页签 ===
+  数据页渲染: ✅
+  绑定页含 Word 面板 (.wrp): 1 ✅
+
+=== 5. Esc 关闭 ===
+  关闭后 mask 数量: 0
+
+=== 6. 双击 xlsx 节点 ===
+  mask 出现: 1 ✅
+  标题: Excel 工作簿
+  含 Excel 面板 (.xrp): 1 ✅
+  Excel 面板含「Excel 工作簿模板」: ✅
+  截图 → sample-template/office-nodes-3-excel-editor.png
+
+=== 7. 右键菜单 & 回收站（回归） ===
+  右键菜单项: ["打开编辑器","删除","复制","置于顶层","置于底层"]
+  含「打开编辑器」: ✅
+  工具栏回收站按钮存在: ✅
+
+=== 8. 清理测试节点 ===
+  已移除: 2 个
+
+=== 9. 控制台错误 ===
+  ✅ 无错误（仅 favicon 404，与本次改动无关）

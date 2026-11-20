@@ -1,0 +1,7 @@
+初始 → tables= records={}
+addTable(param·5字段) → tables=param_1790267024382 records={"param_1790267024382":"rows(0)"}
+setTableData(param·5字段·真实行) → tables=param_1790267024382 records={"param_1790267024382":"rows(1)"}
+addTable(xlsx) → tables=param_1790267024382,xlsx_1790267024382 records={"param_1790267024382":"rows(1)","xlsx_1790267024382":"rows(0)"}
+setNodeConfig(inputs) → tables=param_1790267024382,xlsx_1790267024382 records={"param_1790267024382":"rows(1)","xlsx_1790267024382":"rows(0)"}
+setNodePosition×2 → tables=param_1790267024382,xlsx_1790267024382 records={"param_1790267024382":"rows(1)","xlsx_1790267024382":"rows(0)"}
+盯梢结束（没打印"写坏"= 4 秒内 records 保持正常）

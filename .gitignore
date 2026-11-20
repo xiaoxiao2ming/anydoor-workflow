@@ -1,0 +1,190 @@
+node_modules/
+dist/
+dist-web/
+dist-electron/
+server-data/
+# 网页端部署包（npm run publish:web 生成，4~5MB；只发产物不发二进制）
+release/
+# 操作审计日志（logs/audit-YYYY-MM-DD.log，见 docs/28-操作审计日志.md）
+logs/
+sample-template/_*.png
+sample-template/_*.docx
+sample-template/_*.xlsx
+*.log
+
+# vitest TEMP 重定向（系统 Temp EPERM 吞测试收集）
+.tmp/
+
+# 构建/测试临时产物
+tsconfig.tsbuildinfo
+vitest.config.ts.timestamp-*.mjs
+_backup_selfword_20260928/
+vendors/oo-server/
+
+# 本地日志与诊断产物（2026-09-30 备份时补）
+dev-err.txt
+dev-log.txt
+poc-log.txt
+oo-docservice-log.txt
+.dev-console.log
+sample-template/oo-poc/_*
+_backup/
+
+# ── 实测探针脚本与产物（批次 8~17 期间大量临时脚本，保留在盘上但不入库）──
+# 这些是一次性 e2e / 探测脚本，用完即弃；重跑需要时看 git log 的提交说明重建
+scripts/_*.mjs
+scripts/probe-*.cjs
+scripts/verify-*.cjs
+scripts/diag-*.cjs
+scripts/devconsole-viewer.html
+# ★ 2026-10-17 白名单：下面这几个不是「一次性」脚本，是排查保存链/模板坑的常备工具，
+#   丢了就得从头重写（_diag_log 能一键还原任一次保存的整条链）。其余 _* 仍不入库。
+!scripts/_diag_log.mjs
+!scripts/_check_oo_core.mjs
+!scripts/_diag_e2e_dirty.mjs
+!scripts/_diag_e2e_three_saves.mjs
+!scripts/_diag_e2e_save_visible.mjs
+!scripts/_probe_readfn.mjs
+!scripts/_probe_editor_bin_content.mjs
+# ★ 2026-10-17 第二批白名单（域引用/公式重算轮次）：
+#   _verify_domain_recalc 用 x2t 转 csv 给「公式链算得对不对」当裁判，是唯一不靠引擎自证的验收；
+#   _diag_e2e_refsync_formula 覆盖用户三条反馈（=参数 / =参数*2 / =A1*3）；
+#   _diag_e2e_dirty_twice 覆盖「保存后再改不提示」这个反复复发的坑。
+!scripts/_verify_domain_recalc.mjs
+!scripts/_diag_e2e_refsync_formula.mjs
+!scripts/_diag_e2e_dirty_twice.mjs
+# ★ 2026-10-17 第三批白名单（操作审计日志）：
+#   _verify_audit_log      —— 宿主侧点击/键盘/输入/弹窗落盘的端到端断言；
+#   _verify_audit_oo       —— 编辑器两层 iframe 内的点击/键盘是否真的回到了宿主；
+#   _verify_audit_electron —— 桌面端 IPC 通道（preload → ipcMain → logs/）。
+#   三个脚本分别是「web 通道 / iframe 采集 / 桌面通道」的唯一自动化证据，必须留档。
+!scripts/_verify_audit_log.mjs
+!scripts/_verify_audit_oo.mjs
+!scripts/_verify_audit_electron.mjs
+# ★ 2026-10-17 第四批白名单（网页端同步发布）：
+#   _verify_web_publish —— 网页形态的唯一端到端证据：版本号自证（标题栏 = /healthz）、
+#   无 Office 服务时 OO 节点降级提示、审计日志在部署形态下仍落盘。
+!scripts/_verify_web_publish.mjs
+# ★ 2026-10-17 第五批白名单（访问口令）：
+#   _verify_auth —— 门禁九连：未登录 302/401、healthz 不泄露、错口令 401、
+#   对口令 302+cookie、带 cookie 200、logout 清凭证。本地与群晖线上通用。
+!scripts/_verify_auth.mjs
+# ★ 2026-10-17 第六批白名单（OO 远程桥）：
+#   空白 OOXML 模板是服务端「空白新建」的兜底数据，与代码同生命周期。
+!scripts/_blank_xlsx.b64
+!scripts/_blank_docx.b64
+
+# ── 一次性调试产物（2026-10-18 保存版本时统一忽略）──
+# 实测截图 / 探针 HTML / 中间表格：只在盘上留档，不进仓库
+scripts/_*.html
+scripts/_*.js
+scripts/_*.png
+scripts/_*.xlsx
+scripts/_*.txt
+served_poc_debug.html
+# 编辑器热改前的备份（VS Code 自动/手工备份，禁止入库）
+*.bak
+*.bak-*
+*.stashbak.bak
+# electron-builder 中间输出（out2/ 之外的历史目录）
+outclient-base-*/
+# DS 运行时 pid
+vendors/oo-docservice.pid
+vendors/oo-plugins/
+# 保存链验证时自动留档的样例工作簿（每次保存一份，属于运行数据）
+sample-template/保存留档/
+# 一次性计时探针（没有下划线前缀，单独列）
+scripts/oo-cold-probe.mjs
+scripts/oo-timing2.mjs
+scripts/oo-timing3.mjs
+# 打包产物（electron-builder 输出，694MB）不入库
+out2/
+e2e-*.png
+e2e-*.txt
+probe-*.txt
+probe-*.cjs
+probe-*.png
+verify-*.cjs
+verify-*.txt
+diag-*.txt
+api-probe*-result.txt
+measure-result.txt
+poc-now*.html
+poc-verify*.html
+poc-check.html
+poc-served.html
+poc-final.html
+direct3799.html
+hdr.txt
+hdr-now.txt
+mem72776.txt
+served*.js
+body2.js
+sa3.js
+sa4.js
+verify-font.js
+vite.config.ts.timestamp-*.mjs
+# ★ vite.web.config.ts 的同类产物（2026-10-05 补）
+#   此前只忽略了 vite.config.ts / vitest.config.ts 的 timestamp 文件，
+#   漏了 web 版那一份 → 每跑一次 `npm run dev:web` 就在待提交里躺一个垃圾文件。
+#   属于同一类漏洞：vite 会为每个 .ts 配置文件生成一个。
+*.config.ts.timestamp-*.mjs
+scripts/oo-core.mjs.*.snap.mjs
+sample-template/oo-poc/
+
+# 根目录散落的 probe 脚本（gitignore 只挡了根级，probe-*.cjs 已覆盖；补字体/页面诊断）
+
+# ── ★ 并行开发基线（2026-10-04）新增 ─────────────────────────────────────
+# 下面三条不是「顺手清理」，是**并行开发能成立的前提**。
+# 起因：用户要同时开 2+ 个方向改同一软件，实测发现工作区有 451MB 的
+# OnlyOffice 运行时处于未跟踪状态 —— 任何方向的 `git add -A` 都会试图
+# 把它提交进库，直接把仓库撑到GB 级，之后谁都跑不动 git。
+# 库坏了，两个方向就无从「比对更新记录」，并行也就无从谈起。
+
+# ① OnlyOffice 离线运行时（115MB web-apps + 331MB converter + 5MB fonts + dll）
+#    属第三方二进制发行物，不是源码。它由 docs/16OnlyOffice集成部署.md 的
+#    部署流程负责获取，不进版本库。
+#    ★ 但 docs/24 §2.4 把「内核版本号无记录」列为唯一硬阻塞 ——
+#      解决方式是**记版本**（见 docs/24 §2.4 的待补项），不是把 451MB 提交进库。
+vendors/onlyoffice/web-apps/
+vendors/onlyoffice/converter/
+vendors/onlyoffice/fonts/
+vendors/onlyoffice/dictionaries/
+vendors/onlyoffice/ascdocumentscore.dll
+vendors/onlyoffice/*.dll
+vendors/onlyoffice/*.exe
+
+# ② 构建验证产物（verify 专用目录，含完整 node_modules 副本）
+dist-verify-*/
+dist-*/
+
+# ③ vitest 临时目录（系统 Temp EPERM 后改道此处，见 .tmp/ 说明）
+.vitest-tmp/
+
+# ④ 并行开发基线（dev-baseline.mjs 的运行产物）
+#    基线快照与 git 探针都是**某一时点的状态**，提交进去只会污染 diff ——
+#    每个方向开工都会重写一次，git 历史里全是无意义的二元 diff。
+.workbuddy/dev-baselines/
+
+# ⑤ C 端免安装包产物（pack-cside.mjs，完整版含 OO 引擎约 1.1GB）
+#    绝不能提交：体积巨大且是某一时点的构建结果，二进制 diff 无意义。
+#    需要时用node scripts/pack-cside.mjs 重新生成。
+out/
+
+# ★ 2026-10-22 scripts 大扫除：一次性调试产物不入库（本地保留磁盘文件）
+scripts/_*
+
+# 临时调试产物（测试写入/生成器样本）
+.tmp-*
+
+# 大模型文件（9-13GB）不入库——磁盘保留 models/ 目录
+models/*.gguf
+
+# 工作区记忆/技能定义（本地）
+.workbuddy/
+# 画布工程/自动化测试数据（本地）
+.playwright-cli/
+*.wfc
+
+# OnlyOffice 运行时字体扫描产物（本机相关，运行时自生成）
+vendors/onlyoffice/sdkjs/common/AllFonts.js*
