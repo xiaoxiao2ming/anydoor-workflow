@@ -1,25 +1,43 @@
-# 午马未央 · Canvas Workflow
+# Anydoor
 
-画布式 AI 工作流桌面应用——节点拖拽连线组成流水线，本地大模型离线推理，覆盖网页监控、数据提取、文档生成、PDF 处理与 AI 分析全链路。
+Anydoor 是面向普通办公人群的桌面 C 端工作流应用，专为非技术从业人员打造。
 
-![screenshot](docs/screenshot.png)
+> 工程基线：`client-base`，快照版本：2026-10-22-21-44-20
+> 项目归属 WorkBuddy 工作台体系
 
-## 特性
+## ✨ 项目简介
 
-- **27 种节点**：数据表 / 参数表 / 网址监控 / Excel转DXF / PDF 生成·瘦身·替换·转Word / Word·Excel 模板域回写 / OnlyOffice 内嵌编辑 / AI 分析等
-- **对话式搭建**：对话框一句话（如「搭一个网址监控工作流」）自动创建节点链并连线、预填配置
-- **本地大模型**：node-llama-cpp + GGUF 离线推理，会话池多模型常驻，任务分层路由（重任务主力模型 / 轻任务秒回）；也支持外部 OpenAI 兼容接口
-- **网址监控**：轮询抓取（CSS 选择器 / JSON 路径 / 关键词）→ 变化检测 → 数据自动写入下游 → 变化触发 AI 分析
-- **文档能力**：OnlyOffice 桌面内核内嵌、模板域（w:sdt）回写生成 Word、Excel 命名区域绑定
-- **引用体系**：`{{field}}` 内联引用贯通表格、模板与画布
+本项目目前上线首个基线版本，仍在持续迭代开发中。
 
-## 技术栈
+我们希望跳出传统在线 SaaS 的限制，以**离线优先**为核心设计思路，打造一套自主可控、面向未来的个人工作平台。适合需要自建工作流程、沉淀复用知识模板的办公用户，同时支持控件库共建，让能力可以共享、扩展。
 
-Electron 44 · React 18 · React Flow v12 · zustand · sql.js（IndexedDB）· node-llama-cpp · cheerio · AG Grid · TipTap · docx · mupdf · pdf-lib · OnlyOffice（ascdesktop）
+## 🎯 核心能力
 
-详见 [docs/技术栈总结.md](docs/技术栈总结.md)。
+- **离线优先办公，数据本地自主管理**：数据保存在本机，不依赖云端；断网也能工作。
+- **可视化工作流编排**：节点拖拽连线组成流水线，无需编程即可搭建数据处理流程。
+- **知识模板自定义、快速复用**：表格、参数、模板域沉淀为可复用资产，一次搭建反复使用。
+- **可共建的控件库，扩展能力边界**：节点/控件可持续扩展，能力共享、边界不断生长。
 
-## 快速开始
+## 🧱 工程说明
+
+目录结构说明（本地开发快照）：
+
+```
+├── electron/        # 主进程：文件 IO · 定时任务 · 网页抓取 · 本地大模型推理
+├── src/
+│   ├── core/        # 领域层：schema · store · 计算引擎 · 意图引擎 · AI · 网址监控
+│   ├── office/      # 文档类节点卡片：PDF / OnlyOffice / 网址监控 / Excel转DXF 等
+│   ├── ui/          # 通用 UI：按钮装载条 · 图标库 · 运行状态条
+│   ├── xlsx/        # Excel 处理与 Excel转DXF 逻辑
+│   └── docx/ pptx/  # Word / PPT 文档处理
+├── scripts/         # 构建、同步、回归检查等工程脚本
+├── docs/            # 技术文档（含技术栈总结）
+├── models/          # 本地 GGUF 模型目录（不入库，按需下载）
+├── vendors/         # OnlyOffice SDK 等第三方依赖
+└── public/          # 静态资源与运行时模型文件
+```
+
+### 快速开始
 
 ```bash
 # 环境要求：Node 22+ · Windows 10/11
@@ -32,33 +50,21 @@ npm run dev
 npm run build && node scripts/sync-to-out.mjs
 ```
 
-### 本地大模型
+### 技术栈
 
-模型文件（GGUF）放置于 `models/` 目录，例如 Qwen3.5-9B：
+Electron 44 · React 18 · React Flow v12 · zustand · sql.js（IndexedDB）· node-llama-cpp · cheerio · AG Grid · TipTap · docx · mupdf · pdf-lib · OnlyOffice（ascdesktop）
 
-```bash
-python -m pip install modelscope
-python -c "from modelscope import snapshot_download; snapshot_download('Qwen/Qwen3.5-9B-GGUF', allow_file_pattern=['*q4_k_m*.gguf'], local_dir='models/')"
-```
+详见 [docs/技术栈总结.md](docs/技术栈总结.md)。
+
+### 本地大模型（可选）
+
+模型文件（GGUF）放置于 `models/` 目录。不放置模型也可使用——AI 节点支持外部 OpenAI 兼容接口（接口地址留空则走本地模型）。
 
 | 档位 | 建议显存 | 说明 |
 |---|---|---|
 | 27B-UD-Q3_K_XL | 16GB | 最聪明（heavy 首选） |
 | 9B-Q4_K_M | 8GB+ | 平衡 |
 | 3B-Q4_K_M | 4GB+ | 快（light 首选） |
-
-不放置模型也可使用——AI 节点支持外部 OpenAI 兼容接口（接口地址留空则走本地模型）。
-
-## 目录结构
-
-```
-├── electron/        # 主进程（模型推理 / 文件 IO / 定时任务 / 网页抓取）
-├── src/core/        # 领域层：schema · store · engine · 意图引擎 · AI · 网址监控
-├── src/office/      # 节点卡片（PDF / OnlyOffice / 监控 / DXF …）
-├── src/ui/          # 通用 UI（按钮装载条 / 图标库 / 运行状态）
-├── docs/            # 技术文档
-└── models/          # 本地 GGUF 模型（不入库，见上方下载说明）
-```
 
 ## License
 
